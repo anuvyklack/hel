@@ -1,0 +1,250 @@
+* Hel — Helix Emulation Layer for Emacs
+
+Hel is a [[https://helix-editor.com/][Helix]] emulation layer for Emacs that brings selection-based modal
+editing with multiple cursors to the Emacs ecosystem.
+
+** Documentation
+- [[file:docs/customization.org][Customization Guide]]
+- [[file:docs/keybindings.org][Keybindings Reference]]
+- [[file:docs/multiple-cursors.org][Multiple Cursors Guide]]
+- [[file:docs/extensions.org][Extensions]]
+
+** Key Features
+
+- Multiple cursors based modal editing inside Emacs!
+
+- Undo/redo that plays well with multiple cursors.
+
+- PCRE regexps by default (thanks to [[https://github.com/joddie/pcre2el][pcre2el]]).
+
+- Smooth scrolling out of the box.
+
+- Built-in Meow Keypad / God-mode like functionality.
+
+** Can I use Hel without knowing Emacs keys?
+
+#+begin_quote
+A small terminology difference: what Vim, Helix, and other modal editors call
+Normal and Insert *modes*, Hel refers to as *states*. This is because the word "mode"
+in Emacs is already used for its [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Major-Modes.html][major]] and [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Minor-Modes.html][minor]] modes.
+#+end_quote
+
+When several years ago I came to Emacs from Neovim, I was in love with Vim
+editing model, found Emacs native keybindings ugly and had zero interest in
+learning them. I wanted Emacs not as a text editor (which it obviously lacks)
+but as an operating system with Lisp and all its power. So the first question
+I asked myself was "Can I use modal editing in Emacs without learning Emacs keys?"
+
+The answer is yes. I have never used — and still don't know — most Emacs keys.
+I know only a few that you need when something breaks early during Emacs startup
+and you don't have your Hel keys available. They are:
+
+- =M-x= :: Command palette. The main key you need; all other commands can be
+  invoked from it.
+- =C-x C-s= :: Save current buffer.
+- =C-x C-c= :: Exit Emacs.
+
+That's it.
+
+Hel and Emacs do not interfere much, because Emacs is not a modal editor:
+letters and numbers are self-inserting, and most command key chords begin with
+=C-x= or =C-c= (e.g. =C-x n d=). Due to this, Helix emulation works as a layer on top
+of Emacs.
+
+In Normal state you have selection-based editing, multiple cursors, and all the
+other Hel features. In Insert state, Hel steps aside and standard Emacs keys
+work as usual. Also Hel doesn't touch =C-x= and =C-c= so they are always available.
+This allows you to mix Hel and Emacs in any proportion.
+
+** Kakoune vs Helix
+
+The main difference between Kakoune and Helix, in terms of emulation, is how
+they handle expanding selections: Kakoune uses =Shift= + motions, while Helix
+has a separate state on the =v= key. Since I originally came from Vim, I
+prefer Helix's =v= key, so I chose Helix. However, Kakoune was the original
+inventor, and this should be remembered.
+
+** Installation
+
+Hel is not on Melpa yet. You can install it directly from Github with Emacs
+built-in package manager:
+#+begin_src emacs-lisp
+;; Install dependencies
+(use-package dash :ensure t)
+(use-package avy :ensure t)
+(use-package pcre2el :ensure t)
+
+;; Install Hel
+(use-package hel
+  :vc (:url "https://github.com/anuvyklack/hel.git" :rev "main")
+  :config
+  (hel-mode 1))
+#+end_src
+
+** What's inside
+*** Normal state
+
+In Normal state you get Helix text editing functionality.
+See: [[file:docs/keybindings.org][Normal state keybindings]].
+
+*** Insert state
+
+In Insert state Hel doesn't bind any keys by default, so you get the standard
+Emacs editing experience here.
+
+*** Motion state
+
+Motion state is the default state for special buffers: grep results, error
+lists, file managers — anything not intended for text editing. A simple
+heuristic is used: if any letter key is not self-inserting, Hel enables Motion
+state; otherwise, it uses Normal state.
+
+By default, Motion state binds only the following keys:
+
+- =:= — Command palette
+- =SPC= — ~hel-leader~ (if corresponding extension is loaded)
+- =C-w= — prefix for window and buffer manipulation
+- =[b= / =]b= — switch buffers
+
+- Scrolling commands:
+  - =C-f= / =C-b= — scroll a full page
+  - =C-d= / =C-u= — scroll half a page
+  - =zt=, =zb=, =zz= — scroll to top, bottom, eye level
+
+- =M-u= — ~universal-argument~, since =C-u= is used for scrolling
+
+- =i= — switch to Normal state. This allows you to select and copy arbitrary
+  text in special modes. To switch back, use =zx= or =C-x C-s= (~hel-motion-state~).
+
+*** Extensions
+**** Leader
+#+begin_src emacs-lisp
+(use-package hel-leader
+  :after hel)
+#+end_src
+
+This extension provides a keypad state for executing commands without modifier keys.
+
+Entering KEYPAD state by pressing ~SPC~ in NORMAL or MOTION state.
+
+In KEYPAD state, single keys will be translated, and the first key will decide how it starts:
+
+- Start with ~x~ / ~h~ / ~c~ / ~m~ / ~g~ will begin with ~C-x~ / ~C-h~ / ~C-c~ / ~M-~ / ~C-M-~ respectively.
+- Any other key will start with itself, and temporarily activate the leader keymap.
+
+The following keys will act according to following rules:
+
+- ~m~ will be translated to ~M-~.
+- ~g~ will be translated to ~C-M-~.
+- Any key following a prefix like ~m~ or ~g~ is interpreted as
+  ~C-<key>~.
+- ~SPC~ stands for literal prefix, means that the key will not be
+  modified with ~C-~.
+- If the translation results in an undefined binding, the last key
+  will fallback to an unmodified version. (e.g. If ~C-c C-a~ is
+  undefined, fallback to ~C-c a~)
+
+Some examples(assuming in NORMAL state):
+
+| Input       | Translation        | Explanation                                  |
+|-------------+--------------------+----------------------------------------------|
+| ~SPC a~       | ~a~ in leader keymap | leader map default is ~mode-specific-map~, ~C-c~ |
+| ~SPC c t t~   | ~C-c C-t C-t~        | start with ~c~ as ~C-c~                          |
+| ~SPC x m t~   | ~C-x M-t~            | ~m~ as meta prefix                             |
+| ~SPC g x~     | ~C-M-x~              | ~g~ as control + meta prefix                   |
+| ~SPC x SPC p~ | ~C-x p~              | ~SPC~ as literal prefix                        |
+
+**** Paredit
+#+begin_src emacs-lisp
+(use-package paredit :ensure t)
+(use-package hel-paredit
+  :after hel
+  :hook (emacs-lisp-mode . hel-paredit-mode))
+#+end_src
+
+Integration with Paredit for structured editing of S-expressions. Provides:
+- Enhanced word motions (=W=, =B=, =E=) that skip parentheses
+- S-expression navigation (=M-n=/=M-p= or =C-l=/=C-h=)
+- Tree climbing (=M-o=/=M-i= or =C-k=/=C-j=)
+- Slurp/barf commands (=<=, =>=)
+- Safe deletion that respects parenthesis balance
+
+**** Org mode
+#+begin_src emacs-lisp
+(use-package hel-org
+  :after (hel org))
+#+end_src
+
+Integration with Org-mode for navigating and editing structured documents:
+- AST navigation with =M-i=, =M-n=, =M-p=, =M-o= (or =C-hjkl=)
+- Org-specific text objects (headings, emphasis, sentences)
+- Promote/demote with =<= and =>=
+- Smart insert commands for headings and list items
+
+** Differences from Helix text editor
+
+This package is not one-to-one emulation: some commands are implemented in
+slightly different way (improved from the author's point of view), and some,
+like keyboard macros, registers and jumplist are already have their alternatives
+in Emacs.
+
+- In Emacs the cursor ("point" in Emacs terms) is located *between* two characters
+  rather than *on* a character like in Helix or Vim. I decided to keep this
+  behavior, instead of emulating original one, as Evil does, because the primary
+  object of interaction in Helix approach is a selection, not the cursor itself.
+
+- =x= and =X= commands are reworked. They are expand and contract line-wise
+  selection down when cursor is at the end of the selection, or up when cursor
+  is at the beginning of the selection.
+
+- Inner objects are additionally available directly under =m= prefix to reduce
+  keystrokes: =mw= is the same as =miw= — select word.
+
+- Mark commands accept numeric arguments:
+  =m2ip= or =2mip= — select 2 paragraphs.
+
+- =gh= / =gl= make a selection from current position till the beginning/end of the
+  line. This is done for convenience, since all other motions make selections.
+  In Helix =gh= / =gl= only move cursor without creating selection.
+
+- 6 easymotion commands are provided:
+  - =gw= / =gb= — choose and mark word forward/backward.
+  - =gW= / =gB= — choose and mark WORD forward/backward.
+  - =gj= / =gk= — go to line down/up.
+  Helix provides only =gw= to place 2-char hints at the beginning of each word.
+
+- =gg= / =G= to go to the first/last line of the buffer like in Vim.
+  Helix uses =gg= / =ge=.
+
+- =f=, =F=, =t=, =T= commands to move to char are enhanced: they show hints for targets,
+  and while hints are active, they can be repeated with =n= / =N= keys.
+
+- When you search backward with =?= command, while hints are active =n= and =N= keys
+  are swapped: =n= will repeat search backward and =N= — forward, like in Vim.
+
+- Scrolling keybindings are taken from Vim instead of Helix.
+
+** Commands that are not implemented
+
+- =.= (repeat) — Need to decide what it should repeat.
+- =r= — replace
+- =M-u=, =M-U= — traverse undo tree
+- =q=, =Q= — record keyboard macros
+  
+** Acknowledgments
+
+Hel depends on [[https://github.com/magnars/dash.el][dash.el]], [[https://github.com/joddie/pcre2el][pcre2el]], and [[https://github.com/abo-abo/avy][avy]] wonderful packages.
+
+Hel is heavily inspired by: [[https://github.com/emacs-evil/evil][evil]], [[https://github.com/magnars/multiple-cursors.el][multiple-cursors.el]], [[https://github.com/meow-edit/meow][meow]], [[https://github.com/mkleehammer/surround][surround]],
+[[https://github.com/aome510/kak.el][kak.el]], [[https://github.com/doomemacs/doomemacs][doomemacs]], [[https://github.com/bbatsov/crux][crux]].
+
+You are welcome to go and give them all a star!
+
+** Contributing
+
+- *Share it*
+
+  A quick post about this package on your blog or social network could bring
+  new users to Emacs, which would be great!
+
+- *You can support the development with donation*
