@@ -54,9 +54,9 @@
   (unless hel-executing-command-for-fake-cursor
     (when (and hel-multiple-cursors-mode
                (not (eq hel-this-command #'ignore))
-               ;; TODO: This condition skips keyboard macros.
-               ;; We need to handle these! They will generate actual commands
-               ;; that are also run in the command loop.
+               ;; TODO: This condition skips keyboard macros. We need to handle
+               ;; them! They will generate actual commands that are also run in
+               ;; the command loop.
                (functionp hel-this-command))
       ;; Wrap in `condition-case' to protect `hel--post-command-hook' from
       ;; being removed from `post-command-hook', because the function throwing
