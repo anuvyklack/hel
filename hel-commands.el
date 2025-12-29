@@ -1304,13 +1304,15 @@ already there."
 
 ;; Do not show keys bound to following commands in which-key popup.
 (with-eval-after-load 'which-key
-  (dolist (cmd '(hel-m-digit-argument
-                 hel-m-negative-argument
-                 hel-mi-digit-argument
-                 hel-mi-negative-argument
-                 hel-ma-digit-argument
-                 hel-ma-negative-argument))
-    (cl-pushnew `((nil . ,(symbol-name cmd)) . ignore)
+  (let ((regexp (eval-when-compile
+                  (regexp-opt (-map #'symbol-name
+                                    '(hel-m-digit-argument
+                                      hel-mi-digit-argument
+                                      hel-ma-digit-argument
+                                      hel-m-negative-argument
+                                      hel-mi-negative-argument
+                                      hel-ma-negative-argument))))))
+    (cl-pushnew `((nil . ,regexp) . ignore)
                 which-key-replacement-alist :test #'equal)))
 
 ;; miw
