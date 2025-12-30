@@ -520,12 +520,22 @@ according to the Hel STATE."
   (or (car (rassq keymap minor-mode-map-alist))
       t))
 
-(defun hel-get-nested-hel-keymap (keymap state)
-  "Get from KEYMAP the nested keymap associated with Hel STATE."
+(defun hel-get-nested-hel-keymap (keymap state &optional ignore-parent)
+  "Get from KEYMAP the nested keymap associated with Hel STATE.
+If IGNORE-PARENT is non-nil then Hel STATE keymap nested in KEYMAPs parent
+keymap will be ignored."
   (when (and keymap state)
-    (let ((key (vector (intern (format "%s-state" state)))))
-      (if-let* ((hel-map (lookup-key keymap key))
-                ((hel-nested-keymap-p hel-map)))
+    (let* ((key (vector (intern (format "%s-state" state))))
+           (hel-map (lookup-key keymap key))
+           (parent-hel-map (when ignore-parent
+                             (-some-> (keymap-parent keymap)
+                               (lookup-key key)))))
+      (if (and hel-map
+               (hel-nested-keymap-p hel-map)
+               (not (and ignore-parent
+                         (if-let* ((parent (keymap-parent keymap)))
+                             (eq (lookup-key parent key)
+                                 hel-map)))))
           hel-map))))
 
 (defun hel-create-nested-hel-keymap (keymap state)
@@ -583,7 +593,7 @@ Example:
     (let ((maps (if states
                     (cl-loop for state in states
                              collect
-                             (or (hel-get-nested-hel-keymap keymap state)
+                             (or (hel-get-nested-hel-keymap keymap state t)
                                  (hel-create-nested-hel-keymap keymap state)))
                   (list keymap))))
       (dolist (map maps)
