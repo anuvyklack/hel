@@ -526,10 +526,7 @@ If IGNORE-PARENT is non-nil then Hel STATE keymap nested in KEYMAPs parent
 keymap will be ignored."
   (when (and keymap state)
     (let* ((key (vector (intern (format "%s-state" state))))
-           (hel-map (lookup-key keymap key))
-           (parent-hel-map (when ignore-parent
-                             (-some-> (keymap-parent keymap)
-                               (lookup-key key)))))
+           (hel-map (lookup-key keymap key)))
       (if (and hel-map
                (hel-nested-keymap-p hel-map)
                (not (and ignore-parent
