@@ -300,10 +300,10 @@ Return CURSOR."
 (defun hel--store-cursor-state (overlay point mark)
   "Store POINT, MARK and variables relevant to fake cursor into OVERLAY."
   (or mark (setq mark point))
-  (-if-let (pnt (overlay-get overlay 'point))
+  (if-let* ((pnt (overlay-get overlay 'point)))
       (set-marker pnt point)
     (overlay-put overlay 'point (copy-marker point t)))
-  (-if-let (mrk (overlay-get overlay 'mark))
+  (if-let* ((mrk (overlay-get overlay 'mark)))
       (set-marker mrk mark)
     (overlay-put overlay 'mark (copy-marker mark)))
   (dolist (var hel-fake-cursor-specific-vars)
