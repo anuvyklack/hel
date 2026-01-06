@@ -529,10 +529,10 @@ keymap will be ignored."
            (hel-map (lookup-key keymap key)))
       (if (and hel-map
                (hel-nested-keymap-p hel-map)
-               (not (and ignore-parent
-                         (if-let* ((parent (keymap-parent keymap)))
-                             (eq (lookup-key parent key)
-                                 hel-map)))))
+               (not (and-let* ((ignore-parent)
+                               (parent (keymap-parent keymap))
+                               ((eq (lookup-key parent key)
+                                    hel-map))))))
           hel-map))))
 
 (defun hel-create-nested-hel-keymap (keymap state)
@@ -554,8 +554,8 @@ keymap will be ignored."
 
 (defun hel-nested-keymap-p (keymap)
   "Return non-nil if KEYMAP is a Hel nested keymap."
-  (-if-let (prompt (keymap-prompt keymap))
-      (string-prefix-p "Hel keymap" prompt)))
+  (and-let* ((prompt (keymap-prompt keymap))
+             ((string-prefix-p "Hel keymap" prompt)))))
 
 (defun hel-keymap-set (keymap &rest args)
   "Create keybinding from KEY to DEFINITION in KEYMAP.
