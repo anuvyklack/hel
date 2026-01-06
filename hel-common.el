@@ -1044,12 +1044,12 @@ that `match-beginning', `match-end' and `match-data' access."
 
 (defun hel-cursor-is-bar-p ()
   "Return non-nil if `cursor-type' is bar."
-  (let ((cursor-type (if (eq cursor-type t)
-                         (frame-parameter nil 'cursor-type)
-                       cursor-type)))
-    (or (eq cursor-type 'bar)
-        (and (listp cursor-type)
-             (eq (car cursor-type) 'bar)))))
+  (let ((cursor-type (cond ((eq cursor-type t)
+                            (frame-parameter nil 'cursor-type))
+                           ((consp cursor-type)
+                            (car cursor-type))
+                           (t cursor-type))))
+    (eq cursor-type 'bar)))
 
 (defun hel-set-region (start end &optional direction newline-at-eol)
   "Set the active region between START and END positions.
