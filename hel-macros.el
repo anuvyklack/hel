@@ -145,16 +145,16 @@ If selection is no linewise work like `hel-save-region'."
 Wrapper around `defun' macro, that additionally takes following keyword
 parameters:
 
-:MULTIPLE-CURSORS
-  - t   — Command will be executed for all cursors;
-  - nil — Command will be executed only for main cursor.
+`:multiple-cursors'
+  - t    Command will be executed for all cursors;
+  - nil  Command will be executed only for main cursor.
 
-:MERGE-SELECTIONS
-  - t — After this command overlapping selections (regions) will be merged into
-        single selection.
+`:merge-selections'
+  - t    After this command overlapping selections (regions) will be merged into
+         single selection.
   - `extend-selection' (symbol)
-        Selections will be checked on overlapping only when extending selections
-        is enabled (`hel-extend-selection').
+         Selections will be checked on overlapping only when extending selections
+         is enabled (`hel-extend-selection').
 
 \(fn COMMAND (ARGS...) [DOC] [[KEY VALUE]...] BODY...)"
   (declare (indent defun)

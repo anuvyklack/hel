@@ -431,7 +431,7 @@ Alist containes cons cells:
 NEWLINE-AT-EOL? is the cursors value of the `hel--newline-at-eol' variable.
 MARK is nil if cursor has no region.
 
-Real cursor has ID 0 and is the first element (car) of the list."
+Real cursor has ID 0 and is the first element (`car') of the list."
   (let (alist)
     (when hel-multiple-cursors-mode
       (dolist (cursor (hel-all-fake-cursors))

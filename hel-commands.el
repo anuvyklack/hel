@@ -665,10 +665,11 @@ If no selection — delete COUNT chars after point."
 
 ;; y
 (hel-define-command hel-copy ()
-  "Copy selection into `kill-ring'.
-If there are multiple selections, add each one to the `killed-rectangle'
-unless all selections are identical. You can later paste them with
-`hel-paste-after' (with \\[universal-argument]) or with `yank-rectangle'."
+  (format "Copy selection into `kill-ring'.
+If there are multiple selections and they are not indetical, copy them to
+the `killed-rectangle'. You can paste them later with %s (`hel-paste-after')
+or `yank-rectangle'."
+          (propertize "M-u p" 'face 'help-key-binding))
   :multiple-cursors nil
   (interactive)
   ;; (unless (use-region-p)
@@ -701,7 +702,8 @@ unless they all are equal. You can paste them later with `yank-rectangle'."
 ;; p
 (hel-define-command hel-paste-after (arg)
   "Paste after selection.
-With \\[universal-argument] invokes `yank-rectangle' instead. See `hel-copy'."
+With \\[universal-argument] paste the last coppied multiple selections from the
+`killed-rectangle' instead."
   :multiple-cursors t
   (interactive "*P")
   (pcase arg
@@ -845,9 +847,9 @@ With no selection upcase the character after point."
 
 ;; v
 (hel-define-command hel-extend-selection (arg)
-  "Toggle extending selections.
-If ARG is nil — toggle extending selection.
-If ARG positive number — enable, negative — disable."
+  "Enable or disable extending selections.
+If ARG positive number — enable, negative — disable.
+When called interactively — toggle extending selection."
   :multiple-cursors t
   (interactive `(,(if hel--extend-selection -1 1)))
   (pcase arg
