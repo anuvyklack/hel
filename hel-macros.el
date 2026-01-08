@@ -168,8 +168,8 @@ parameters:
   (let (doc properties key value)
     ;; collect docstring
     (setq doc (pcase (car-safe body)
-                (`(format . ,args)
-                 (apply #'format args))
+                ((and `(format . ,_) doc-form)
+                 (eval doc-form t))
                 ((and (pred stringp) doc)
                  doc)))
     (when doc (pop body))
