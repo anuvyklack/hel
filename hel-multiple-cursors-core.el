@@ -117,7 +117,7 @@ CURSORS-POSITIONS is an alist returned by `hel-cursors-positions' function."
   (push `(apply hel--undo-step-end ,cursors-positions)
         buffer-undo-list))
 
-(defun hel--undo-step-end (&optional cursors-positions)
+(defun hel--undo-step-end (cursors-positions)
   "This function always called from `buffer-undo-list' during undo by
 `primitive-undo' function. It is the second one from a pair of functions:
 `hel--undo-step-start' and `hel--undo-step-end', which are executed
@@ -125,18 +125,7 @@ at beginning and end of a single undo step and restores real and fake
 cursors positions and regions after undo/redo step.
 
 CURSORS-POSITIONS is an alist returned by `hel-cursors-positions' function."
-  (maphash (lambda (id cursor)
-             (unless (assoc id cursors-positions #'eql)
-               (hel--delete-fake-cursor cursor)))
-           hel--cursors-table)
-  (cl-loop for (id point mark) in cursors-positions
-           do (pcase id
-                (0 (hel-set-region mark point))
-                (_ (let ((mark-active (not (null mark))))
-                     (if-let* ((cursor (gethash id hel--cursors-table)))
-                         (hel-move-fake-cursor cursor point mark :update)
-                       (hel--create-fake-cursor-1 id point mark))))))
-  (hel-auto-multiple-cursors-mode)
+  (hel-position-cursors cursors-positions)
   (push `(apply hel--undo-step-start ,cursors-positions)
         buffer-undo-list))
 
@@ -433,6 +422,22 @@ Real cursor has ID 0 and is the first element (`car') of the list."
     (push (list 0 (point) (if mark-active (marker-position (mark-marker))))
           alist)
     alist))
+
+(defun hel-position-cursors (cursors-positions)
+  "Setup all cursors according to CURSORS-POSITIONS.
+CURSORS-POSITIONS is an alist of the form that `hel-cursors-positions' returns."
+  (maphash (lambda (id cursor)
+             (unless (assoc id cursors-positions #'eql)
+               (hel--delete-fake-cursor cursor)))
+           hel--cursors-table)
+  (cl-loop for (id point mark) in cursors-positions
+           do (pcase id
+                (0 (hel-set-region mark point))
+                (_ (let ((mark-active (not (null mark))))
+                     (if-let* ((cursor (gethash id hel--cursors-table)))
+                         (hel-move-fake-cursor cursor point mark :update)
+                       (hel--create-fake-cursor-1 id point mark))))))
+  (hel-auto-multiple-cursors-mode))
 
 ;;; Executing commands for real and fake cursors
 

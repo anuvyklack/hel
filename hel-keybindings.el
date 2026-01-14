@@ -152,6 +152,7 @@ use it."
   "g ;" #'hel-exchange-point-and-mark
   "_"   #'hel-trim-whitespaces-from-selection
   "&"   #'hel-align-selections
+  "g v" #'hel-restore-cursors
 
   ;; Surround
   "m m" #'hel-jump-to-match-item

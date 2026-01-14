@@ -118,6 +118,8 @@ alternatives in Emacs.
 - =gg= / =G= to go to the first/last line of the buffer like in Vim.
   Helix uses =gg= / =ge=.
 
+- Restore last multiple selections with =gv=.
+
 - =f=, =F=, =t=, =T= commands to move to char are inhanced: they show hints for targets,
   and while hints are active, they can be repeated with =n= / =N= keys.
 

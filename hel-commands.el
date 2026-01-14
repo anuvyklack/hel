@@ -1121,9 +1121,12 @@ at START-COLUMN, ends at END-COLUMN and consists of NUMBER-OF-LINES."
 
 ;; ,
 (hel-define-command hel-delete-all-fake-cursors ()
-  "Delete all fake cursors from current buffer."
+  (format "Delete all fake cursors from current buffer.
+You may restore them with %s (`hel-restore-cursors')."
+          (propertize "g v" 'face 'help-key-binding))
   (interactive)
   (when hel-multiple-cursors-mode
+    (setq hel--cursors-positions-history (hel-cursors-positions))
     (hel-multiple-cursors-mode -1)))
 
 ;; M-,
@@ -1135,6 +1138,14 @@ at START-COLUMN, ends at END-COLUMN and consists of NUMBER-OF-LINES."
     (hel-restore-point-from-fake-cursor (or (hel-next-fake-cursor (point))
                                             (hel-first-fake-cursor)))
     (hel-auto-multiple-cursors-mode)))
+
+;; gv
+(hel-define-command hel-restore-cursors ()
+  "Restore last multiple cursors positions."
+  :multiple-cursors nil
+  (interactive)
+  (when hel--cursors-positions-history
+    (hel-position-cursors hel--cursors-positions-history)))
 
 ;; M-minus
 (hel-define-command hel-merge-selections ()

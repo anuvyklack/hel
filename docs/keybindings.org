@@ -187,6 +187,8 @@ Scrolling commands are taken from Vim.
 
 - =M-,= :: Remove main cursor.
 
+- =gv= :: Restore last multiple cursors positions.
+
 - =&= :: Align selections.
 
 - =M-minus= :: Merge all selections into single one.

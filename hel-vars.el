@@ -460,6 +460,8 @@ multiple cursors.")
 
 (hel-defvar-local hel--undo-boundary nil)
 
+(hel-defvar-local hel--cursors-positions-history nil)
+
 (hel-defvar-local hel--input-cache nil)
 
 (hel-defvar-local hel--narrowed-base-buffer nil)
