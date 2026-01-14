@@ -336,25 +336,21 @@ buffer if no sexp forward."
 (defun hel-expand-selection-to-full-lines (&optional direction)
   "Extend the selection so that it consists of complete lines.
 When region is active: expand selection to line boundaries to encompass full
-line(s). With no region, select current line. Uses visual lines if
-`visual-line-mode' is active, otherwise use logical lines."
-  (unless (or (hel-logical-lines-p)
-              (hel-visual-lines-p))
-    (let ((line (if visual-line-mode 'hel-visual-line 'hel-line)))
-      (if (use-region-p)
-          (progn
-            (let ((beg (region-beginning))
-                  (end (region-end))
-                  (dir (or direction (hel-region-direction))))
-              (hel-set-region (progn (goto-char beg)
-                                     (car (bounds-of-thing-at-point line)))
-                              (progn (goto-char end)
-                                     (cdr (bounds-of-thing-at-point line)))
-                              dir)))
-        ;; else no region
-        (-let [(beg . end) (bounds-of-thing-at-point line)]
-          (hel-set-region beg end direction)))
-      t)))
+line(s). With no region, select current line."
+  (unless (hel-logical-lines-p)
+    (if (use-region-p)
+        (let ((beg (region-beginning))
+              (end (region-end))
+              (dir (or direction (hel-region-direction))))
+          (hel-set-region (progn (goto-char beg)
+                                 (car (bounds-of-thing-at-point 'hel-line)))
+                          (progn (goto-char end)
+                                 (cdr (bounds-of-thing-at-point 'hel-line)))
+                          dir))
+      ;; else no region
+      (-let [(beg . end) (bounds-of-thing-at-point 'hel-line)]
+        (hel-set-region beg end direction)))
+    t))
 
 (defun hel-mark-inner-thing (thing &optional count)
   (or count (setq count 1))
