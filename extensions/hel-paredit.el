@@ -291,14 +291,14 @@ and brackets."
 If no selection — delete COUNT chars before point."
   :multiple-cursors t
   (interactive "p")
-  (cond ((use-region-p)
-         (condition-case err
-             (paredit-kill-region (region-beginning) (region-end))
-           (error
-            (hel-echo (error-message-string err) 'error)
-            (hel-set-region (mark t) (point)))))
-        (t
-         (paredit-backward-delete count)))
+  (if (use-region-p)
+      (condition-case err
+          (paredit-kill-region (region-beginning) (region-end))
+        (error
+         (hel-echo (error-message-string err) 'error)
+         (hel-set-region (mark t) (point))))
+    ;; else
+    (paredit-backward-delete count))
   (hel-extend-selection -1))
 
 ;; D
@@ -307,14 +307,14 @@ If no selection — delete COUNT chars before point."
 If no selection — delete COUNT chars after point."
   :multiple-cursors t
   (interactive "p")
-  (cond ((use-region-p)
-         (condition-case err
-             (paredit-delete-region (region-beginning) (region-end))
-           (error
-            (hel-echo (error-message-string err) 'error)
-            (hel-set-region (mark t) (point)))))
-        (t
-         (paredit-forward-delete count)))
+  (if (use-region-p)
+      (condition-case err
+          (paredit-delete-region (region-beginning) (region-end))
+        (error
+         (hel-echo (error-message-string err) 'error)
+         (hel-set-region (mark t) (point))))
+    ;; else
+    (paredit-forward-delete count))
   (hel-extend-selection -1))
 
 ;; M-r

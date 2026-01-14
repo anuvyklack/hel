@@ -618,10 +618,9 @@ If no selection — delete COUNT chars before point."
   :multiple-cursors t
   :merge-selections t
   (interactive "*p")
-  (cond ((use-region-p)
-         (kill-region nil nil t))
-        (t
-         (delete-char (- count))))
+  (if (use-region-p)
+      (kill-region nil nil t)
+    (delete-char (- count)))
   (hel-extend-selection -1))
 
 ;; D
@@ -631,10 +630,9 @@ If no selection — delete COUNT chars after point."
   :multiple-cursors t
   :merge-selections t
   (interactive "*p")
-  (cond ((use-region-p)
-         (delete-region (region-beginning) (region-end)))
-        (t
-         (delete-char count)))
+  (if (use-region-p)
+      (delete-region (region-beginning) (region-end))
+    (delete-char count))
   (hel-extend-selection -1))
 
 ;; C-w in insert state
@@ -1166,7 +1164,7 @@ You may restore them with %s (`hel-restore-cursors')."
                       (point)
                       (if (use-region-p) (mark) 0)))))
       (hel-delete-all-fake-cursors)
-      (hel-set-region beg end 1))))
+      (hel-set-region beg end))))
 
 ;; )
 (hel-define-command hel-rotate-selections-forward (count)

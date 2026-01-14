@@ -916,7 +916,7 @@ BEG, END position and done the indentation."
   (save-excursion
     (let ((p (point)))
       (beginning-of-visual-line)
-      (eql p (point)))))
+      (= p (point)))))
 
 (defun hel-eolp ()
   "Like `eolp' but consider visual lines when `visual-line-mode' is enabled."
@@ -929,7 +929,7 @@ BEG, END position and done the indentation."
   (save-excursion
     (let ((p (point)))
       (end-of-visual-line)
-      (eql p (point)))))
+      (= p (point)))))
 
 (defun hel-line-boundary-p (direction)
   "If DIRECTION is negative number, checks for beginning of line,
@@ -1048,7 +1048,7 @@ that `match-beginning', `match-end' and `match-data' access."
 
 (defun hel-all-elements-are-equal-p (list)
   "Return t if all elemetns in the LIST are `equal' each other."
-  (let ((first (-first-item list)))
+  (let ((first (car list)))
     (-all? (lambda (x) (equal first x))
            (cdr list))))
 

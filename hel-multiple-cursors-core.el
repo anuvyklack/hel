@@ -185,7 +185,7 @@ not this one."
   (when hel--max-cursors-original
     (setq hel-max-cursors-number hel--max-cursors-original
           hel--max-cursors-original nil))
-  (mapc #'hel--delete-fake-cursor (hel-all-fake-cursors)))
+  (-each (hel-all-fake-cursors) #'hel--delete-fake-cursor))
 
 (defun hel-create-fake-cursor-from-point (&optional id)
   "Create a fake cursor with an optional fake region based on point and mark.
@@ -365,14 +365,14 @@ If SORT is non-nil sort cursors in order they are located in buffer."
   ;; (unless position (setq position (point)))
   (cl-loop for pos = (next-overlay-change position)
            then (next-overlay-change pos)
-           until (eql pos (point-max))
+           until (= pos (point-max))
            thereis (hel-fake-cursor-at pos)))
 
 (defun hel-previous-fake-cursor (position)
   "Return the first fake cursor before the POSITION."
   (cl-loop for pos = (previous-overlay-change position)
            then (previous-overlay-change pos)
-           until (eql pos (point-min))
+           until (= pos (point-min))
            thereis (hel-fake-cursor-at pos)))
 
 (defun hel-first-fake-cursor ()

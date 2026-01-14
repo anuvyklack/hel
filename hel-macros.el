@@ -159,7 +159,7 @@ parameters:
     ;; macro expansion
     `(progn
        (defun ,command (,@args)
-         ,(or doc "")
+         ,@(when doc `(,doc))
          ,@body)
        ,@properties)))
 
