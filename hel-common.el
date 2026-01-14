@@ -350,24 +350,22 @@ line(s). With no region, select current line. Uses visual lines if
                                      (car (bounds-of-thing-at-point line)))
                               (progn (goto-char end)
                                      (cdr (bounds-of-thing-at-point line)))
-                              dir :adjust)))
+                              dir)))
         ;; else no region
         (-let [(beg . end) (bounds-of-thing-at-point line)]
-          (hel-set-region beg end direction :adjust)))
+          (hel-set-region beg end direction)))
       t)))
 
-(defun hel-mark-inner-thing (thing &optional count adjust-end)
+(defun hel-mark-inner-thing (thing &optional count)
   (or count (setq count 1))
   (cl-assert (/= count 0))
-  (if adjust-end (hel-restore-newline-at-eol))
   (-let (((beg . end) (hel-bounds-of-count-things-at-point thing count)))
-    (hel-set-region beg end (hel-sign count) (if adjust-end :adjust))))
+    (hel-set-region beg end (hel-sign count))))
 
-(defun hel-mark-a-thing (thing count &optional adjust-end)
+(defun hel-mark-a-thing (thing count)
   "Select COUNT THINGs with spacing around.
 Works only with THINGs, that returns the count of steps left to move,
 such as `paragraph', `hel-function'."
-  (if adjust-end (hel-restore-newline-at-eol))
   (-let* (((thing-beg . thing-end) (hel-bounds-of-count-things-at-point thing count))
           ((beg . end)
            (or (progn
@@ -381,7 +379,7 @@ such as `paragraph', `hel-function'."
                            (hel-bounds-of-complement-of-thing-at-point thing))
                      (cons space-beg thing-end)))
                (cons thing-beg thing-end))))
-    (hel-set-region beg end (hel-sign count) (if adjust-end :adjust))))
+    (hel-set-region beg end (hel-sign count))))
 
 (defun hel-bounds-of-count-things-at-point (thing count)
   "Return the bounds of COUNT things at point.
@@ -436,7 +434,6 @@ If no THING at point select COUNT following THINGs."
   (hel-restore-region-on-error
     (let ((point-pos (point))
           (dir (hel-sign count)))
-      (hel-restore-newline-at-eol)
       (if (hel-end-of-buffer-p dir)
           (user-error (if (< dir 0) "Beginning of buffer" "End of buffer"))
         ;; else
@@ -456,7 +453,7 @@ If no THING at point select COUNT following THINGs."
                        (point)))
               (end (progn (forward-thing thing count)
                           (point))))
-          (hel-set-region start end nil :adjust)
+          (hel-set-region start end)
           (when (= (region-beginning) (region-end))
             (hel-mark-thing-forward thing dir))
           (hel-reveal-point-when-on-top))))))
@@ -859,20 +856,32 @@ If NOMSG is nil show `Mark set' message in echo area."
     (set-mark (mark t)))
   nil)
 
+(defvar hel--yank-transform-linewise-selection? nil)
+
 (defun hel-paste (yank-function direction)
   "Paste before/after selection depending on DIRECTION.
 YANK-FUNCTION should be a `yank' like function."
   (let ((region-dir (if (use-region-p) (hel-region-direction) 1))
         (deactivate-mark nil))
     (hel-ensure-region-direction direction)
-    (when (hel-string-ends-with-newline (current-kill 0 :do-not-move))
-      (forward-thing 'hel-line (if (natnump direction) 1 0)))
-    ;; Intercept `push-mark' so that any time `yank' calls it, `hel-push-mark'
-    ;; is executed instead.
-    (cl-letf (((symbol-function 'push-mark) #'hel-push-mark))
+    (setq hel--yank-transform-linewise-selection? (hel-logical-lines-p))
+    (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
+                                              yank-transform-functions))
+              ;; Intercept `push-mark' so that any time `yank' calls it,
+              ;; `hel-push-mark' is executed instead.
+              ((symbol-function 'push-mark) #'hel-push-mark))
       (funcall yank-function))
-    (hel-set-region (mark t) (point) region-dir :adjust)
+    (hel-set-region (mark t) (point) region-dir)
     (hel-extend-selection -1)))
+
+(defun hel--yank-transform (str)
+  (if (and (not (string-empty-p str))
+           (xor hel--yank-transform-linewise-selection?
+                (hel-string-ends-with-newline str)))
+      (if hel--yank-transform-linewise-selection?
+          (concat str "\n")
+        (string-trim-right str "[\r\n]+"))
+    str))
 
 ;;; Changes
 
@@ -881,7 +890,7 @@ YANK-FUNCTION should be a `yank' like function."
 INDENT-FUNCTION should be a `indent-rigidly-left' like function that takes
 BEG, END position and done the indentation."
   (if (use-region-p)
-      (hel-save-linewise-selection
+      (hel-save-region
         (dotimes (_ count)
           (funcall indent-function (region-beginning) (region-end)))
         (hel-extend-selection -1))
@@ -937,9 +946,14 @@ positive — end of line."
 
 (defun hel-logical-lines-p ()
   "Return t if active region spawns full logical lines."
-  (and hel--newline-at-eol ;; This should guarantee that region is active.
-       (save-excursion (goto-char (region-beginning)) (bolp))
-       (save-excursion (goto-char (region-end)) (eolp))))
+  (and (use-region-p)
+       (save-excursion
+         (goto-char (region-beginning))
+         (bolp))
+       (save-excursion
+         (goto-char (region-end))
+         (or (bolp)
+             (eobp)))))
 
 (defun hel-visual-lines-p ()
   "Return t if active region spawns visual lines."
@@ -1051,7 +1065,7 @@ that `match-beginning', `match-end' and `match-data' access."
                            (t cursor-type))))
     (eq cursor-type 'bar)))
 
-(defun hel-set-region (start end &optional direction newline-at-eol)
+(defun hel-set-region (start end &optional direction)
   "Set the active region between START and END positions.
 
 DIRECTION of the region:
@@ -1059,67 +1073,38 @@ DIRECTION of the region:
    1       Force forward region (mark < point).
   -1       Force backward region (point < mark).
 
-When DIRECTION is specified, START and END can be provided in any order.
-
-NEWLINE-AT-EOL handles trailing newline behavior. In Emacs, selecting a newline
-character at the end of a line moves point to the beginning of the next line.
-This contradicts Hel's and Vim's editors behavior. We emulate their behavior,
-by keeping the point at the end of the line and setting `hel--newline-at-eol'
-flag.
-
-NEWLINE-AT-EOL possible values:
-  nil      Set `hel--newline-at-eol' to nil.
-  t        Set `hel--newline-at-eol' to t.
-  `:adjust'  Check if region includes trailing newline, exclude it if found,
-             and set `hel--newline-at-eol' flag."
-  (pcase newline-at-eol
-    (:adjust (and (setq hel--newline-at-eol (and (/= start end)
-                                                 (save-excursion
-                                                   (goto-char (max start end))
-                                                   (bolp))))
-                  (cl-decf (if (< start end) end start))))
-    (_ (setq hel--newline-at-eol newline-at-eol)))
+When DIRECTION is specified, START and END can be provided in any order."
   (when (and (numberp direction)
              (xor (< 0 direction)
                   (<= start end)))
     (cl-rotatef start end))
   (set-mark start)
-  (goto-char end)
-  (unless hel-executing-command-for-fake-cursor
-    (if hel--newline-at-eol
-        (hel--set-region-overlay (region-beginning) (1+ (region-end)))
-      (hel--delete-region-overlay))))
+  (goto-char end))
 
 (defun hel-region ()
   "Region list with parameters of the active region. If no region return nil.
 
 The result is a list with following elements:
 
-  (BEG END DIRECTION NEWLINE-AT-EOL)
+  (BEG END DIRECTION)
 
 It is suitable to restore region with `hel-set-region':
 
   (let ((region (hel-region)))
     ...
     (apply #'hel-set-region region))"
-  (if (or hel--newline-at-eol
-          (use-region-p))
-      (list (region-beginning) (region-end)
-            (hel-region-direction)
-            hel--newline-at-eol)))
+  (if (use-region-p)
+      (list (region-beginning) (region-end) (hel-region-direction))))
 
 (defun hel-maybe-set-mark ()
-  "Set mark at point unless extending selection is active.
-Return the position of the mark."
-  (hel-disable-newline-at-eol)
-  (unless hel--extend-selection (set-mark (point)))
-  (mark))
+  "Set mark at point unless extending selection is active."
+  (or hel--extend-selection
+      (set-mark (point))))
 
 (defun hel-maybe-deactivate-mark ()
   "Deactivate mark unless extending selection is active."
-  (if hel--extend-selection
-      (hel-disable-newline-at-eol)
-    (deactivate-mark)))
+  (or hel--extend-selection
+      (deactivate-mark)))
 
 (defun hel-ensure-region-direction (direction)
   "Exchange point and mark if region direction mismatch DIRECTION.
@@ -1271,35 +1256,8 @@ the string is delimited by general string fences."
     (overlay-buffer)
     (buffer-live-p)))
 
-(defun hel-restore-newline-at-eol ()
-  "Extend active region to include trailing newline when `hel--newline-at-eol'
-is non-nil."
-  (when hel--newline-at-eol
-    (hel-set-region (region-beginning) (1+ (region-end))
-                    (hel-region-direction))
-    t))
-
-(defun hel-disable-newline-at-eol ()
-  (setq hel--newline-at-eol nil)
-  (unless hel-executing-command-for-fake-cursor
-    (hel--delete-region-overlay)))
-
-(defun hel--set-region-overlay (start end)
-  (unless hel-executing-command-for-fake-cursor
-    (if (overlayp hel-main-region-overlay)
-        (move-overlay hel-main-region-overlay start end)
-      (setq hel-main-region-overlay (-doto (make-overlay start end)
-                                      (overlay-put 'face 'region)
-                                      (overlay-put 'priority 1))))))
-
-(defun hel--delete-region-overlay ()
-  (if (overlayp hel-main-region-overlay)
-      (delete-overlay hel-main-region-overlay)))
-
 (defun hel-pulse-main-region (&optional face)
-  (if (hel-overlay-live-p hel-main-region-overlay)
-      (pulse-momentary-highlight-overlay hel-main-region-overlay face)
-    (pulse-momentary-highlight-region (region-beginning) (region-end) face)))
+  (pulse-momentary-highlight-region (region-beginning) (region-end) face))
 
 (defun hel-reveal-point-when-on-top (&rest _)
   "Reveal point when it's only partially visible.
@@ -1327,9 +1285,8 @@ function prevents that. It is intended to be used as `:after' advice."
 
 (defun hel-maybe-deactivate-mark-a (&rest _)
   "Deactivate mark unless extending selection is active. Can be used as advice."
-  (if hel--extend-selection
-      (hel-disable-newline-at-eol)
-    (deactivate-mark)))
+  (or hel--extend-selection
+      (deactivate-mark)))
 
 (defun hel-jump-command-a (command &rest args)
   "Aroung advice for COMMAND that moves point."

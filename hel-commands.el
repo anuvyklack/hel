@@ -217,7 +217,6 @@ Use visual line when `visual-line-mode' is active."
         (dir (hel-sign count)))
     (hel-restore-region-on-error
       ;; (if (eolp) (forward-char))
-      (hel-restore-newline-at-eol)
       (if (hel-end-of-buffer-p dir)
           (user-error (if (< dir 0) "Beginning of buffer" "End of buffer"))
         ;; else
@@ -231,7 +230,7 @@ Use visual line when `visual-line-mode' is active."
                                 (t
                                  (forward-thing thing count)))
                           (point))
-                        dir :adjust)
+                        dir)
         (hel-reveal-point-when-on-top)))))
 
 ;; {
@@ -494,6 +493,8 @@ to the chosen one."
   (interactive)
   (hel-with-each-cursor
     (hel-ensure-region-direction 1))
+  (when (and (hel-logical-lines-p) (not (eobp)))
+    (backward-char))
   (hel-insert-state 1))
 
 ;; I
@@ -539,7 +540,9 @@ depending on DIRECTION."
   (interactive)
   (hel-with-each-cursor
     (when (use-region-p) (hel-ensure-region-direction 1))
-    (move-end-of-line nil)
+    (if (and (hel-logical-lines-p) (not (eobp)))
+        (backward-char)
+      (move-end-of-line nil))
     (newline-and-indent)
     (set-marker (mark-marker) (point)))
   (hel-insert-state 1))
@@ -563,9 +566,10 @@ depending on DIRECTION."
   "Add COUNT blank lines below selection."
   :multiple-cursors t
   (interactive "p")
-  (hel-save-linewise-selection
+  (hel-save-region
     (hel-ensure-region-direction 1)
-    (hel--forward-line 1)
+    (unless (hel-logical-lines-p)
+      (hel--forward-line 1))
     (newline count)))
 
 ;; [ SPC
@@ -613,8 +617,6 @@ depending on DIRECTION."
 If no selection — delete COUNT chars before point."
   :multiple-cursors t
   (interactive "*p")
-  (when (hel-logical-lines-p)
-    (hel-restore-newline-at-eol))
   (cond ((use-region-p)
          (kill-region nil nil t))
         (t
@@ -627,8 +629,6 @@ If no selection — delete COUNT chars before point."
 If no selection — delete COUNT chars after point."
   :multiple-cursors t
   (interactive "*p")
-  (when (hel-logical-lines-p)
-    (hel-restore-newline-at-eol))
   (cond ((use-region-p)
          (delete-region (region-beginning) (region-end)))
         (t
@@ -679,9 +679,7 @@ or `yank-rectangle'."
           any?)
       (hel-with-each-cursor
         (when (use-region-p)
-          (copy-region-as-kill (region-beginning) (if hel--newline-at-eol
-                                                      (1+ (region-end))
-                                                    (region-end)))
+          (copy-region-as-kill (region-beginning) (region-end))
           (setq any? t))
         (hel-extend-selection -1))
       (when any? (message "Copied into kill-ring")))
@@ -722,13 +720,16 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   "Replace just-pasted text with next COUNT element from `kill-ring'."
   :multiple-cursors t
   (interactive "*p")
-  (hel-disable-newline-at-eol)
   (let ((deactivate-mark nil))
-    (let ((yank-pop (or (command-remapping 'yank-pop)
+    (unless (eq last-command 'yank)
+      (setq hel--yank-transform-linewise-selection? (hel-logical-lines-p)))
+    (let ((yank-transform-functions (cons #'hel--yank-transform
+                                          yank-transform-functions))
+          (yank-pop (or (command-remapping 'yank-pop)
                         #'yank-pop)))
       (funcall-interactively yank-pop count))
     (if (and (mark t)
-             (/= (point) (mark t)))
+             (/= (point) (mark-marker)))
         (activate-mark)
       (deactivate-mark))))
 
@@ -745,14 +746,15 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   :multiple-cursors t
   (interactive)
   (when (use-region-p)
-    (when (hel-string-ends-with-newline (current-kill 0 :do-not-move))
-      (hel-restore-newline-at-eol))
     (let ((deactivate-mark nil)
           (dir (hel-region-direction)))
+      (setq hel--yank-transform-linewise-selection? (hel-logical-lines-p))
       (delete-region (region-beginning) (region-end))
-      (cl-letf (((symbol-function 'push-mark) #'hel-push-mark))
+      (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
+                                                yank-transform-functions))
+                ((symbol-function 'push-mark) #'hel-push-mark))
         (yank))
-      (hel-set-region (mark t) (point) dir :adjust)
+      (hel-set-region (mark t) (point) dir)
       (hel-extend-selection -1))))
 
 ;; J
@@ -869,9 +871,7 @@ When called interactively — toggle extending selection."
   :multiple-cursors t
   (interactive)
   (if hel--extend-selection
-      (progn
-        (hel-disable-newline-at-eol)
-        (set-mark (point)))
+      (set-mark (point))
     (deactivate-mark)))
 
 ;; x
@@ -884,7 +884,6 @@ When called interactively — toggle extending selection."
     (and (hel-expand-selection-to-full-lines motion-dir)
          (cl-callf - count motion-dir))
     (unless (zerop count)
-      (hel-restore-newline-at-eol)
       (let* ((line (if visual-line-mode 'hel-visual-line 'hel-line))
              (region-dir (hel-region-direction))
              (end (progn (forward-thing line count)
@@ -897,7 +896,9 @@ When called interactively — toggle extending selection."
                           (forward-thing line (- motion-dir))
                           (point))
                       (mark))))
-        (hel-set-region start end nil :adjust)))
+        (hel-set-region start end)))
+    (when (= 1 (count-lines (region-beginning) (region-end) t))
+      (hel-ensure-region-direction -1))
     (setq disable-point-adjustment t)))
 
 ;; X
@@ -915,7 +916,7 @@ When called interactively — toggle extending selection."
   (hel-push-point)
   ;; `minibuffer-prompt-end'is really `point-min' in most cases, but if we're
   ;; in the minibuffer, this is at the end of the prompt.
-  (hel-set-region (minibuffer-prompt-end) (point-max) -1 :adjust))
+  (hel-set-region (minibuffer-prompt-end) (point-max) -1))
 
 ;; s
 (hel-define-command hel-select-regex (&optional invert)
@@ -957,7 +958,6 @@ entered regexp withing current selections."
   "Split selections on line boundaries."
   :multiple-cursors nil
   (interactive)
-  (hel-disable-newline-at-eol)
   (hel-with-each-cursor
     (hel-extend-selection -1)
     (when (use-region-p)
@@ -1048,7 +1048,6 @@ entered regexp withing current selections."
   :merge-selections t
   (interactive "p")
   (hel-with-each-cursor
-    (hel-disable-newline-at-eol)
     (hel-motion-loop (dir count)
       (if (use-region-p)
           (hel--copy-region dir)
@@ -1381,7 +1380,7 @@ already there."
   :merge-selections t
   (interactive "p")
   (hel-push-point)
-  (hel-mark-inner-thing 'hel-paragraph count t)
+  (hel-mark-inner-thing 'hel-paragraph count)
   (hel-reveal-point-when-on-top))
 
 ;; map
@@ -1390,7 +1389,7 @@ already there."
   :merge-selections t
   (interactive "p")
   (hel-push-point)
-  (hel-mark-a-thing 'hel-paragraph count t)
+  (hel-mark-a-thing 'hel-paragraph count)
   (hel-reveal-point-when-on-top))
 
 ;; mif
@@ -1399,7 +1398,7 @@ already there."
   :merge-selections t
   (interactive "p")
   (hel-push-point)
-  (hel-mark-inner-thing 'hel-function count t)
+  (hel-mark-inner-thing 'hel-function count)
   (hel-ensure-region-direction -1)
   (hel-reveal-point-when-on-top))
 
@@ -1435,7 +1434,7 @@ already there."
                     (goto-char thing-beg)
                     (car (bounds-of-thing-at-point 'hel-paragraph)))
               end thing-end))
-    (hel-set-region beg end (hel-sign count) :adjust))
+    (hel-set-region beg end (hel-sign count)))
   (hel-reveal-point-when-on-top))
 
 ;; mi"
@@ -1652,7 +1651,6 @@ keys to repeat motion forward/backward."
   :multiple-cursors nil
   :merge-selections t
   (interactive "p")
-  (hel-disable-newline-at-eol)
   (unless hel-search--direction (setq hel-search--direction 1))
   (when (< hel-search--direction 0)
     (cl-callf - count))
@@ -1788,7 +1786,6 @@ lines and reindent the region."
               (bounds (hel-surround--4-bounds key)))
     (-let (((left-beg left-end right-beg right-end) bounds)
            (deactivate-mark nil))
-      (hel-disable-newline-at-eol)
       (delete-region right-beg right-end)
       (delete-region left-beg left-end))))
 
@@ -1980,7 +1977,6 @@ narrowing doesn't affect other windows displaying the same buffer. Call
   :multiple-cursors t
   (interactive)
   (when (use-region-p)
-    (hel-restore-newline-at-eol)
     (let ((orig-buffer (current-buffer))
           (name (or buffer-file-name
                     list-buffers-directory))

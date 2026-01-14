@@ -240,7 +240,6 @@ With \\[universal-argument] invokes `yank-rectangle' instead. See `hel-copy'."
 If no selection — delete COUNT chars before point."
   :multiple-cursors t
   (interactive "*p")
-  (when (hel-logical-lines-p) (hel-restore-newline-at-eol))
   (if (use-region-p)
       (kill-region nil nil t)
     (org-delete-char (- count)))
@@ -263,9 +262,7 @@ In tables, move column to the left."
      (save-excursion (goto-char beg) (org-at-heading-p)))
     (org-map-region #'org-do-promote beg end))
    ;; table
-   ((and (org-at-table-p) (hel-save-region
-                            (hel-restore-newline-at-eol)
-                            (org-at-table-p)))
+   ((org-at-table-p)
     (org-table-move-column -1))
    ;; list
    ((and (save-excursion (goto-char beg) (org-at-item-p))
@@ -300,9 +297,7 @@ In tables, move column to the right."
      (save-excursion (goto-char beg) (org-at-heading-p)))
     (org-map-region #'org-do-demote beg end))
    ;; table
-   ((and (org-at-table-p) (hel-save-region
-                            (hel-restore-newline-at-eol)
-                            (org-at-table-p)))
+   ((org-at-table-p)
     (org-table-move-column))
    ;; list
    ((and (save-excursion (goto-char beg) (org-at-item-p))
@@ -328,7 +323,7 @@ In tables, move column to the right."
   :multiple-cursors t
   :merge-selections t
   (interactive "p")
-  (hel-mark-inner-thing 'hel-org-sentence count t))
+  (hel-mark-inner-thing 'hel-org-sentence count))
 
 ;; mas
 (hel-define-command hel-org-mark-a-sentence ()
@@ -503,7 +498,6 @@ be set manually."
   :multiple-cursors t
   :merge-selections t
   (interactive "p")
-  (hel-restore-newline-at-eol)
   ;; BUG: When paragraph starts with link, currently we lands at invisible
   ;;   position. Skip it and select the entire heading subtree.
   (when (and (not (bobp))
@@ -538,7 +532,7 @@ be set manually."
                       (org-element-end element)
                       ;; (- (org-element-end element)
                       ;;    (org-element-post-blank element))
-                      -1 :adjust)
+                      -1)
       (if arg (hel-reveal-point-when-on-top)))))
 
 ;; M-i
@@ -573,7 +567,7 @@ be set manually."
                             ;; ;; Skip empty lines
                             ;; (- (org-element-end child)
                             ;;    (org-element-post-blank child))
-                            -1 :adjust)
+                            -1)
             (hel-reveal-point-when-on-top))
         ;; (user-error "No content for this element")
         (user-error "No nested element"))
@@ -591,17 +585,16 @@ be set manually."
     (hel-org-up-element))
   (if hel--extend-selection
       (-let (((region-beg region-end dir new-line?) (hel-region)))
-        (hel-restore-newline-at-eol)
         (deactivate-mark)
         (if-let* ((next-element (hel-org--next-element)))
             (let ((element-beg (org-element-begin next-element))
                   (element-end (org-element-end next-element)))
               (if (< element-end region-end)
-                  (hel-set-region element-beg region-end dir new-line?)
-                (hel-set-region region-beg element-end 1 :adjust))
+                  (hel-set-region element-beg region-end dir)
+                (hel-set-region region-beg element-end 1))
               (hel-org--set-current-element next-element))
           ;; else -- restore original region
-          (hel-set-region region-beg region-end dir new-line?)))
+          (hel-set-region region-beg region-end dir)))
     ;; else
     (when-let* ((next-element (hel-org--next-element)))
       (hel-set-region (org-element-begin next-element)
@@ -609,7 +602,7 @@ be set manually."
                       ;; ;; Skip empty lines
                       ;; (- (org-element-end next-element)
                       ;;    (org-element-post-blank next-element))
-                      (hel-region-direction) :adjust)
+                      (hel-region-direction))
       (hel-org--set-current-element next-element)))
   (hel-reveal-point-when-on-top))
 
@@ -665,24 +658,23 @@ a parent with different boundaries or reaches a `section' element."
     (hel-org-up-element))
   (if hel--extend-selection
       (-let (((region-beg region-end dir new-line?) (hel-region)))
-        (hel-restore-newline-at-eol)
         (deactivate-mark)
         (if-let* ((previous-element (hel-org--previous-element)))
             (let ((element-beg (org-element-begin previous-element))
                   (element-end (org-element-end previous-element)))
               (if (< region-beg element-beg)
-                  (hel-set-region region-beg element-end dir :adjust)
-                (hel-set-region element-beg region-end -1 new-line?))
+                  (hel-set-region region-beg element-end dir)
+                (hel-set-region element-beg region-end -1))
               (hel-org--set-current-element previous-element))
           ;; else -- restore original region
-          (hel-set-region region-beg region-end dir new-line?)))
+          (hel-set-region region-beg region-end dir)))
     ;; else
     (when-let* ((previous-element (hel-org--previous-element)))
       (hel-set-region (org-element-begin previous-element)
                       (org-element-end previous-element)
                       ;; (- (org-element-end previous-element)
                       ;;    (org-element-post-blank previous-element))
-                      (hel-region-direction) :adjust)
+                      (hel-region-direction))
       (hel-org--set-current-element previous-element)
       (hel-reveal-point-when-on-top))))
 

@@ -77,21 +77,15 @@ saved as markers and correctly handle case when text was inserted before region.
   (let ((pnt (gensym "point"))
         (beg (gensym "region-beg"))
         (end (gensym "region-end"))
-        (dir (gensym "region-dir"))
-        (newline-at-eol (gensym "newline-at-eol")))
+        (dir (gensym "region-dir")))
     `(if (use-region-p)
          (let ((deactivate-mark nil)
                (,beg (copy-marker (region-beginning) t))
                (,end (copy-marker (region-end)))
-               (,dir (hel-region-direction))
-               (,newline-at-eol hel--newline-at-eol))
+               (,dir (hel-region-direction)))
            (unwind-protect
                (save-excursion ,@body)
-             (hel-set-region ,beg ,end ,dir (and ,newline-at-eol
-                                                 (/= ,beg ,end)
-                                                 (save-excursion
-                                                   (goto-char ,end)
-                                                   (eolp))))
+             (hel-set-region ,beg ,end ,dir)
              (set-marker ,beg nil)
              (set-marker ,end nil)))
        ;; else
@@ -101,28 +95,6 @@ saved as markers and correctly handle case when text was inserted before region.
            (if mark-active (deactivate-mark))
            (goto-char ,pnt)
            (set-marker ,pnt nil))))))
-
-(defmacro hel-save-linewise-selection (&rest body)
-  "Evaluate BODY keeping linewise selection.
-If selection is no linewise work like `hel-save-region'."
-  (declare (indent 0) (debug t))
-  (let ((beg (gensym "region-beg"))
-        (end (gensym "region-end"))
-        (dir (gensym "region-dir")))
-    `(if (hel-logical-lines-p)
-         (let ((deactivate-mark nil)
-               (,beg (copy-marker (region-beginning)))
-               (,end (copy-marker (region-end) t))
-               (,dir (hel-region-direction)))
-           (unwind-protect
-               (save-excursion
-                 ,@body)
-             (hel-set-region ,beg ,end ,dir)
-             (hel-expand-selection-to-full-lines ,dir)
-             (set-marker ,beg nil)
-             (set-marker ,end nil)))
-       (hel-save-region
-         ,@body))))
 
 (defmacro hel-restore-region-on-error (&rest body)
   (declare (indent 0) (debug t))

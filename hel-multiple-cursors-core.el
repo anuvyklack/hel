@@ -129,15 +129,13 @@ CURSORS-POSITIONS is an alist returned by `hel-cursors-positions' function."
              (unless (assoc id cursors-positions #'eql)
                (hel--delete-fake-cursor cursor)))
            hel--cursors-table)
-  (dolist (val cursors-positions)
-    (-let [(id point mark newline-at-eol) val]
-      (pcase id
-        (0 (hel-set-region mark point nil newline-at-eol))
-        (_ (let ((mark-active (not (null mark)))
-                 (hel--newline-at-eol newline-at-eol))
-             (if-let* ((cursor (gethash id hel--cursors-table)))
-                 (hel-move-fake-cursor cursor point mark :update)
-               (hel--create-fake-cursor-1 id point mark)))))))
+  (cl-loop for (id point mark) in cursors-positions
+           do (pcase id
+                (0 (hel-set-region mark point))
+                (_ (let ((mark-active (not (null mark))))
+                     (if-let* ((cursor (gethash id hel--cursors-table)))
+                         (hel-move-fake-cursor cursor point mark :update)
+                       (hel--create-fake-cursor-1 id point mark))))))
   (hel-auto-multiple-cursors-mode)
   (push `(apply hel--undo-step-start ,cursors-positions)
         buffer-undo-list))
@@ -264,23 +262,18 @@ Return CURSOR."
 (defun hel--set-fake-region-overlay (cursor)
   "For fake CURSOR setup the overlay looking like active region when appropriate."
   (let ((beg (overlay-get cursor 'point))
-        (end (overlay-get cursor 'mark))
-        (newline-at-eol? (overlay-get cursor 'hel--newline-at-eol)))
+        (end (overlay-get cursor 'mark)))
     (if (and (overlay-get cursor 'mark-active)
-             (or (/= beg end) newline-at-eol?))
-        (progn
-          (when newline-at-eol?
-            (when (< end beg) (cl-rotatef beg end))
-            (cl-incf end))
-          (if-let ((region (overlay-get cursor 'fake-region)))
-              (move-overlay region beg end)
-            ;; else
-            (setq region (-doto (make-overlay beg end nil nil t)
-                           (overlay-put 'face 'region)
-                           (overlay-put 'type 'fake-region)
-                           (overlay-put 'id (overlay-get cursor 'id))
-                           (overlay-put 'priority 1)))
-            (overlay-put cursor 'fake-region region)))
+             (/= beg end))
+        (if-let* ((region (overlay-get cursor 'fake-region)))
+            (move-overlay region beg end)
+          ;; else
+          (setq region (-doto (make-overlay beg end nil nil t)
+                         (overlay-put 'face 'region)
+                         (overlay-put 'type 'fake-region)
+                         (overlay-put 'id (overlay-get cursor 'id))
+                         (overlay-put 'priority 1)))
+          (overlay-put cursor 'fake-region region))
       ;; else
       (hel--delete-fake-region-overlay cursor))))
 
@@ -320,10 +313,7 @@ Return CURSOR."
 (defun hel-restore-point-from-fake-cursor (cursor)
   "Restore point, mark and variables from fake CURSOR overlay and delete it."
   (hel--restore-cursor-state cursor)
-  (hel--delete-fake-cursor cursor)
-  (if hel--newline-at-eol
-      (hel--set-region-overlay (region-beginning) (1+ (region-end)))
-    (hel--delete-region-overlay)))
+  (hel--delete-fake-cursor cursor))
 
 (defun hel--restore-cursor-state (overlay)
   "Restore point, mark and cursor variables saved in OVERLAY."
@@ -426,9 +416,8 @@ If SORT is non-nil sort cursors in order they are located in buffer."
   "Return alist with positions data of all cursors.
 Alist containes cons cells:
 
-    (ID . (POINT MARK NEWLINE-AT-EOL?))
+    (ID . (POINT MARK))
 
-NEWLINE-AT-EOL? is the cursors value of the `hel--newline-at-eol' variable.
 MARK is nil if cursor has no region.
 
 Real cursor has ID 0 and is the first element (`car') of the list."
@@ -438,13 +427,10 @@ Real cursor has ID 0 and is the first element (`car') of the list."
         (push (list (overlay-get cursor 'id) ;; id
                     (marker-position (overlay-get cursor 'point)) ;; point
                     (if (overlay-get cursor 'mark-active)
-                        (marker-position (overlay-get cursor 'mark))) ;; mark
-                    (overlay-get cursor 'hel--newline-at-eol))
+                        (marker-position (overlay-get cursor 'mark)))) ;; mark
               alist)))
-    (push (list 0 ;; id
-                (point)
-                (if mark-active (mark))
-                hel--newline-at-eol)
+    ;; Real cursor
+    (push (list 0 (point) (if mark-active (marker-position (mark-marker))))
           alist)
     alist))
 
@@ -477,7 +463,6 @@ the data needed for multiple cursors functionality."
     (dolist (var hel-fake-cursor-specific-vars)
       (if (boundp var)
           (cl-callf plist-put state var (symbol-value var))))
-    (hel--delete-region-overlay)
     state))
 
 (defun hel--restore-main-cursor-state (state)
@@ -490,10 +475,7 @@ the data needed for multiple cursors functionality."
                   (set-marker mrk nil))))
   (dolist (var hel-fake-cursor-specific-vars)
     (if (boundp var)
-        (set var (plist-get state var))))
-  (if (and hel--newline-at-eol mark-active)
-      (hel--set-region-overlay (region-beginning) (1+ (region-end)))
-    (hel--delete-region-overlay)))
+        (set var (plist-get state var)))))
 
 (defmacro hel-with-fake-cursor (cursor &rest body)
   "Move point to the fake CURSOR, restore the environment from it,
@@ -570,7 +552,6 @@ Restore it after BODY evaluation if it is still alive."
   (declare (indent 0) (debug t))
   (let ((real-cursor (make-symbol "real-cursor")))
     `(let ((,real-cursor (hel--create-fake-cursor-1 0 (point) (mark t))))
-       (hel--delete-region-overlay)
        (unwind-protect (progn ,@body)
          (cond ((hel-overlay-live-p ,real-cursor)
                 (hel-restore-point-from-fake-cursor ,real-cursor))

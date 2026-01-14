@@ -326,8 +326,7 @@ RANGES is a list of cons cells with positions (START . END)."
                                 ranges)))
     (hel-add-to-regex-history pattern)
     (setq mark-active t
-          hel--extend-selection nil
-          hel--newline-at-eol nil)
+          hel--extend-selection nil)
     (cl-loop for (mark . point) in regions
              do (hel-create-fake-cursor point mark))
     :success))

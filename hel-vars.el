@@ -424,7 +424,6 @@ Default value is 0 - scroll half the screen.")
     yank-undo-function
     temporary-goal-column
     hel--extend-selection
-    hel--newline-at-eol
     ;; Dabbrev
     dabbrev--abbrev-char-regexp
     dabbrev--check-other-buffers
@@ -462,20 +461,6 @@ multiple cursors.")
 (hel-defvar-local hel--undo-boundary nil)
 
 (hel-defvar-local hel--input-cache nil)
-
-(hel-defvar-local hel--newline-at-eol nil
-  "Non-nil when newline char at the end of the line should be considered a part
-of the region (selection).
-
-In Emacs, selecting a newline character at the end of a line moves point to the
-next line. This contradicts Hel's and Vim's text editors behavior. We emulate
-their behavior, by keeping the point at the end of the line and and set this
-flag. To take it into account use `hel-restore-newline-at-eol' function.")
-
-(hel-defvar-local hel-main-region-overlay nil
-  "An overlay with region face that covers active region plus one newline
-character after, to visually extend selection over full line while point remains
-at the end of the line. Conterpart to `hel--newline-at-eol' flag.")
 
 (hel-defvar-local hel--narrowed-base-buffer nil)
 

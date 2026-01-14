@@ -88,7 +88,6 @@
         (hel-load-whitelists)
         (add-hook 'pre-command-hook #'hel--pre-commad-hook nil t)
         (add-hook 'post-command-hook #'hel--post-command-hook 90 t)
-        (add-hook 'deactivate-mark-hook #'hel-disable-newline-at-eol nil t)
         (add-hook 'after-revert-hook #'hel-delete-all-fake-cursors nil t)
         (setq hel-input-method current-input-method)
         (add-hook 'input-method-activate-hook #'hel-activate-input-method 90 t)
@@ -97,7 +96,6 @@
     ;; else
     (remove-hook 'post-command-hook #'hel--post-command-hook t)
     (remove-hook 'pre-command-hook #'hel--pre-commad-hook t)
-    (remove-hook 'deactivate-mark-hook #'hel-disable-newline-at-eol t)
     (remove-hook 'after-revert-hook #'hel-delete-all-fake-cursors t)
     (remove-hook 'input-method-activate-hook #'hel-activate-input-method t)
     (remove-hook 'input-method-deactivate-hook #'hel-deactivate-input-method t)
