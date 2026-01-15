@@ -689,41 +689,40 @@ and which for all to `hel-whitelist-file' file."
   "Merge overlapping regions."
   (let ((dir (hel-region-direction)))
     (dolist (group-or-overlapping-regions (hel--overlapping-regions))
-      (let ((beg (point-max))
-            (end (point-min))
-            id delete real-cursor?)
-        (dolist (val group-or-overlapping-regions)
-          ;; rid - region ID, b - region beginning, e - region end
-          (-let [(rid b e) val]
-            (when (< b beg)
-              (setq beg b)
-              (when (< dir 0)
-                (if id (push id delete))
-                (setq id rid)))
-            (when (> e end)
-              (setq end e)
-              (when (< 0 dir)
-                (if id (push id delete))
-                (setq id rid)))
-            (cond ((eql rid 0)
-                   (setq real-cursor? t))
-                  ((/= id rid)
-                   (push rid delete)))))
-        (let ((pnt (if (< dir 0) beg end))
-              (mrk (if (< dir 0) end beg)))
+      (-let (for-deletion
+             real-cursor?
+             ((id beg end) (car group-or-overlapping-regions)))
+        ;; i - region ID
+        ;; b - region beginning
+        ;; e - region end
+        (cl-loop for (i b e) in (cdr group-or-overlapping-regions) do
+                 (when (< b beg)
+                   (setq beg b)
+                   (when (< dir 0)
+                     (push id for-deletion)
+                     (setq id i)))
+                 (when (> e end)
+                   (setq end e)
+                   (when (< 0 dir)
+                     (push id for-deletion)
+                     (setq id i)))
+                 (cond ((eql i 0)
+                        (setq real-cursor? t))
+                       ((/= id i)
+                        (push i for-deletion))))
           (pcase id
-            (0 (goto-char pnt)
-               (set-marker (mark-marker) mrk))
+            (0 (hel-set-region beg end dir))
             (_ (when-let* ((cursor (gethash id hel--cursors-table)))
                  (cond (real-cursor?
                         (hel-restore-point-from-fake-cursor cursor)
-                        (goto-char pnt)
-                        (set-marker (mark-marker) mrk))
+                        (hel-set-region beg end dir))
+                       ((< dir 0)
+                        (hel-move-fake-cursor cursor beg end))
                        (t
-                        (hel-move-fake-cursor cursor pnt mrk)))))))
-        (dolist (id delete)
-          (when-let* ((cursor (gethash id hel--cursors-table)))
-            (hel--delete-fake-cursor cursor)))))
+                        (hel-move-fake-cursor cursor end beg))))))
+          (dolist (id for-deletion)
+            (when-let* ((cursor (gethash id hel--cursors-table)))
+              (hel--delete-fake-cursor cursor)))))
     (hel-auto-multiple-cursors-mode)))
 
 (defun hel--overlapping-regions ()
