@@ -361,8 +361,9 @@ If SORT is non-nil sort cursors in order they are located in buffer."
 
 (defun hel-fake-cursor-at (position)
   "Return the fake cursor at POSITION, or nil if no one."
-  (--find (= position (overlay-get it 'point))
-          (hel-fake-cursors-in position (1+ position))))
+  (-some->> (overlays-in position (1+ position))
+    (-filter #'hel-fake-cursor-p)
+    (--find (= position (overlay-get it 'point)))))
 
 (defun hel-next-fake-cursor (&optional position)
   "Return the next fake cursor after the POSITION."
@@ -513,8 +514,8 @@ evaluate BODY, update fake CURSOR."
   "Call COMMAND interactively for all cursors: real and fake ones."
   (hel--call-interactively command)
   (hel--execute-command-for-all-fake-cursors command)
-  (when (hel-merge-regions-p command)
-    (hel-merge-overlapping-regions))
+  (when (hel--merge-cursors-p command)
+    (hel-merge-overlapping-cursors))
   (setq hel--input-cache nil))
 
 (defun hel--execute-command-for-all-fake-cursors (command)
@@ -674,7 +675,7 @@ and which for all to `hel-whitelist-file' file."
 
 ;;; Merge overlapping regions
 
-(defun hel-merge-regions-p (command)
+(defun hel--merge-cursors-p (command)
   "Return non-nil if regions need to be merged after COMMAND."
   (and hel-multiple-cursors-mode
        mark-active
@@ -685,7 +686,29 @@ and which for all to `hel-whitelist-file' file."
              ((functionp command) ;; COMMAND is a lambda
               t))))
 
-(defun hel-merge-overlapping-regions ()
+(defun hel-merge-overlapping-cursors ()
+  "Merge overlapping cursors."
+  (if (use-region-p)
+      (hel--merge-overlapping-regions)
+    (hel--merge-overlapping-points)))
+
+(defun hel--merge-overlapping-points ()
+  "Merge cursors at the same positions."
+  (let* ((cursors (hel-all-fake-cursors t))
+         (cursor (car cursors))
+         (point (overlay-get cursor 'point))
+         pos)
+    (dolist (c (cdr cursors))
+      (setq pos (overlay-get c 'point))
+      (if (= point pos)
+          (hel--delete-fake-cursor c)
+        (setq cursor c
+              point pos))))
+  (-some-> (hel-fake-cursor-at (point))
+    (hel--delete-fake-cursor))
+  (hel-auto-multiple-cursors-mode))
+
+(defun hel--merge-overlapping-regions ()
   "Merge overlapping regions."
   (let ((dir (hel-region-direction)))
     (dolist (group-or-overlapping-regions (hel--overlapping-regions))

@@ -616,6 +616,7 @@ depending on DIRECTION."
   "Kill (cut) text in region. I.e. delete text and put it in the `kill-ring'.
 If no selection — delete COUNT chars before point."
   :multiple-cursors t
+  :merge-selections t
   (interactive "*p")
   (cond ((use-region-p)
          (kill-region nil nil t))
@@ -628,6 +629,7 @@ If no selection — delete COUNT chars before point."
   "Delete text in region, without modifying the `kill-ring'.
 If no selection — delete COUNT chars after point."
   :multiple-cursors t
+  :merge-selections t
   (interactive "*p")
   (cond ((use-region-p)
          (delete-region (region-beginning) (region-end)))

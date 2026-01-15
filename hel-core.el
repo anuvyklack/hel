@@ -64,8 +64,8 @@
       (condition-case err
           (progn
             (hel--execute-command-for-all-fake-cursors hel-this-command)
-            (when (hel-merge-regions-p hel-this-command)
-              (hel-merge-overlapping-regions)))
+            (when (hel--merge-cursors-p hel-this-command)
+              (hel-merge-overlapping-cursors)))
         (error
          (message "[Hel] error while executing command for fake cursor: %s"
                   (error-message-string err)))
