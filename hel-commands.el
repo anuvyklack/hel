@@ -159,7 +159,7 @@ Push mark at previous position, unless extending selection."
 (hel-define-command hel-end-of-buffer ()
   "Move point the end of the buffer."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-delete-all-fake-cursors)
   (hel-push-point)
   (hel-maybe-deactivate-mark)
@@ -374,7 +374,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-word-forward ()
   "Move to a word start after the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates avy-goto-word-0-regexp
@@ -390,7 +390,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-word-backward ()
   "Move to a word start before the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates avy-goto-word-0-regexp
@@ -409,7 +409,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-WORD-forward ()
   "Move to a WORD start after the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates "[^ \r\n\t]+" (point) (window-end nil t))
@@ -424,7 +424,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-WORD-backward ()
   "Move to a WORD start before the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates "[^ \r\n\t]+" (window-start) (point))
@@ -481,7 +481,7 @@ to the chosen one."
 (hel-define-command hel-insert ()
   "Switch to Insert state before region."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-with-each-cursor
     (hel-ensure-region-direction -1))
   (hel-insert-state 1))
@@ -490,7 +490,7 @@ to the chosen one."
 (hel-define-command hel-append ()
   "Switch to Insert state after region."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-with-each-cursor
     (hel-ensure-region-direction 1))
   (when (and (hel-logical-lines-p) (not (eobp)))
@@ -501,14 +501,14 @@ to the chosen one."
 (hel-define-command hel-insert-line ()
   "Switch to insert state at beginning of current line."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel--insert-or-append-on-line -1))
 
 ;; A
 (hel-define-command hel-append-line ()
   "Switch to Insert state at the end of the current line."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel--insert-or-append-on-line 1))
 
 (defun hel--insert-or-append-on-line (direction)
@@ -537,7 +537,7 @@ depending on DIRECTION."
 (hel-define-command hel-open-below ()
   "Open new line below selection."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-with-each-cursor
     (when (use-region-p) (hel-ensure-region-direction 1))
     (if (and (hel-logical-lines-p) (not (eobp)))
@@ -551,7 +551,7 @@ depending on DIRECTION."
 (hel-define-command hel-open-above ()
   "Open new line above selection."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-with-each-cursor
     (when (use-region-p) (hel-ensure-region-direction -1))
     (move-beginning-of-line nil)
@@ -586,7 +586,7 @@ depending on DIRECTION."
 (hel-define-command hel-change ()
   "Delete region and enter Insert state."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-with-each-cursor
     (cond ((use-region-p)
            (let ((logical-lines? (hel-logical-lines-p))
@@ -638,7 +638,7 @@ If no selection — delete COUNT chars after point."
 ;; C-w in insert state
 (hel-define-command hel-delete-backward-word ()
   :multiple-cursors t
-  (interactive)
+  (interactive "*")
   (delete-region (point) (progn
                            (hel-backward-word-start 1)
                            (point))))
@@ -647,7 +647,7 @@ If no selection — delete COUNT chars after point."
 (hel-define-command hel-undo ()
   "Undo."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   ;; Deactivate mark to trigger global undo instead of region undo.
   (deactivate-mark)
   (let ((deactivate-mark nil))
@@ -657,7 +657,7 @@ If no selection — delete COUNT chars after point."
 (hel-define-command hel-redo ()
   "Redo."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   ;; Deactivate mark to trigger global undo instead of region undo.
   (deactivate-mark)
   (let ((deactivate-mark nil))
@@ -671,7 +671,7 @@ the `killed-rectangle'. You can paste them later with %s (`hel-paste-after')
 or `yank-rectangle'."
           (propertize "M-u p" 'face 'help-key-binding))
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   ;; (unless (use-region-p)
   ;;   (user-error "No active selection"))
   (when (use-region-p)
@@ -744,7 +744,7 @@ With \\[universal-argument] paste the last coppied multiple selections from the
 (hel-define-command hel-replace-with-kill-ring ()
   "Replace selection content with yanked text from `kill-ring'."
   :multiple-cursors t
-  (interactive)
+  (interactive "*")
   (when (use-region-p)
     (let ((deactivate-mark nil)
           (dir (hel-region-direction)))
@@ -761,7 +761,7 @@ With \\[universal-argument] paste the last coppied multiple selections from the
 (hel-define-command hel-join-line ()
   "Join the selected lines."
   :multiple-cursors t
-  (interactive)
+  (interactive "*")
   (hel-save-region
     (let* ((deactivate-mark nil)
            (region? (use-region-p))
@@ -803,7 +803,7 @@ With \\[universal-argument] paste the last coppied multiple selections from the
 (hel-define-command hel-invert-case ()
   "Invert case of characters."
   :multiple-cursors t
-  (interactive)
+  (interactive "*")
   (if-let ((region (hel-region)))
       (-let (((beg end) region)
              (deactivate-mark nil))
@@ -817,7 +817,7 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   "Convert text in selection to lower case.
 With no selection downcase the character after point."
   :multiple-cursors t
-  (interactive)
+  (interactive "*")
   (if (use-region-p)
       (let ((deactivate-mark nil))
         (downcase-region (region-beginning) (region-end)))
@@ -828,7 +828,7 @@ With no selection downcase the character after point."
   "Convert text in selection to upper case.
 With no selection upcase the character after point."
   :multiple-cursors t
-  (interactive)
+  (interactive "*")
   (if (use-region-p)
       (let ((deactivate-mark nil))
         (upcase-region (region-beginning) (region-end)))
@@ -910,7 +910,7 @@ When called interactively — toggle extending selection."
 ;; %
 (hel-define-command hel-mark-whole-buffer ()
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (hel-delete-all-fake-cursors)
   (hel-push-point)
   ;; `minibuffer-prompt-end'is really `point-min' in most cases, but if we're
@@ -1124,7 +1124,7 @@ at START-COLUMN, ends at END-COLUMN and consists of NUMBER-OF-LINES."
   (format "Delete all fake cursors from current buffer.
 You may restore them with %s (`hel-restore-cursors')."
           (propertize "g v" 'face 'help-key-binding))
-  (interactive)
+  (interactive "*")
   (when hel-multiple-cursors-mode
     (setq hel--cursors-positions-history (hel-cursors-positions))
     (hel-multiple-cursors-mode -1)))
@@ -1151,7 +1151,7 @@ You may restore them with %s (`hel-restore-cursors')."
 (hel-define-command hel-merge-selections ()
   "Merge all cursors into single selection."
   :multiple-cursors nil
-  (interactive)
+  (interactive "*")
   (when hel-multiple-cursors-mode
     (let ((beg (let ((cursor (hel-first-fake-cursor)))
                  (min (overlay-get cursor 'point)

@@ -224,12 +224,10 @@ in the command loop, and the fake cursors can pick up on those instead."
 ;;;; Help
 
 (with-eval-after-load 'help-mode
-  (hel-set-initial-state 'help-mode 'normal)
-  (hel-inhibit-insert-state help-mode-map))
+  (hel-set-initial-state 'help-mode 'normal))
 
 (with-eval-after-load 'helpful
   (hel-set-initial-state 'helpful-mode 'normal)
-  (hel-inhibit-insert-state helpful-mode-map)
   (put 'helpful-at-point 'multiple-cursors 'false))
 
 ;;;; Compilation

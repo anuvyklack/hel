@@ -385,34 +385,6 @@ MODE and STATE should be symbols."
   "Motion state."
   :cursor hel-motion-state-cursor)
 
-(defun hel-inhibit-insert-state (keymap)
-  "Unmap insertion keys from normal state.
-This is useful for read-only modes that starts in normal state."
-  (hel-keymap-set keymap
-    "<remap> <hel-insert>"                 #'ignore
-    "<remap> <hel-append>"                 #'ignore
-    "<remap> <hel-insert-line>"            #'ignore
-    "<remap> <hel-append-line>"            #'ignore
-    "<remap> <hel-open-below>"             #'ignore
-    "<remap> <hel-open-above>"             #'ignore
-    "<remap> <hel-change>"                 #'ignore
-    "<remap> <hel-cut>"                    #'ignore
-    "<remap> <hel-delete>"                 #'ignore
-    "<remap> <hel-undo>"                   #'ignore
-    "<remap> <hel-redo>"                   #'ignore
-    "<remap> <hel-paste-after>"            #'ignore
-    "<remap> <hel-paste-before>"           #'ignore
-    "<remap> <hel-replace-with-kill-ring>" #'ignore
-    "<remap> <hel-paste-pop>"              #'ignore
-    "<remap> <hel-paste-undo-pop>"         #'ignore
-    "<remap> <hel-join-line>"              #'ignore
-    "<remap> <hel-downcase>"               #'ignore
-    "<remap> <hel-upcase>"                 #'ignore
-    "<remap> <hel-invert-case>"            #'ignore
-    "<remap> <indent-region>"              #'ignore
-    "<remap> <indent-rigidly-left>"        #'ignore
-    "<remap> <indent-rigidly-right>"       #'ignore))
-
 ;;; Input-method
 
 (defun hel-activate-input-method ()
