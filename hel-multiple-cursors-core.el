@@ -348,11 +348,6 @@ If SORT is non-nil sort cursors in order they are located in buffer."
                            (overlay-get c2 'point))))
       cursors)))
 
-(defun hel-fake-cursors-in (start end)
-  "Return list of fake cursors within START...END buffer positions."
-  (-filter #'hel-fake-cursor-p
-           (overlays-in start end)))
-
 (defun hel-cursor-with-id (id)
   "Return the cursor with the given ID if it is stil alive."
   (if-let* ((cursor (gethash id hel--cursors-table))
