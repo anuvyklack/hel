@@ -671,7 +671,7 @@ the `killed-rectangle'. You can paste them later with %s (`hel-paste-after')
 or `yank-rectangle'."
           (propertize "M-u p" 'face 'help-key-binding))
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   ;; (unless (use-region-p)
   ;;   (user-error "No active selection"))
   (when (use-region-p)
