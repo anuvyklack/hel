@@ -59,22 +59,43 @@ Hel is not yet on MELPA. You can install it directly from Github.
 
 *** Dependencies
 #+begin_src emacs-lisp
+(use-package s :ensure t)
 (use-package dash :ensure t)
 (use-package avy :ensure t)
 (use-package pcre2el :ensure t)
+(use-package paredit :ensure t)
 #+end_src
 
 *** Emacs' built-in package manager
+
+This is the most minimal example of the =init.el= file:
+
 #+begin_src emacs-lisp
+;;; init.el -*- lexical-binding: t; no-byte-compile: t; -*-
+
+(setq package-archives '(("melpa"  . "https://melpa.org/packages/")
+                         ("gnu"    . "https://elpa.gnu.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+;; Dependencies
+(use-package s :ensure t)
+(use-package dash :ensure t)
+(use-package avy :ensure t)
+(use-package pcre2el :ensure t)
+(use-package paredit :ensure t)
+
 (use-package hel
   :vc (:url "https://github.com/anuvyklack/hel.git" :rev "main")
+  :custom (inhibit-startup-screen t)
   :config (hel-mode))
+
+;;; init.el ends here
 #+end_src
 
 *** [[https://github.com/progfolio/elpaca][Elpaca]]
 #+begin_src emacs-lisp
 (use-package hel
   :ensure (hel :host github :repo "anuvyklack/hel" :files (:defaults "**"))
+  :custom (inhibit-startup-screen t)
   :config (hel-mode))
 #+end_src
 
