@@ -584,7 +584,7 @@ be set manually."
   (unless (use-region-p)
     (hel-org-up-element))
   (if hel--extend-selection
-      (-let (((region-beg region-end dir new-line?) (hel-region)))
+      (-let (((region-beg region-end dir) (hel-region)))
         (deactivate-mark)
         (if-let* ((next-element (hel-org--next-element)))
             (let ((element-beg (org-element-begin next-element))
@@ -657,7 +657,7 @@ a parent with different boundaries or reaches a `section' element."
   (unless (use-region-p)
     (hel-org-up-element))
   (if hel--extend-selection
-      (-let (((region-beg region-end dir new-line?) (hel-region)))
+      (-let (((region-beg region-end dir) (hel-region)))
         (deactivate-mark)
         (if-let* ((previous-element (hel-org--previous-element)))
             (let ((element-beg (org-element-begin previous-element))
