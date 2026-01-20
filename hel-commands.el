@@ -159,7 +159,7 @@ Push mark at previous position, unless extending selection."
 (hel-define-command hel-end-of-buffer ()
   "Move point the end of the buffer."
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (hel-delete-all-fake-cursors)
   (hel-push-point)
   (hel-maybe-deactivate-mark)
@@ -374,7 +374,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-word-forward ()
   "Move to a word start after the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates avy-goto-word-0-regexp
@@ -390,7 +390,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-word-backward ()
   "Move to a word start before the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates avy-goto-word-0-regexp
@@ -409,7 +409,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-WORD-forward ()
   "Move to a WORD start after the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates "[^ \r\n\t]+" (point) (window-end nil t))
@@ -424,7 +424,7 @@ backward and jump to new top location."
 (hel-define-command hel-avy-WORD-backward ()
   "Move to a WORD start before the point, choosing it with Avy."
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (let ((orig-point (point)))
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates "[^ \r\n\t]+" (window-start) (point))
@@ -910,7 +910,7 @@ When called interactively — toggle extending selection."
 ;; %
 (hel-define-command hel-mark-whole-buffer ()
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (hel-delete-all-fake-cursors)
   (hel-push-point)
   ;; `minibuffer-prompt-end'is really `point-min' in most cases, but if we're
@@ -1124,7 +1124,7 @@ at START-COLUMN, ends at END-COLUMN and consists of NUMBER-OF-LINES."
   (format "Delete all fake cursors from current buffer.
 You may restore them with %s (`hel-restore-cursors')."
           (propertize "g v" 'face 'help-key-binding))
-  (interactive "*")
+  (interactive)
   (when hel-multiple-cursors-mode
     (setq hel--cursors-positions-history (hel-cursors-positions))
     (hel-multiple-cursors-mode -1)))
@@ -1151,7 +1151,7 @@ You may restore them with %s (`hel-restore-cursors')."
 (hel-define-command hel-merge-selections ()
   "Merge all cursors into single selection."
   :multiple-cursors nil
-  (interactive "*")
+  (interactive)
   (when hel-multiple-cursors-mode
     (let ((beg (let ((cursor (hel-first-fake-cursor)))
                  (min (overlay-get cursor 'point)
