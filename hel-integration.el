@@ -489,6 +489,38 @@ in the command loop, and the fake cursors can pick up on those instead."
     "j" #'log-view-msg-next
     "k" #'log-view-msg-prev))
 
+;;;; widget
+
+(defun hel-switch-to-normal-state-in-field-widget ()
+  "This function intended to be called from mode hook of major modes that use
+field widgets (like `Custom-mode' or `notmuch-hello-mode')."
+  (add-hook 'post-command-hook #'hel--widget-field-h nil t))
+
+(defun hel--widget-field-h ()
+  (cond ((widget-field-at (point))
+         (when (eq hel-state 'motion)
+           (hel-normal-state)
+           (hel-update-active-keymaps)))
+        ((not (eq hel-state 'motion))
+         (when hel-multiple-cursors-mode (hel-multiple-cursors-mode -1))
+         (hel-motion-state))))
+
+(with-eval-after-load 'wid-edit
+  (hel-keymap-set widget-field-keymap :state 'normal
+    "g h" 'hel-beginning-of-line-command
+    "g l" 'hel-widget-end-of-line)
+  ;;
+  (widget-put (get 'editable-field 'widget-type) :keymap widget-field-keymap))
+
+;; gl
+(hel-define-command hel-widget-end-of-line ()
+  "Move point to end of field or end of line, whichever is first."
+  :multiple-cursors t
+  :merge-selections t
+  (interactive)
+  (hel-set-region (if hel--extend-selection (mark) (point))
+                  (progn (widget-end-of-line) (point))))
+
 ;;;; Xref
 
 (with-eval-after-load 'xref
