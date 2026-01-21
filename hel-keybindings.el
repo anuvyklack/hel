@@ -134,24 +134,14 @@ use it."
   "%"   #'hel-mark-whole-buffer
   "C"   #'hel-copy-selection
   "M-c" #'hel-copy-selection-up
-  "("   #'hel-rotate-selections-backward
-  ")"   #'hel-rotate-selections-forward
-  "M-(" #'hel-rotate-selections-content-backward
-  "M-)" #'hel-rotate-selections-content-forward
   "s"   #'hel-select-regex
   "S"   #'hel-split-region
   "M-s" #'hel-split-region-on-newline
-  "K"   #'hel-keep-selections
-  "M-K" #'hel-remove-selections
-  ","   #'hel-delete-all-fake-cursors
-  "M-," #'hel-remove-main-cursor
-  "M--" #'hel-merge-selections
   ";"   #'hel-collapse-selection
   "C-;" #'hel-exchange-point-and-mark
   "M-;" #'hel-exchange-point-and-mark
   "g ;" #'hel-exchange-point-and-mark
   "_"   #'hel-trim-whitespaces-from-selection
-  "&"   #'hel-align-selections
   "g v" #'hel-restore-cursors
 
   ;; Surround
@@ -210,6 +200,20 @@ use it."
   "g D" #'xref-find-references
   "[ x" #'xref-go-back
   "] x" #'xref-go-forward)
+
+;;;; Keys active while there are multiple cursors
+
+(hel-keymap-set hel-multiple-cursors-mode-map :state 'normal
+  "K"   #'hel-keep-selections
+  "M-K" #'hel-remove-selections
+  ","   #'hel-delete-all-fake-cursors
+  "M-," #'hel-remove-main-cursor
+  "("   #'hel-rotate-selections-backward
+  ")"   #'hel-rotate-selections-forward
+  "M-(" #'hel-rotate-selections-content-backward
+  "M-)" #'hel-rotate-selections-content-forward
+  "M--" #'hel-merge-selections
+  "&"   #'hel-align-selections)
 
 ;;;; Mark commands
 

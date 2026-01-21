@@ -574,7 +574,8 @@ delete last one with `hel-delete-fake-cursor'."
   (if hel-multiple-cursors-mode
       (hel--disable-minor-modes-incompatible-with-multiple-cursors)
     (hel--delete-all-fake-cursors)
-    (hel--enable-minor-modes-incompatible-with-multiple-cursors)))
+    (hel--enable-minor-modes-incompatible-with-multiple-cursors))
+  (hel-update-active-keymaps))
 
 (defun hel-auto-multiple-cursors-mode ()
   "Enable `hel-multiple-cursors' if there are multiple cursors,
