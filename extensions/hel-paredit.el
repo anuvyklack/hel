@@ -290,6 +290,7 @@ and brackets."
   "Kill (cut) text in region. I.e. delete text and put it in the `kill-ring'.
 If no selection — delete COUNT chars before point."
   :multiple-cursors t
+  :merge-selections t
   (interactive "p")
   (if (use-region-p)
       (condition-case err
@@ -306,6 +307,7 @@ If no selection — delete COUNT chars before point."
   "Delete text in region, without modifying the `kill-ring'.
 If no selection — delete COUNT chars after point."
   :multiple-cursors t
+  :merge-selections t
   (interactive "p")
   (if (use-region-p)
       (condition-case err

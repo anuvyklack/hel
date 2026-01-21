@@ -239,6 +239,7 @@ With \\[universal-argument] invokes `yank-rectangle' instead. See `hel-copy'."
   "Kill (cut) text in region. I.e. delete text and put it in the `kill-ring'.
 If no selection — delete COUNT chars before point."
   :multiple-cursors t
+  :merge-selections t
   (interactive "*p")
   (if (use-region-p)
       (kill-region nil nil t)

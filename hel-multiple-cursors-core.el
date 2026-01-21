@@ -674,7 +674,6 @@ and which for all to `hel-whitelist-file' file."
 (defun hel--merge-cursors-p (command)
   "Return non-nil if regions need to be merged after COMMAND."
   (and hel-multiple-cursors-mode
-       mark-active
        (cond ((symbolp command)
               (pcase (get command 'merge-selections)
                 ('extend-selection hel--extend-selection)
