@@ -349,9 +349,26 @@ use it."
   "m a 8" #'hel-ma-digit-argument
   "m a 9" #'hel-ma-digit-argument)
 
-;;;; Windows
+;;; Motion state
 
-(hel-keymap-global-set :state 'normal
+(hel-keymap-global-set :state 'motion
+  ":"   #'execute-extended-command
+  "] b" #'next-buffer
+  "[ b" #'previous-buffer
+  ;; Scrolling
+  "C-b" #'hel-smooth-scroll-page-up
+  "C-f" #'hel-smooth-scroll-page-down
+  "C-d" #'hel-smooth-scroll-down
+  "C-u" #'hel-smooth-scroll-up
+  "C-e" #'hel-mix-scroll-line-down
+  "C-y" #'hel-mix-scroll-line-up
+  "z z" #'hel-smooth-scroll-line-to-eye-level
+  "z t" #'hel-smooth-scroll-line-to-top
+  "z b" #'hel-smooth-scroll-line-to-bottom)
+
+;;; C-w keys
+
+(hel-keymap-global-set :state '(normal motion)
   "C-w" 'hel-window-map)
 
 (hel-keymap-set hel-window-map
@@ -415,24 +432,6 @@ use it."
   "C-b" #'clone-indirect-buffer-other-window
   "C-x" #'scratch-buffer
   "C-z" #'bury-buffer)
-
-;;; Motion state
-
-(hel-keymap-global-set :state 'motion
-  "C-w" 'hel-window-map
-  ":"   #'execute-extended-command
-  "] b" #'next-buffer
-  "[ b" #'previous-buffer
-  ;; Scrolling
-  "C-b" #'hel-smooth-scroll-page-up
-  "C-f" #'hel-smooth-scroll-page-down
-  "C-d" #'hel-smooth-scroll-down
-  "C-u" #'hel-smooth-scroll-up
-  "C-e" #'hel-mix-scroll-line-down
-  "C-y" #'hel-mix-scroll-line-up
-  "z z" #'hel-smooth-scroll-line-to-eye-level
-  "z t" #'hel-smooth-scroll-line-to-top
-  "z b" #'hel-smooth-scroll-line-to-bottom)
 
 ;;; Insert state
 
