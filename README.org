@@ -57,15 +57,6 @@ deserves credit.
 
 Hel is not yet on MELPA. You can install it directly from Github.
 
-*** Dependencies
-#+begin_src emacs-lisp
-(use-package s :ensure t)
-(use-package dash :ensure t)
-(use-package avy :ensure t)
-(use-package pcre2el :ensure t)
-(use-package paredit :ensure t)
-#+end_src
-
 *** Emacs' built-in package manager
 
 This is the most minimal example of the =init.el= file:
@@ -136,8 +127,11 @@ alternatives in Emacs.
   line. This is done for convenience, since all other motions make selections.
   In Helix =gh= / =gl= only move cursor without creating selection.
 
-- Keys that are relevant only when multiple cursors are present (e.g. =,=, =M-,=, =(=​,
-  =)=, =&=, etc) will be active only in that case.
+- Keys that are relevant only when multiple cursors are present will be active
+  only in that case (e.g. =K=, =,=, =&= — full list is in
+  ~hel-multiple-cursors-mode-map~ keymap). This allows to reuse, for example, =K=
+  for documentation lookup, =,= for localleader when there is only one cursor in
+  the buffer.
 
 - =gg= / =G= to go to the first/last line of the buffer like in Vim.
   Helix uses =gg= / =ge=.
@@ -166,14 +160,14 @@ alternatives in Emacs.
 ** Tips
 
 - By default, Hel uses a bar cursor for Normal state and a box cursor for Insert
-  state—the opposite of what Vim and Evil do. Your first instinct may be to
-  switch them back to what you’re used to, but I recommend not doing so. This
-  was the first I done myself, and went through all the stages of acceptance —
-  the bar cursor is better suited for Normal state.
+  state—the opposite of what Vim does. Your first instinct may be to switch them
+  back to what you’re used to, but I recommend not doing so. This was the first
+  I done myself, and went through all the stages of acceptance, give default
+  settings a try — the bar cursor is better suited for Normal state.
 
-- You can set localleader keymap to =,=. It will act as the local leader
-  when there is only one cursor in the buffer, and will delete all secondary
-  cursors when there are multiple cursors.
+- You can set localleader keymap to =,=. It will act as the local leader while
+  there is only one cursor in the buffer, and will delete all secondary cursors
+  when there are multiple cursors.
 
 ** Acknowledgments
 
@@ -199,7 +193,7 @@ You are welcome to go and give them all at least a star!
 
 - *Support the development*
 
-  If you wish, you can support Hel development via:
+  If you’d like to support Hel’s development, you can do so with a donation:
 
   - [[https://www.paypal.me/anuvyklack][PayPal]]
 
