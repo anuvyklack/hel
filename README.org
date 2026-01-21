@@ -92,6 +92,10 @@ This is the most minimal example of the =init.el= file:
 #+end_src
 
 *** [[https://github.com/progfolio/elpaca][Elpaca]]
+
+You also need to install dependencies the same way as in the example for
+built-in package manager.
+
 #+begin_src emacs-lisp
 (use-package hel
   :ensure (hel :host github :repo "anuvyklack/hel" :files (:defaults "**"))
@@ -126,9 +130,19 @@ alternatives in Emacs.
 - Mark commands accept numeric arguments:
   =m2ip= or =2mip= — select 2 paragraphs.
 
+- You can restore last multiple selections with =gv=.
+
 - =gh= / =gl= make a selection from current position till the beginning/end of the
   line. This is done for convenience, since all other motions make selections.
   In Helix =gh= / =gl= only move cursor without creating selection.
+
+- Keys that are relevant only when multiple cursors are present (e.g. =,=, =M-,=, =(=​,
+  =)=, =&=, etc) will be active only in that case.
+
+- =gg= / =G= to go to the first/last line of the buffer like in Vim.
+  Helix uses =gg= / =ge=.
+
+- Scrolling keybindings are taken from Vim instead of Helix.
 
 - Six easymotion commands are provided:
   - =gw= / =gb= — chose and mark word forward/backward.
@@ -136,18 +150,11 @@ alternatives in Emacs.
   - =gj= / =gk= — go to line down/up.
   Helix provides only =gw= to place 2-char hints at the beginning of each word.
 
-- =gg= / =G= to go to the first/last line of the buffer like in Vim.
-  Helix uses =gg= / =ge=.
-
-- Restore last multiple selections with =gv=.
-
 - =f=, =F=, =t=, =T= commands to move to char are inhanced: they show hints for targets,
   and while hints are active, they can be repeated with =n= / =N= keys.
 
 - When you search backward with =?= command, while hints are acitve =n= and =N= keys
   are swaped: =n= will repeat search backward and =N= — forward, like in Vim.
-
-- Scrolling keybindings are taken from Vim instead of Helix.
 
 ** Commands that are not implemented
 
@@ -155,7 +162,19 @@ alternatives in Emacs.
 - =r= — replace (TODO)
 - =M-u=, =M-U= — traverse undo tree
 - =q=, =Q= — record keyboard macros
-  
+
+** Tips
+
+- By default, Hel uses a bar cursor for Normal state and a box cursor for Insert
+  state—the opposite of what Vim and Evil do. Your first instinct may be to
+  switch them back to what you’re used to, but I recommend not doing so. This
+  was the first I done myself, and went through all the stages of acceptance —
+  the bar cursor is better suited for Normal state.
+
+- You can set localleader keymap to =,=. It will act as the local leader
+  when there is only one cursor in the buffer, and will delete all secondary
+  cursors when there are multiple cursors.
+
 ** Acknowledgments
 
 Hel depends on [[https://github.com/magnars/dash.el][dash.el]], [[https://github.com/joddie/pcre2el][pcre2el]], and [[https://github.com/abo-abo/avy][avy]] wonderful packages.
@@ -173,17 +192,15 @@ You are welcome to go and give them all at least a star!
 
 ** Contributing
 
-- *Share it*
+- *Share*
 
   A quick post about this package on your blog or social network could bring
   new users to Emacs, which would be great!
 
-- *Support development*
+- *Support the development*
 
-  Hel was developed on an old laptop with a cracked screen. I worked on it instead
-  of grinding LeetCode, and I have run out of money. If you like it and want to
-  support its development, you can donate via:
+  If you wish, you can support Hel development via:
 
   - [[https://www.paypal.me/anuvyklack][PayPal]]
 
-  Every contribution is greatly appreciated. Thank you!
+  Every contribution is greatly appreciated.
