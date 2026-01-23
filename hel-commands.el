@@ -593,6 +593,8 @@ depending on DIRECTION."
                  (visual-lines? (hel-visual-lines-p)))
              (kill-region nil nil t)
              (cond (logical-lines?
+                    (newline)
+                    (backward-char)
                     (indent-according-to-mode))
                    (visual-lines?
                     (insert " ")
