@@ -106,17 +106,26 @@ Scrolling commands are taken from Vim.
 - =w=, =b=, =e= :: word motions
 - =W=, =B=, =E= :: WORD motions
 
-- =f=, =F= :: Find next/previous char.
+- =f= / =F= :: Find next/previous char.
   While hints are active use =n= / =N= to repeat motion.
 
-- =t=, =T= :: Till next/previous char.
+- =t= / =T= :: Till next/previous char.
   While hints are active use =n= / =N= to repeat motion.
 
 - =gs=, =gh=, =gl= :: Move to beginning/end of line
 
 - =gg= / =G= :: Go to the *first* / *last* line of the buffer.
 
-- =}=, ={= or =]p=, =[p= :: Move over paragraphs.
+- ={= / =}= or =[p= / =]p= :: Move over paragraphs.
+
+- =(= / =)= ::
+  When there is only one cursor in the buffer, moves over sentences in major
+  modes derived from ~text-mode~, or over functions in major modes derived from
+  ~prog-mode~.
+
+- =[f= / =]f= :: Move over functions.
+
+- =[s= / =]s= :: Move over sentences.
 
 *** Easymotion
 
@@ -181,13 +190,15 @@ Scrolling commands are taken from Vim.
 
 - =M-s= :: Split selections on newlines.
 
+- =gv= :: Restore last multiple cursors positions.
+
+*** Keys active while there are multiple cursors
+
 - =K= / =M-K= :: Keep/remove selections matching to regexp.
 
 - =,= :: Remove all secondary cursors.
 
 - =M-,= :: Remove main cursor.
-
-- =gv= :: Restore last multiple cursors positions.
 
 - =&= :: Align selections.
 

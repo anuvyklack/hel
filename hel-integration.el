@@ -444,7 +444,15 @@ in the command loop, and the fake cursors can pick up on those instead."
 ;;;; prog-mode
 
 (hel-keymap-set prog-mode-map :state 'normal
-  "g q" #'prog-fill-reindent-defun)
+  "g q" #'prog-fill-reindent-defun
+  ")"   #'hel-mark-function-forward
+  "("   #'hel-mark-function-backward)
+
+;;;; text-mode
+
+(hel-keymap-set text-mode-map :state 'normal
+  ")" #'hel-mark-sentence-forward
+  "(" #'hel-mark-sentence-backward)
 
 ;;;; winner-mode & tab-bar-history-mode
 
