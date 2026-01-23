@@ -123,15 +123,15 @@ alternatives in Emacs.
 
 - You can restore last multiple selections with =gv=.
 
-- =gh= / =gl= make a selection from current position till the beginning/end of the
-  line. This is done for convenience, since all other motions make selections.
-  In Helix =gh= / =gl= only move cursor without creating selection.
+- =gs=, =gh= and =gl= commadns are reworked: they make selections like all other
+  motions, =gs= moves to the beginning of a line, =gh= moves to the beginning of a
+  line skipping indentation, =gl= move to the end of a line.
 
 - Keys that are relevant only when multiple cursors are present will be active
   only in that case (e.g. =K=, =,=, =&= — full list is in
   ~hel-multiple-cursors-mode-map~ keymap). This allows to reuse, for example, =K=
-  for documentation lookup, =,= for localleader when there is only one cursor in
-  the buffer.
+  for documentation lookup or =,= for localleader when there is only one cursor
+  in the buffer.
 
 - =gg= / =G= to go to the first/last line of the buffer like in Vim.
   Helix uses =gg= / =ge=.

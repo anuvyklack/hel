@@ -106,13 +106,15 @@ Scrolling commands are taken from Vim.
 - =w=, =b=, =e= :: word motions
 - =W=, =B=, =E= :: WORD motions
 
-- =f= / =F= :: Find next/previous char.
+- =f= / =F= :: Find *next* / *previous* char.
   While hints are active use =n= / =N= to repeat motion.
 
-- =t= / =T= :: Till next/previous char.
+- =t= / =T= :: Till *next* / *previous* char.
   While hints are active use =n= / =N= to repeat motion.
 
-- =gs=, =gh=, =gl= :: Move to beginning/end of line
+- =gs= / =gl= :: Move to the *beginning* / *end* of a line.
+
+- =gh= :: Move to the beginning of a line skipping indentation.
 
 - =gg= / =G= :: Go to the *first* / *last* line of the buffer.
 
