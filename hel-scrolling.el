@@ -47,7 +47,8 @@ If PAGES is non-nil scroll over pages instead of lines."
                       (t (* count line-height))))
          (point-data (posn-at-point))
          (row-at-point (cdr (posn-col-row point-data)))
-         (y-at-point (cdr (posn-x-y point-data)))
+         (y-at-point (or (cdr (posn-x-y point-data))
+                         0)) ;; because sometimes `posn-at-point' returns nil
          at-bottom?)
     ;; BUG: When jump lands at the top of the screen the point could be only
     ;;   partially visible. If you try to scroll smoothly from this position
@@ -81,7 +82,8 @@ If PAGES is non-nil scroll over pages instead of lines."
                       (t (* count line-height))))
          (point-data (posn-at-point))
          (row-at-point (cdr (posn-col-row point-data)))
-         (y-at-point (cdr (posn-x-y point-data)))
+         (y-at-point (or (cdr (posn-x-y point-data))
+                         0)) ;; because sometimes `posn-at-point' returns nil
          at-top?)
     ;; BUG: When jump lands at the top of the screen the point could be only
     ;;   partially visible. If you try to scroll smoothly from this position
@@ -246,7 +248,8 @@ If COUNT > 1 scroll smoothly."
          (posn-y-target (ceiling (/ window-height 2)))
          (point-data (posn-at-point))
          (row-at-point (cdr (posn-col-row point-data)))
-         (y-at-point (cdr (posn-x-y point-data)))
+         (y-at-point (or (cdr (posn-x-y point-data))
+                         0)) ;; because sometimes `posn-at-point' returns nil
          (delta (- posn-y-target
                    y-at-point)))
     (when (= row-at-point 0) (recenter 0))
@@ -266,7 +269,8 @@ If COUNT > 1 scroll smoothly."
          (posn-y-target (ceiling (/ window-height 5)))
          (point-data (posn-at-point))
          (row-at-point (cdr (posn-col-row point-data)))
-         (y-at-point (cdr (posn-x-y point-data)))
+         (y-at-point (or (cdr (posn-x-y point-data))
+                         0)) ;; because sometimes `posn-at-point' returns nil
          (delta (- posn-y-target
                    y-at-point)))
     (when (= row-at-point 0) (recenter 0))
@@ -285,7 +289,8 @@ If COUNT > 1 scroll smoothly."
   (let* ((line-height (default-line-height))
          (point-data (posn-at-point))
          (row-at-point (cdr (posn-col-row point-data)))
-         (y-at-point (cdr (posn-x-y point-data)))
+         (y-at-point (or (cdr (posn-x-y point-data))
+                         0))
          (delta (- y-at-point
                    (/ line-height 4))))
     (when (= row-at-point 0) (recenter 0))
@@ -309,7 +314,8 @@ If COUNT > 1 scroll smoothly."
          (line-height (default-line-height))
          (point-data (posn-at-point))
          (row-at-point (cdr (posn-col-row point-data)))
-         (y-at-point (cdr (posn-x-y point-data)))
+         (y-at-point (or (cdr (posn-x-y point-data))
+                         0))
          (delta (- window-height
                    y-at-point
                    (/ line-height 4))))
