@@ -123,9 +123,12 @@ alternatives in Emacs.
 
 - You can restore last multiple selections with =gv=.
 
-- =gs=, =gh= and =gl= commadns are reworked: they make selections like all other
-  motions, =gs= moves to the beginning of a line, =gh= moves to the beginning of a
-  line skipping indentation, =gl= move to the end of a line.
+- =gs=, =gh=, and =gl= make selections. This is done for convenience, since all other
+  motions make selections. In Helix they only move the cursor without creating
+  selection.
+
+- =gs= and =gh= are swapped: =gs= moves to the beginning of a line, =gh= moves to the
+  beginning of a line skipping indentation.
 
 - Keys that are relevant only when multiple cursors are present will be active
   only in that case (e.g. =K=, =,=, =&= — full list is in
@@ -148,7 +151,7 @@ alternatives in Emacs.
   and while hints are active, they can be repeated with =n= / =N= keys.
 
 - When you search backward with =?= command, while hints are acitve =n= and =N= keys
-  are swaped: =n= will repeat search backward and =N= — forward, like in Vim.
+  are swapped: =n= will repeat search backward and =N= — forward, like in Vim.
 
 ** Commands that are not implemented
 
