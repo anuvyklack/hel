@@ -675,10 +675,11 @@ and which for all to `hel-whitelist-file' file."
   "Return non-nil if regions need to be merged after COMMAND."
   (and hel-multiple-cursors-mode
        (cond ((symbolp command)
-              (let ((val (get command 'merge-selections)))
-                (if (functionp val)
-                    (funcall val)
-                  val)))
+              (pcase (get command 'merge-selections)
+                ('t t)
+                ('hel--extend-selection hel--extend-selection)
+                ((and (pred functionp) fn)
+                 (funcall fn))))
              ((functionp command) ;; COMMAND is a lambda
               t))))
 

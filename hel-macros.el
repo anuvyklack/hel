@@ -154,6 +154,7 @@ parameters:
         (:merge-selections
          (when (setq value (pcase value
                              ((or 't 'nil) value)
+                             ('hel--extend-selection ''hel--extend-selection)
                              (_ `(lambda () ,value))))
            (push `(put ',command 'merge-selections ,value)
                  properties)))))
