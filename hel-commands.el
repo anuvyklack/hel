@@ -1072,6 +1072,7 @@ entered regexp withing current selections."
               ((not (hel-fake-cursor-at pos))))
     (unless (hel-fake-cursor-at (point))
       (hel-create-fake-cursor-from-point))
+    (deactivate-mark)
     (goto-char pos)))
 
 (defun hel--copy-region (direction)
