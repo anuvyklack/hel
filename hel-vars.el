@@ -372,7 +372,7 @@ use `hel-state-property'.")
 (hel-defvar-local hel-overriding-local-map nil)
 
 (hel-defvar-local hel--extend-selection nil
-  "Extend selection.")
+  "When this flag is set motions will extend selection.")
 
 (hel-defvar-local hel-selection-history nil
   "The history of selections.")

@@ -43,7 +43,7 @@
 (hel-define-command hel-backward-char (count)
   "Move backward COUNT chars."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel-maybe-deactivate-mark)
   (backward-char count))
@@ -52,7 +52,7 @@
 (hel-define-command hel-forward-char (count)
   "Move forward COUNT chars."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel-maybe-deactivate-mark)
   (forward-char count))
@@ -63,7 +63,7 @@
 If both linewise selection (`x' key) and extending selection (`v' key)
 are active — works like `hel-expand-line-selection'."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (if (and hel--extend-selection (hel-logical-lines-p))
       (hel-expand-line-selection count)
@@ -80,7 +80,7 @@ are active — works like `hel-expand-line-selection'."
 If both linewise selection (`x' key) and extending selection (`v' key)
 are active — works like `hel-expand-line-selection-backward'."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel-next-line (- count)))
 
@@ -88,7 +88,7 @@ are active — works like `hel-expand-line-selection-backward'."
 (hel-define-command hel-forward-word-start (count)
   "Move to the COUNT-th next word start."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel--forward-word-start 'hel-word count))
 
@@ -96,7 +96,7 @@ are active — works like `hel-expand-line-selection-backward'."
 (hel-define-command hel-forward-WORD-start (count)
   "Move to the COUNT-th next WORD start."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel--forward-word-start 'hel-WORD count))
 
@@ -104,7 +104,7 @@ are active — works like `hel-expand-line-selection-backward'."
 (hel-define-command hel-backward-word-start (count)
   "Move to the COUNT-th previous word start."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel--backward-word-start 'hel-word count))
 
@@ -112,7 +112,7 @@ are active — works like `hel-expand-line-selection-backward'."
 (hel-define-command hel-backward-WORD-start (count)
   "Move to the COUNT-th previous WORD start."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel--backward-word-start 'hel-WORD count))
 
@@ -120,7 +120,7 @@ are active — works like `hel-expand-line-selection-backward'."
 (hel-define-command hel-forward-word-end (count)
   "Move to the COUNT-th next word end."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel--forward-word-end 'hel-word count))
 
@@ -128,7 +128,7 @@ are active — works like `hel-expand-line-selection-backward'."
 (hel-define-command hel-forward-WORD-end (count)
   "Move COUNT-th next WORD end."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel--forward-word-end 'hel-WORD count))
 
@@ -1591,7 +1591,7 @@ already there."
 Right after this command while hints are active, you can use `n' and `N'
 keys to repeat motion forward/backward."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (let ((char (read-char "f" t)))
     (hel-maybe-set-mark)
@@ -1604,7 +1604,7 @@ keys to repeat motion forward/backward."
 Right after this command while hints are active, you can use `n' and `N'
 keys to repeat motion forward/backward."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (cl-callf - count)
   (let ((char (read-char "F" t)))
@@ -1618,7 +1618,7 @@ keys to repeat motion forward/backward."
 Right after this command while hints are active, you can use `n' and `N'
 keys to repeat motion forward/backward."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (let ((char (read-char "t" t)))
     (hel-maybe-set-mark)
@@ -1631,7 +1631,7 @@ keys to repeat motion forward/backward."
 Right after this command while hints are active, you can use `n' and `N'
 keys to repeat motion forward/backward."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (cl-callf - count)
   (let ((char (read-char "T" t)))

@@ -676,8 +676,8 @@ and which for all to `hel-whitelist-file' file."
   (and hel-multiple-cursors-mode
        (cond ((symbolp command)
               (let ((val (get command 'merge-selections)))
-                (if (eq val 'extend-selection)
-                    hel--extend-selection
+                (if (functionp val)
+                    (funcall val)
                   val)))
              ((functionp command) ;; COMMAND is a lambda
               t))))

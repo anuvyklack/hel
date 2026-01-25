@@ -122,11 +122,9 @@ parameters:
   - nil  Command will be executed only for main cursor.
 
 `:merge-selections'
-  - t    After this command overlapping selections (regions) will be merged into
-         single selection.
-  - `extend-selection' (symbol)
-         Selections will be checked on overlapping only when extending selections
-         is enabled (`hel-extend-selection').
+  Any Emacs lisp FORM, that will be evaluated after COMMAND execution,
+  and if it evaluates to non-nil overlapping selections (regions) will
+  be merged into single selection.
 
 \(fn COMMAND (ARGS...) [DOC] [[KEY VALUE]...] BODY...)"
   (declare (indent defun)
@@ -154,8 +152,11 @@ parameters:
          (push `(put ',command 'multiple-cursors ,(if (eq value t) t ''false))
                properties))
         (:merge-selections
-         (push `(put ',command 'merge-selections ,value)
-               properties))))
+         (when (setq value (pcase value
+                             ((or 't 'nil) value)
+                             (_ `(lambda () ,value))))
+           (push `(put ',command 'merge-selections ,value)
+                 properties)))))
     ;; macro expansion
     `(progn
        (defun ,command (,@args)

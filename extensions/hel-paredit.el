@@ -129,7 +129,7 @@ If COUNT is negative — move backward."
 Like `hel-forward-WORD-end' but additionally skips all parentheses
 and brackets."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (skip-chars-forward "()[]")
   (hel--forward-word-start 'hel-paredit-WORD count))
@@ -140,7 +140,7 @@ and brackets."
 Like `hel-backward-WORD-end' but additionally skips all parentheses
 and brackets."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (cl-assert (< 0 count))
   (skip-chars-backward "\r\n")
@@ -156,7 +156,7 @@ and brackets."
 Like `hel-forward-WORD-end' but additionally skips all parentheses
 and brackets."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (skip-chars-forward "()[]")
   (skip-chars-forward "\r\n")
@@ -183,7 +183,7 @@ and brackets."
 (hel-define-command hel-paredit-forward-sexp (count)
   "Mark COUNT sexp forward."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (unless (zerop count)
     (let* ((sexp 'hel-paredit-sexp)
@@ -219,7 +219,7 @@ and brackets."
 (hel-define-command hel-paredit-backward-sexp (count)
   "Mark COUNT sexp backward."
   :multiple-cursors t
-  :merge-selections 'extend-selection
+  :merge-selections hel--extend-selection
   (interactive "p")
   (hel-paredit-forward-sexp (- count)))
 
