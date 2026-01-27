@@ -152,12 +152,10 @@ parameters:
          (push `(put ',command 'multiple-cursors ,(if (eq value t) t ''false))
                properties))
         (:merge-selections
-         (when (setq value (pcase value
-                             ((or 't 'nil) value)
-                             ('hel--extend-selection ''hel--extend-selection)
-                             (_ `(lambda () ,value))))
-           (push `(put ',command 'merge-selections ,value)
-                 properties)))))
+         (push `(put ',command 'merge-selections ,(if (symbolp value)
+                                                      `',value
+                                                    `(lambda () ,value)))
+               properties))))
     ;; macro expansion
     `(progn
        (defun ,command (,@args)
