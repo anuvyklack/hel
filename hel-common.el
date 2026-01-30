@@ -868,9 +868,10 @@ YANK-FUNCTION should be a `yank' like function."
               ((symbol-function 'push-mark) #'hel-push-mark))
       (funcall yank-function))
     (hel-set-region (mark t) (point) region-dir)
-    (when (use-region-p)
-      (indent-region (region-beginning) (region-end)))
-    (hel-extend-selection -1)))
+    (hel-extend-selection -1)
+    (when (and (derived-mode-p 'prog-mode)
+               (use-region-p))
+      (indent-region (region-beginning) (region-end)))))
 
 (defun hel--yank-transform (str)
   (if (and (not (string-empty-p str))

@@ -757,8 +757,10 @@ With \\[universal-argument] paste the last coppied multiple selections from the
                 ((symbol-function 'push-mark) #'hel-push-mark))
         (yank))
       (hel-set-region (mark t) (point) dir)
-      (indent-region (region-beginning) (region-end))
-      (hel-extend-selection -1))))
+      (hel-extend-selection -1)
+      (when (and (derived-mode-p 'prog-mode)
+                 (use-region-p))
+        (indent-region (region-beginning) (region-end))))))
 
 ;; J
 (hel-define-command hel-join-line ()
