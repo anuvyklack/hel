@@ -579,6 +579,19 @@ field widgets (like `Custom-mode' or `notmuch-hello-mode')."
                  consult-ripgrep))
     (hel-advice-add cmd :before #'hel-deactivate-mark-a)))
 
+;;;; diff-hl
+
+(add-hook 'diff-hl-show-hunk-inline-transient-mode-hook
+          (defun hel-switch-to-motion-state-while-diff-hl-show-hunk-h ()
+            "Switch to motion state while VC diff hunk is shown."
+            (if diff-hl-show-hunk-inline-transient-mode
+                (hel-motion-state)
+              (hel-normal-state))))
+
+(with-eval-after-load 'diff-hl-show-hunk-inline
+  (hel-keymap-set diff-hl-show-hunk-inline-transient-mode-map
+    "<remap> <self-insert-command>" 'ignore))
+
 ;;; .
 (provide 'hel-integration)
 ;;; hel-integration.el ends here
