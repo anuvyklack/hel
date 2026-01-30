@@ -173,6 +173,43 @@
                org-shiftmetaright))
   (hel-advice-add cmd :around #'hel-keep-selection-a))
 
+;;; Show full markup while multiple cursors are active
+
+(add-hook 'org-mode-hook 'hel-org-show-emphasis-markers-when-multiple-cursors
+
+(defun hel-org-show-emphasis-markers-when-multiple-cursors ()
+  "Temporary disable `org-hide-emphasis-markers' while there are multiple
+cursors in the buffer."
+  (when org-hide-emphasis-markers
+    (hel-keymap-set org-mode-map
+      "<remap> <hel-copy-selection>"    'hel-org-copy-selection
+      "<remap> <hel-copy-selection-up>" 'hel-org-copy-selection-up)
+    (add-hook 'hel-multiple-cursors-mode-hook
+              (lambda ()
+                (setq-local org-hide-emphasis-markers (not hel-multiple-cursors-mode))
+                (font-lock-flush))
+              nil t))))
+
+;; C
+(hel-define-command hel-org-copy-selection (count)
+  "Copy selections COUNT times down if COUNT is positive, or up if negative."
+  :multiple-cursors nil
+  :merge-selections t
+  (interactive "p")
+  (progn
+    (setq-local org-hide-emphasis-markers nil)
+    (font-lock-flush)
+    (redisplay))
+  (hel-copy-selection count))
+
+;; M-c
+(hel-define-command hel-org-copy-selection-up (count)
+  "Copy each selection COUNT times up."
+  :multiple-cursors nil
+  :merge-selections t
+  (interactive "p")
+  (hel-org-copy-selection (- count)))
+
 ;;; Commands
 
 ;; (dolist (cmd '(org-cycle      ; TAB
