@@ -56,13 +56,9 @@ action. The step is terminated with `hel--single-undo-step-end'."
     (setq hel--undo-list-pointer buffer-undo-list)
     (hel--push-undo-boundary-1)))
 
-(defvar hel-insert-state)
-
 (defun hel--single-undo-step-end ()
   "Finalize atomic undo step started by `hel--single-undo-step-beginning'."
-  (when (and hel--in-single-undo-step
-             ;; Merged all changes in Insert state into one undo step.
-             (not hel-insert-state))
+  (when hel--in-single-undo-step
     (hel--push-undo-boundary-2)
     (unless (eq buffer-undo-list hel--undo-list-pointer)
       (let ((undo-list buffer-undo-list))

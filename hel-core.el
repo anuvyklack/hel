@@ -70,7 +70,9 @@
          (message "[Hel] error while executing command for fake cursor: %s"
                   (error-message-string err)))
         (quit))) ;; "C-g" during multistage command.
-    (hel--single-undo-step-end)
+    ;; Merged all changes in Insert state into one undo step.
+    (unless hel-insert-state
+      (hel--single-undo-step-end))
     (setq hel-this-command nil
           hel--input-cache nil)))
 
