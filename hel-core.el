@@ -47,7 +47,11 @@
     (set-mark (point)))
   (unless hel-executing-command-for-fake-cursor
     (setq hel-this-command this-command)
-    (hel--single-undo-step-beginning)))
+    ;; Use our undo mechanism only in Normal state. This will
+    ;; - merge all changes in Insert state into one undo step;
+    ;; - ignore buffers in Motion state that use undo, like Dired.
+    (when hel-normal-state
+      (hel--single-undo-step-beginning))))
 
 (defun hel--post-command-hook ()
   "Hook run after each command is executed. See `post-command-hook'."
@@ -70,8 +74,7 @@
          (message "[Hel] error while executing command for fake cursor: %s"
                   (error-message-string err)))
         (quit))) ;; "C-g" during multistage command.
-    ;; Merged all changes in Insert state into one undo step.
-    (unless hel-insert-state
+    (when hel-normal-state
       (hel--single-undo-step-end))
     (setq hel-this-command nil
           hel--input-cache nil)))
