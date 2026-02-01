@@ -437,9 +437,11 @@ in the command loop, and the fake cursors can pick up on those instead."
 
   "g"   nil ; unbind `revert-buffer'
   "g a" #'describe-char
-  "g r" #'revert-buffer       ; also "C-w r"
-  "g g" #'beginning-of-buffer ; also "<"
-  "G"   #'end-of-buffer)      ; also ">"
+  "g r" #'revert-buffer          ; also "C-w r"
+  "g h" #'move-beginning-of-line ; also "C-a"
+  "g l" #'move-end-of-line       ; also "C-e"
+  "g g" #'beginning-of-buffer    ; also "<"
+  "G"   #'end-of-buffer)         ; also ">"
 
 ;;;; prog-mode
 
