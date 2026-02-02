@@ -354,33 +354,19 @@ in the command loop, and the fake cursors can pick up on those instead."
 
 ;;;; Minibuffer
 
-;; (hel-keymap-set minibuffer-mode-map :state 'normal
-;;   ;; "ESC" #'abort-minibuffers
-;;   "<escape>" #'abort-recursive-edit
-;;   ;; "<down>"   #'next-line-or-history-element
-;;   ;; "<up>"     #'previous-line-or-history-element
-;;   "C-j" #'next-line-or-history-element
-;;   "C-k" #'previous-line-or-history-element)
-;;
-;; ;; (hel-keymap-set minibuffer-local-map :state 'insert
-;; ;;   "C-j" #'next-line-or-history-element
-;; ;;   "C-k" #'previous-line-or-history-element)
-
 (hel-keymap-set minibuffer-mode-map :state 'normal
   ;; "ESC" #'abort-minibuffers
-  "<escape>" #'abort-recursive-edit)
+  "<escape>" #'abort-recursive-edit
+  "<down>"   #'next-line-or-history-element
+  "<up>"     #'previous-line-or-history-element
+  "j"        #'next-line-or-history-element
+  "k"        #'previous-line-or-history-element)
 
 (hel-keymap-set minibuffer-mode-map
-  "C-j" #'next-line-or-history-element
-  "C-k" #'previous-line-or-history-element)
-
-(hel-keymap-set read-expression-map :state 'normal
-  "<down>" #'next-line-or-history-element
-  "<up>"   #'previous-line-or-history-element)
-
-(hel-keymap-set read-expression-map
-  "C-j" #'next-line-or-history-element
-  "C-k" #'previous-line-or-history-element)
+  "C-j" #'next-history-element
+  "C-k" #'previous-history-element
+  "M-j" #'next-history-element
+  "M-k" #'previous-history-element)
 
 ;; `C-j' in `read--expression-map' is bound to `read--expression-try-read'
 ;; which is also bound to `RET'. Remove it, to make the binding from the
