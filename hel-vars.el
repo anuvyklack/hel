@@ -452,9 +452,6 @@ The command that that will be executed for each fake cursor.")
   "The list of temporarily disabled minor-modes while there are
 multiple cursors.")
 
-(hel-defvar-local hel--in-single-undo-step nil
-  "Non-nil while we are in the single undo step.")
-
 (hel-defvar-local hel--undo-list-pointer nil
   "Stores the start of the current undo step in `buffer-undo-list'.")
 

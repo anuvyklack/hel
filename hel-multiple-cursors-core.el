@@ -43,6 +43,9 @@
 
 ;;; Undo
 
+(hel-defvar-local hel--in-single-undo-step nil
+  "Non-nil while we are in the single undo step.")
+
 (defun hel--single-undo-step-beginning ()
   "Initiate atomic undo step.
 All following buffer modifications are grouped together as a single
