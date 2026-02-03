@@ -122,7 +122,7 @@ parameters:
   - nil  Command will be executed only for main cursor.
 
 `:merge-selections'
-  Any Emacs lisp FORM, that will be evaluated after COMMAND execution,
+  Any Emacs lisp FORM, that will be evaluated after COMMAND execution
   and if it evaluates to non-nil overlapping selections (regions) will
   be merged into single selection.
 

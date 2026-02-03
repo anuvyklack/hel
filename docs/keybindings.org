@@ -141,14 +141,14 @@ Scrolling commands are taken from Vim.
 
 ** Changes
 
-- =i=, =a= :: insert, append: Switch to Insert state before/after selection.
+- =i= / =a= :: insert / append: Switch to Insert state *before* / *after* selection.
 
-- =I=, =A= :: Insert, Append: Switch to Insert state at the start/end of the line.
+- =I= / =A= :: Insert / Append: Switch to Insert state at the *start* / *end* of the line.
 
-- =o=, =O= ::
-  Open: add new line bellow/above the current line and switch to Insert state.
+- =o= / =O= ::
+  Open: add new line *bellow* / *above* the current line and switch to Insert state.
 
-- =d= :: Cut selection: delete it from buffer and put it into ~kill-ring~.
+- =d= :: Cut selection: delete it from buffer and put into ~kill-ring~.
 
 - =D= :: Delete selection.
 
@@ -214,9 +214,9 @@ Scrolling commands are taken from Vim.
 
 - =v= :: Toggle extend selection.
 
-- =x=, =X= ::
+- =x= / =X= ::
   Select current visual (if ~visual-line-mode~ is active) or logical line on first
-  invocation. On subsequent calls extend and contract linewise selection down
+  invocation. On subsequent calls *extend* / *contract* linewise selection down
   when cursor is at the end of the selection, or up when cursor is at the
   beginning of the selection.
 
@@ -278,7 +278,7 @@ for =m= prefix. Also, this is in line with Emacs tradition which has commands li
 ** Surround
 
 - =mm= :: Go to matching bracket.
-- =ms= :: Surrond selection.
+- =ms= :: Surround selection.
 - =md= :: Delete surround.
 - =mr= :: Change (replace) surround.
 
