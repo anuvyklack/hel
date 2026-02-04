@@ -318,22 +318,22 @@ in the command loop, and the fake cursors can pick up on those instead."
   (hel-advice-add 'wdired-change-to-dired-mode  :after #'hel-switch-to-initial-state)
 
   (hel-keymap-set wdired-mode-map :state 'normal
+    "<escape>" 'helheim-wdired-exit
+    "Z Z"      'wdired-finish-edit
+    "Z Q"      'wdired-abort-changes
+    ;;
     "j"        'wdired-next-line
     "k"        'wdired-previous-line
     "<up>"     'wdired-next-line
     "<down>"   'wdired-previous-line
-
-    "Z Z"      'wdired-finish-edit
-    "Z Q"      'wdired-abort-changes
-    "<escape>" 'wdired-exit
-
     ;; Commands bound to these keys have no sense for wdired.
     "o" 'undefined
     "O" 'undefined
     "J" 'undefined)
 
   (hel-keymap-set wdired-mode-map
-    "<remap> <save-buffer>" #'wdired-finish-edit)
+    "<remap> <save-buffer>" #'wdired-finish-edit
+    "C-g" 'wdired-abort-changes)
 
   (put 'wdired--self-insert  'multiple-cursors t)
   (put 'wdired-next-line     'multiple-cursors t)
@@ -347,6 +347,16 @@ in the command loop, and the fake cursors can pick up on those instead."
 
   (hel-advice-add 'wdired-next-line     :before #'hel-deactivate-mark-a)
   (hel-advice-add 'wdired-previous-line :before #'hel-deactivate-mark-a))
+
+(hel-define-command helheim-wdired-exit ()
+  :multiple-cursors t
+  (interactive)
+  (cond (hel--extend-selection
+         (hel-extend-selection -1))
+        ((use-region-p)
+         (deactivate-mark))
+        (t
+         (wdired-exit))))
 
 ;;;; Messages buffer
 
@@ -421,7 +431,7 @@ in the command loop, and the fake cursors can pick up on those instead."
   ;; Saving special buffer has little sense, so we can reuse it.
   "<remap> <save-buffer>" #'hel-motion-state
 
-  "g"   nil ; unbind `revert-buffer'
+  "g"   nil ; Unbind `revert-buffer'. We have it on "C-w r"
   "g a" #'describe-char
   "g r" #'revert-buffer          ; also "C-w r"
   "g h" #'move-beginning-of-line ; also "C-a"
