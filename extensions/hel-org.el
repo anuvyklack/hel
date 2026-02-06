@@ -418,7 +418,7 @@ In tables, move column to the right."
          (insert (make-string level ?*) " ")
          (save-excursion (insert "\n")))
        (run-hooks 'org-insert-heading-hook))))
-  (when (org-invisible-p) (org-show-hidden-entry))
+  (when (org-invisible-p) (org-fold-show-hidden-entry))
   ;; (hel-insert-state 1)
   )
 
