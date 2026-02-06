@@ -1,4 +1,4 @@
-;;; hel-search.el --- Search -*- lexical-binding: t; -*-
+;;; hel-search.el -*- lexical-binding: t; -*-
 ;;
 ;; Copyright © 2025 Yuriy Artemyev
 ;;
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Hel search related functionality
+;;  Hel search related functionality.
 ;;
 ;;; Code:
 

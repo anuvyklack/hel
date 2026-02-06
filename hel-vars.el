@@ -11,9 +11,9 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
-;;;
-;;; Hel settings and variables.
-;;;
+;;
+;; Hel settings and variables.
+;;
 ;;; Code:
 
 (require 'hel-macros)

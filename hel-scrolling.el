@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; Hel commands for smooth and non-smooth scrolling.
+;; Hel commands for smooth scrolling.
 ;;
 ;;; Code:
 

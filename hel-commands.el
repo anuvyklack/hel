@@ -1,4 +1,4 @@
-;;; hel-commands.el --- Hel commands -*- lexical-binding: t; -*-
+;;; hel-commands.el --- Interactive commands -*- lexical-binding: t; -*-
 ;;
 ;; Copyright © 2025 Yuriy Artemyev
 ;;
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Hel commands
+;;  Hel interactive commands.
 ;;
 ;;; Code:
 

@@ -1,4 +1,4 @@
-;;; hel.el --- Hel emulation -*- lexical-binding: t; -*-
+;;; hel.el --- Helix Emulation Layer -*- lexical-binding: t; -*-
 ;;
 ;; Copyright © 2025 Yuriy Artemyev
 ;;
@@ -13,7 +13,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; Emulation of the Hel text editing model.
+;; Emulation of the Kakoune/Helix text editing model.
 ;;
 ;;; Code:
 

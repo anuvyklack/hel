@@ -1,4 +1,4 @@
-;;; hel-keybindings.el --- Hel keybindings -*- lexical-binding: t; -*-
+;;; hel-keybindings.el -*- lexical-binding: t; -*-
 ;;
 ;; Copyright © 2025 Yuriy Artemyev
 ;;

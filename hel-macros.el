@@ -1,4 +1,4 @@
-;;; hel-macros.el --- Macros -*- lexical-binding: t; -*-
+;;; hel-macros.el -*- lexical-binding: t; -*-
 ;;
 ;; Copyright © 2025 Yuriy Artemyev
 ;;

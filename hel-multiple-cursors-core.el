@@ -1,4 +1,4 @@
-;;; hel-multiple-cursors-core.el --- Multiple cursors for Hel -*- lexical-binding: t; -*-
+;;; hel-multiple-cursors-core.el --- Multiple cursors -*- lexical-binding: t; -*-
 ;;
 ;; Copyright © 2025 Yuriy Artemyev
 ;;
@@ -824,7 +824,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
 ;; Execute following commands for ALL cursor.
 (mapc (lambda (command)
         (put command 'multiple-cursors t))
-      '(keyboard-quit
+      '(keyboard-quit        ;; C-g
         comment-dwim         ;; gc
         fill-region          ;; gq
         indent-region        ;; =
@@ -886,7 +886,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
 ;; Execute following commands only for MAIN cursor.
 (mapc (lambda (command)
         (put command 'multiple-cursors 'false))
-      '(hel-normal-state  ;; ESC
+      '(hel-normal-state    ;; <escape>
         find-file-at-point  ;; gf
         browse-url-at-point ;; gx
         save-buffer

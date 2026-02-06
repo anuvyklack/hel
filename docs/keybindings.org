@@ -16,11 +16,6 @@ Hel keybindings are defined in the =hel-keybindings.el= file. Using the advice
 above, you can read the documentation for any command bound to a key you’re
 interested in.
 
-* Insert state
-
-In Insert state Hel doesn’t bind any keys by default, so you get the standard
-Emacs editing experience here.
-
 * Motion state
 
 Motion state is the default state for special buffers: grep results, error
@@ -28,13 +23,14 @@ lists, file managers — anything not intended for text editing. A simple
 heuristic is used: if any letter key is not self-inserting, Hel enables Motion
 state; otherwise, it uses Normal state.
 
-* Keys common between Normal and Motion states
+In Motion state Hel provide service keys to control Emacs itself.
 
 - =:= :: Emacs analoug of command pallete. (Native key is =M-x=)
 
 - =M-u= ::
-  Emacs universal argument. Since =C-u= is used for scrolling, and =M-u= by default
-  is bind to ~upcase-word~, for which Hel has itself version on =M-`= or =gU=.
+  Emacs universal argument. Native key is =C-u=, but Hel use it for scrolling,
+  and =M-u= by default is bound to ~upcase-word~, for which Hel has itself version
+  on =M-`= or =gU=.
 
 - =SPC= :: leader key (if ~hel-leader~ extension is loaded)
 
@@ -48,13 +44,10 @@ state; otherwise, it uses Normal state.
 
 - =C-w d=, =C-w c= :: Delete current window or tab.
 
-- =C-w h=, =C-w j=, =C-w k=, =C-w l= ::
-  Go to the window to the left/down/up/right.
-
 - =C-w w= :: Cycle to next window
 
 - =C-w h=, =C-w j=, =C-w k=, =C-w l= ::
-  Go to the window toward in direction.
+  Go to the window toward the direction.
 
 - =C-w H=, =C-w J=, =C-w K=, =C-w L= :: Move window in direction.
 
@@ -92,13 +85,16 @@ Scrolling commands are taken from Vim.
 
 - =C-w z= ::
   Burry current buffer: put it the end of the list of all buffers.
-  Mnemonics: "z" is the last letter.
+  Mnemonics: =z= is the last letter.
 
-- =]b= / =[b= :: *next* / *previous* buffer
+- =[b= / =]b= :: *previous* / *next* buffer
 
 - =C-w x= :: ~scratch-buffer~
 
 * Normal state
+
+All keys available in Motion state are also work in Normal state.
+
 ** Motions
 
 - =h=, =j=, =k=, =l= :: Arrows.
@@ -342,4 +338,9 @@ for =m= prefix. Also, this is in line with Emacs tradition which has commands li
   Go to the *previous* / *next* position in xref history. It appeares to be very handy
   to have these positions in a stack separate from the jumplist (unlike how Vim
   does).
+
+* Insert state
+
+In Insert state Hel doesn’t bind any keys by default, so you get the standard
+Emacs editing experience here.
 
