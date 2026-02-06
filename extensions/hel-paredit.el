@@ -65,7 +65,7 @@
     "C-l" 'hel-paredit-forward-sexp))
 
 (hel-keymap-set hel-paredit-mode-map
-  "RET"         'paredit-newline
+  "RET"         'default-indent-new-line
   "C-M-f"       'paredit-forward       ; `forward-sexp'
   "C-M-b"       'paredit-backward      ; `backward-sexp'
   "C-M-u"       'paredit-backward-up   ; `backward-up-list'
