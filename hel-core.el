@@ -553,27 +553,32 @@ Example:
       \"b\" nil) ; unbind
 
 \(fn KEYMAP [:state STATE] &rest [KEY DEFINITION]...)"
+  ;; `:unset' keyword argument is not documented intentionally to not distract
+  ;; new users. It should be a list of keys that would be removed from KEYMAP
+  ;; before any keys would be bound.
   (declare (indent defun))
-  (let ((states (pcase (car-safe args)
-                  (:state (pop args)
-                          (ensure-list (pop args))))))
-    (dolist (state states)
-      (cl-assert (hel-state-p state) nil
-                 "Hel state `%s' is not known to be defined" state))
+  (-let (((kwargs . args) (hel-split-keyword-args args)))
     (cl-assert (cl-evenp (length args)) nil
                "The number of [KEY DEFINITION] pairs is not even")
-    (let ((maps (if states
-                    (cl-loop for state in states
-                             collect
-                             (or (hel-get-nested-hel-keymap keymap state t)
-                                 (hel-create-nested-hel-keymap keymap state)))
-                  (list keymap))))
-      (dolist (map maps)
-        (cl-loop for (key definition) on args by #'cddr
-                 do (if definition
-                        (keymap-set map key definition)
-                      (keymap-unset map key :remove)))))
-    keymap))
+    (map-let (:state :unset) kwargs
+      (-let* ((maps (if state
+                        (-map (lambda (state)
+                                (cl-assert (hel-state-p state) t "Unknown Hel state")
+                                (or (hel-get-nested-hel-keymap keymap state t)
+                                    (hel-create-nested-hel-keymap keymap state)))
+                              (ensure-list state))
+                      (list keymap)))
+              ((bind unbind) (->> args
+                                  (-partition 2)
+                                  (-separate #'-second-item)))
+              (unbind (nconc (ensure-list unset)
+                             (-flatten unbind))))
+        (dolist (map maps)
+          (-each unbind (lambda (key)
+                          (keymap-unset map key t)))
+          (-each bind (-lambda ((key definition))
+                        (keymap-set map key definition)))))))
+  keymap)
 
 (defun hel-keymap-global-set (&rest args)
   "Create keybinding from KEY to DEFINITION in `global-map'.
@@ -597,23 +602,21 @@ Example:
 
 \(fn [:state STATE] &rest [KEY DEFINITION]...)"
   (declare (indent defun))
-  (let ((states (pcase (car-safe args)
-                  (:state (pop args)
-                          (ensure-list (pop args))))))
-    (dolist (state states)
-      (cl-assert (hel-state-p state) nil
-                 "Hel state `%s' is not known to be defined" state))
+  (-let (((kwargs . args) (hel-split-keyword-args args)))
     (unless (cl-evenp (length args))
       (user-error "The number of [KEY DEFINITION] pairs is not even"))
-    (let ((maps (if states
-                    (cl-loop for state in states
-                             collect (hel-state-property state :keymap))
-                  (list (current-global-map)))))
-      (dolist (map maps)
-        (cl-loop for (key definition) on args by #'cddr
-                 do (if definition
-                        (keymap-set map key definition)
-                      (keymap-unset map key :remove)))))))
+    (map-let (:state) kwargs
+      (let ((maps (if state
+                      (-map (lambda (state)
+                              (cl-assert (hel-state-p state) t "Unknown Hel state")
+                              (hel-state-property state :keymap))
+                            (ensure-list state))
+                    (list (current-global-map)))))
+        (dolist (map maps)
+          (cl-loop for (key definition) on args by #'cddr
+                   do (if definition
+                          (keymap-set map key definition)
+                        (keymap-unset map key t))))))))
 
 (defun hel-keymap-local-set (&rest args)
   "Create keybinding from KEY to DEFINITION in current buffer local keymap.

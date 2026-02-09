@@ -1267,6 +1267,17 @@ function prevents that. It is intended to be used as `:after' advice."
     (when (zerop (cdr (posn-col-row (posn-at-point))))
       (recenter 0))))
 
+(defun hel-split-keyword-args (args)
+  "Split ARGS list into keyword-value pairs and remaining arguments.
+Returns a cons cell: (PLIST . REST)
+PLIST is a list with keyword-value pairs from the beginning of ARGS list.
+REST contains all other elements."
+  (let (plist)
+    (while (keywordp (car-safe args))
+      (cl-callf plist-put plist (car args) (cadr args))
+      (cl-callf cddr args)) ; advance by 2
+    (cons plist args)))
+
 ;;; Advices
 
 (declare-function hel-extend-selection "hel-commands")
