@@ -135,27 +135,23 @@ parameters:
                     [&rest keywordp sexp]
                     [&optional ("interactive" [&rest form])]
                     def-body)))
-  (let (doc properties key value)
-    ;; collect docstring
-    (setq doc (pcase (car-safe body)
-                ((and `(format . ,_) doc-form)
-                 (eval doc-form t))
-                ((and (pred stringp) doc)
-                 doc)))
-    (when doc (pop body))
-    ;; collect keywords
-    (while (keywordp (car-safe body))
-      (setq key   (pop body)
-            value (pop body))
-      (pcase key
-        (:multiple-cursors
-         (push `(put ',command 'multiple-cursors ,(if (eq value t) t ''false))
-               properties))
-        (:merge-selections
-         (push `(put ',command 'merge-selections ,(if (symbolp value)
+  (-let* ((doc (pcase (car-safe body)
+                 ((and `(format . ,_) doc-form)
+                  (eval doc-form t))
+                 ((and (pred stringp) doc)
+                  doc)))
+          ((kwargs . body) (hel-split-keyword-args (if doc (cdr body) body)))
+          (properties (->> kwargs
+                           (map-apply (lambda (key value)
+                                        (pcase key
+                                          (:multiple-cursors
+                                           `(put ',command 'multiple-cursors
+                                                 ,(if (eq value t) t ''false)))
+                                          (:merge-selections
+                                           `(put ',command 'merge-selections
+                                                 ,(if (symbolp value)
                                                       `',value
-                                                    `(lambda () ,value)))
-               properties))))
+                                                    `(lambda () ,value))))))))))
     ;; macro expansion
     `(progn
        (defun ,command (,@args)
