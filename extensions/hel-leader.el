@@ -1,6 +1,6 @@
 ;;; hel-leader.el -*- lexical-binding: t; -*-
 ;;
-;; Copyright © 2025 Yuriy Artemyev
+;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
@@ -497,5 +497,6 @@ itself and hence unavailable."
      (concat current-prefix-arg " "))
     (_ "")))
 
+;;; .
 (provide 'hel-leader)
 ;;; hel-leader.el ends here

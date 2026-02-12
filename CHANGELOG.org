@@ -1,0 +1,18 @@
+* [Unreleased]
+** Added
+
+- =gv= — restore last multiple cursors positions.
+
+** Changed
+
+- =p= and =P= will paste on the separate line if selection is linewise (i.e. made
+  with =x=).
+
+- =gi= (~imenu~) moved to =go= to leave =gi= for LSP’s "go to implementation".
+
+- =gD= (~xref-find-references~) moved to =gr= to leave =gD= for LSP's "go to
+  declaration".
+
+- ~hel-surround-alist~ variable format has beed changed.
+
+* [0.9.0]
