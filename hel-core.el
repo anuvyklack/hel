@@ -1,6 +1,6 @@
 ;;; hel-core.el --- Core functionality -*- lexical-binding: t; -*-
 ;;
-;; Copyright © 2025 Yuriy Artemyev
+;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
@@ -667,5 +667,6 @@ or a list of the above."
       (type
        (setq cursor-type type)))))
 
+;;; .
 (provide 'hel-core)
 ;;; hel-core.el ends here

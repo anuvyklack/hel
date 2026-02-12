@@ -1,6 +1,6 @@
 ;;; hel-multiple-cursors-core.el --- Multiple cursors -*- lexical-binding: t; -*-
 ;;
-;; Copyright © 2025 Yuriy Artemyev
+;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Authors: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
@@ -549,7 +549,7 @@ makes sense for fake cursor."
   )
 
 (defmacro hel-with-real-cursor-as-fake (&rest body)
-  "Temporarily convert real cursor into fake-cursor one with ID 0.
+  "Temporarily convert real cursor into fake-cursor with ID 0.
 Restore it after BODY evaluation if it is still alive."
   (declare (indent 0) (debug t))
   (let ((real-cursor (make-symbol "real-cursor")))
@@ -930,5 +930,6 @@ from being executed when `hel-multiple-cursors-mode' is active."
         edebug-next-mode
         undefined))
 
+;;; .
 (provide 'hel-multiple-cursors-core)
 ;;; hel-multiple-cursors-core.el ends here

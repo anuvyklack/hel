@@ -1,6 +1,6 @@
 ;;; hel-vars.el --- Settings and variables -*- lexical-binding: t; -*-
 ;;
-;; Copyright © 2025 Yuriy Artemyev
+;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
@@ -491,5 +491,6 @@ multiple cursors.")
 
 (hel-defvar-local hel--narrowed-base-buffer nil)
 
+;;; .
 (provide 'hel-vars)
 ;;; hel-vars.el ends here

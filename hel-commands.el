@@ -1,6 +1,6 @@
 ;;; hel-commands.el --- Interactive commands -*- lexical-binding: t; -*-
 ;;
-;; Copyright © 2025 Yuriy Artemyev
+;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
@@ -1771,8 +1771,8 @@ Do not auto-detect word boundaries in the search pattern."
   "Enclose the active region with the chosen delimiters.
 
 Left brackets — `(', `[', `{' — add extra spaces around the surrounded
-region. If the selection is linewise, the delimiters are placed on
-separate lines.
+region. If the selection is linewise (made with \"x\"), the delimiters
+are placed on separate lines.
 
 Right brackets — `)', `]', `}' — do the opposite: they remove all
 spaces or newlines from the selection and are inserted tightly.
@@ -1988,7 +1988,7 @@ narrowing doesn't affect other windows displaying the same buffer. Call
 Incrementally kill indirect buffers (under the assumption they were created by
 `hel-narrow-to-region-indirectly') and switch to their base buffer.
 
-With \\[universal-argument] kill all indirect buffers, return the base buffer and widen it.
+With \\[universal-argument] undone all recursive levels of inderect narrowing.
 
 If the current buffer is not an indirect buffer, works like `widen'."
   :multiple-cursors nil
@@ -2029,5 +2029,6 @@ If the current buffer is not an indirect buffer, works like `widen'."
   (other-window-prefix)
   (call-interactively #'execute-extended-command-for-buffer))
 
+;;; .
 (provide 'hel-commands)
 ;;; hel-commands.el ends here

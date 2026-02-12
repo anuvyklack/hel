@@ -55,8 +55,6 @@ surround), and =mr= (change surround) commands. It is buffer-local so you can
 modify it from major-mode hooks. See its documentation and default value fo the
 structure and examples.
 
-*** Examples
-
 ** Variables
 *** Regex Settings
 

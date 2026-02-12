@@ -1,6 +1,6 @@
 ;;; hel-common.el --- Common functions -*- lexical-binding: t; -*-
 ;;
-;; Copyright © 2025 Yuriy Artemyev
+;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
@@ -1006,7 +1006,7 @@ on desired end of the region. Should be 1 or -1."
 
 DIRECTION can be either 1 — search forward, or -1 — search backward.
 
-BOUND optionally bounds the search. It should be a position that
+LIMIT optionally bounds the search. It should be a position that
 is *after* the point if DIRECTION is positive, and *before* the
 point — if negative.
 
@@ -1346,5 +1346,6 @@ Can be used as advice."
   "Execute selected command for all cursors."
   (setq hel-this-command this-command))
 
+;;; .
 (provide 'hel-common)
 ;;; hel-common.el ends here
