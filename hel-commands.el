@@ -2023,14 +2023,13 @@ If the current buffer is not an indirect buffer, works like `widen'."
                (not (buffer-live-p base-buffer)))
            (widen))
           (arg
-           (let ((buffer orig-buffer)
-                 (buffers-to-kill (list orig-buffer)))
-             (while (setq buffer (buffer-local-value 'hel--narrowed-base-buffer buffer))
-               (push buffer buffers-to-kill))
-             (switch-to-buffer (buffer-base-buffer))
-             (->> buffers-to-kill
-                  (-remove (current-buffer))
-                  (-each #'kill-buffer))))
+           (->> orig-buffer
+                (-unfold (lambda (buffer)
+                           (when buffer
+                             (cons buffer (buffer-local-value
+                                           'hel--narrowed-base-buffer buffer)))))
+                (-remove (current-buffer))
+                (map-do #'kill-buffer)))
           ((switch-to-buffer base-buffer)
            (kill-buffer orig-buffer)))))
 
