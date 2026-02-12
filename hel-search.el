@@ -172,17 +172,17 @@ If INVERT is non-nil return list with complements of ranges that match REGEXP."
 
 (defun hel--invert-ranges (ranges start end)
   "Return the list with complements to RANGES withing START...END positions.
+
+  ((1 . 2) (3 . 4) (5 . 6))  =>  ((start . 1) (2 . 3) (4 . 5) (6 . end))
+
 RANGES is a list of cons cells with positions (START . END)."
   (when ranges
     (let (result)
-      (-let [(r-start . r-end) (car ranges)]
-        (unless (eql r-start start)
-          (push (cons start r-start) result)
-          (setq start r-end)))
-      (cl-loop for (r-start . r-end) in (cdr ranges) do
-               (push (cons start r-start) result)
-               (setq start r-end))
-      (unless (eql start end)
+      (dolist (range ranges)
+        (when (< start (car range))
+          (push (cons start (car range)) result))
+        (setq start (cdr range)))
+      (when (< start end)
         (push (cons start end) result))
       (nreverse result))))
 
