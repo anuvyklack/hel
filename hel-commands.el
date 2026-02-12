@@ -2018,7 +2018,7 @@ narrowing doesn't affect other windows displaying the same buffer. Call
 Incrementally kill indirect buffers (under the assumption they were created by
 `hel-narrow-to-region-indirectly') and switch to their base buffer.
 
-With \\[universal-argument] kill all indirect buffers, return the base buffer and widen it.
+With \\[universal-argument] undone all recursive levels of inderect narrowing.
 
 If the current buffer is not an indirect buffer, works like `widen'."
   :multiple-cursors nil
@@ -2055,5 +2055,6 @@ If the current buffer is not an indirect buffer, works like `widen'."
   (other-window-prefix)
   (call-interactively #'execute-extended-command-for-buffer))
 
+;;; .
 (provide 'hel-commands)
 ;;; hel-commands.el ends here

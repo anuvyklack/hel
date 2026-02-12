@@ -442,5 +442,6 @@ The point must located right after the closing bracket."
                    'hel-paredit-backward-WORD-start ; B
                    'hel-paredit-forward-WORD-end)   ; E
 
+;;; .
 (provide 'hel-paredit)
 ;;; hel-paredit.el ends here

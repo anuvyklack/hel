@@ -478,5 +478,6 @@ multiple cursors.")
 
 (hel-defvar-local hel--narrowed-base-buffer nil)
 
+;;; .
 (provide 'hel-vars)
 ;;; hel-vars.el ends here
