@@ -1326,5 +1326,6 @@ Can be used as advice."
   "Execute selected command for all cursors."
   (setq hel-this-command this-command))
 
+;;; .
 (provide 'hel-common)
 ;;; hel-common.el ends here

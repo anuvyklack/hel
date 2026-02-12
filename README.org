@@ -30,6 +30,7 @@ and you don’t have your Hel keys available. They are:
 
 - =M-x= — Command palette. The main key you need; all other commands can be
   invoked from it.
+- =M-w= — Copy the selected text to google the error message or feed it to LLM.
 - =C-x C-s= — Save current buffer.
 - =C-x C-c= — Exit Emacs.
 

@@ -462,7 +462,7 @@ If INVERT is non-nil — remove selections that match regexp."
                     (?\t "\t") ;; TAB
                     ((or ?\r ?\n) "\n") ;; RET
                     ;; (?\e) ;; ESC
-                    ;; (?\d) ;; DEL (backspace)
+                    ;; (?\d) ;; DEL <backspace>
                     ;; (_ (char-fold-to-regexp (char-to-string char)))
                     (_ (regexp-quote (char-to-string char)))))
          (hl (hel-highlight-create :buffer (current-buffer)
@@ -509,5 +509,6 @@ If INVERT is non-nil — remove selections that match regexp."
                                "N" prev)
                              t on-exit))))))
 
+;;; .
 (provide 'hel-search)
 ;;; hel-search.el ends here

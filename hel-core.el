@@ -676,5 +676,6 @@ or a list of the above."
       (type
        (setq cursor-type type)))))
 
+;;; .
 (provide 'hel-core)
 ;;; hel-core.el ends here

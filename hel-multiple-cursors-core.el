@@ -930,5 +930,6 @@ from being executed when `hel-multiple-cursors-mode' is active."
         edebug-next-mode
         undefined))
 
+;;; .
 (provide 'hel-multiple-cursors-core)
 ;;; hel-multiple-cursors-core.el ends here
