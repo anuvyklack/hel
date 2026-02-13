@@ -116,7 +116,7 @@ and fake ones."
                          hel-multiple-cursors-mode))
 
 (put 'hel-smooth-scroll-up 'scroll-command t)
-(put 'hel-smooth-scroll-up 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-up 'multiple-cursors nil)
 
 ;; C-d
 (defun hel-smooth-scroll-down (count)
@@ -133,7 +133,7 @@ and fake ones."
                            hel-multiple-cursors-mode))
 
 (put 'hel-smooth-scroll-down 'scroll-command t)
-(put 'hel-smooth-scroll-down 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-down 'multiple-cursors nil)
 
 ;; C-b
 (defun hel-smooth-scroll-page-up (count)
@@ -144,7 +144,7 @@ backward instead."
   (hel--smooth-scroll-up count hel-multiple-cursors-mode :full-pages))
 
 (put 'hel-smooth-scroll-page-up 'scroll-command t)
-(put 'hel-smooth-scroll-page-up 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-page-up 'multiple-cursors nil)
 
 ;; C-f
 (defun hel-smooth-scroll-page-down (count)
@@ -155,7 +155,7 @@ instead."
   (hel--smooth-scroll-down count hel-multiple-cursors-mode :full-pages))
 
 (put 'hel-smooth-scroll-page-down 'scroll-command t)
-(put 'hel-smooth-scroll-page-down 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-page-down 'multiple-cursors nil)
 
 ;; C-e
 (defun hel-mix-scroll-line-down (count)
@@ -167,7 +167,7 @@ If COUNT > 1 scroll smoothly."
     (hel-smooth-scroll-line-down count)))
 
 (put 'hel-mix-scroll-line-down 'scroll-command t)
-(put 'hel-mix-scroll-line-down 'multiple-cursors 'false)
+(put 'hel-mix-scroll-line-down 'multiple-cursors nil)
 
 ;; C-e
 (defun hel-scroll-line-down (count)
@@ -183,7 +183,7 @@ If COUNT > 1 scroll smoothly."
       (scroll-up count))))
 
 (put 'hel-scroll-line-down 'scroll-command t)
-(put 'hel-scroll-line-down 'multiple-cursors 'false)
+(put 'hel-scroll-line-down 'multiple-cursors nil)
 
 ;; C-e
 (defun hel-smooth-scroll-line-down (count)
@@ -193,7 +193,7 @@ If COUNT > 1 scroll smoothly."
     (hel--smooth-scroll-down count hel-multiple-cursors-mode)))
 
 (put 'hel-smooth-scroll-line-down 'scroll-command t)
-(put 'hel-smooth-scroll-line-down 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-line-down 'multiple-cursors nil)
 
 ;; C-y
 (defun hel-mix-scroll-line-up (count)
@@ -205,7 +205,7 @@ If COUNT > 1 scroll smoothly."
     (hel-smooth-scroll-line-up count)))
 
 (put 'hel-mix-scroll-line-up 'scroll-command t)
-(put 'hel-mix-scroll-line-up 'multiple-cursors 'false)
+(put 'hel-mix-scroll-line-up 'multiple-cursors nil)
 
 ;; C-y
 (defun hel-scroll-line-up (count)
@@ -225,7 +225,7 @@ If COUNT > 1 scroll smoothly."
       (scroll-down count))))
 
 (put 'hel-scroll-line-up 'scroll-command t)
-(put 'hel-scroll-line-up 'multiple-cursors 'false)
+(put 'hel-scroll-line-up 'multiple-cursors nil)
 
 ;; C-y
 (defun hel-smooth-scroll-line-up (count)
@@ -235,7 +235,7 @@ If COUNT > 1 scroll smoothly."
     (hel--smooth-scroll-up count hel-multiple-cursors-mode)))
 
 (put 'hel-smooth-scroll-line-up 'scroll-command t)
-(put 'hel-smooth-scroll-line-up 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-line-up 'multiple-cursors nil)
 
 ;; zz
 (defun hel-smooth-scroll-line-to-center ()
@@ -256,7 +256,7 @@ If COUNT > 1 scroll smoothly."
     (pixel-scroll-precision-interpolate delta nil 1)))
 
 (put 'hel-smooth-scroll-line-to-center 'scroll-command t)
-(put 'hel-smooth-scroll-line-to-center 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-line-to-center 'multiple-cursors nil)
 
 ;; zz (another version)
 (defun hel-smooth-scroll-line-to-eye-level ()
@@ -277,7 +277,7 @@ If COUNT > 1 scroll smoothly."
     (pixel-scroll-precision-interpolate delta nil 1)))
 
 (put 'hel-smooth-scroll-line-to-eye-level 'scroll-command t)
-(put 'hel-smooth-scroll-line-to-eye-level 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-line-to-eye-level 'multiple-cursors nil)
 
 ;; zt
 (defun hel-smooth-scroll-line-to-top ()
@@ -298,7 +298,7 @@ If COUNT > 1 scroll smoothly."
     (recenter 0)))
 
 (put 'hel-smooth-scroll-line-to-top 'scroll-command t)
-(put 'hel-smooth-scroll-line-to-top 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-line-to-top 'multiple-cursors nil)
 
 ;; zb
 (defun hel-smooth-scroll-line-to-bottom ()
@@ -324,7 +324,7 @@ If COUNT > 1 scroll smoothly."
     (recenter -1)))
 
 (put 'hel-smooth-scroll-line-to-bottom 'scroll-command t)
-(put 'hel-smooth-scroll-line-to-bottom 'multiple-cursors 'false)
+(put 'hel-smooth-scroll-line-to-bottom 'multiple-cursors nil)
 
 (provide 'hel-scrolling)
 ;;; hel-scrolling.el ends here

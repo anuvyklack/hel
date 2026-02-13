@@ -25,11 +25,11 @@
 
 ;; M-x
 (hel-advice-add 'execute-extended-command :after #'hel--execute-for-all-cursors-a)
-(put 'execute-extended-command 'multiple-cursors 'false)
+(put 'execute-extended-command 'multiple-cursors nil)
 
 ;; M-X
 (hel-advice-add 'execute-extended-command-for-buffer :after #'hel--execute-for-all-cursors-a)
-(put 'execute-extended-command-for-buffer 'multiple-cursors 'false)
+(put 'execute-extended-command-for-buffer 'multiple-cursors nil)
 
 (hel-define-advice current-kill (:before (n &optional _do-not-move) hel)
   "Make sure pastes from other programs are added to `kill-ring's
@@ -228,7 +228,7 @@ in the command loop, and the fake cursors can pick up on those instead."
 
 (with-eval-after-load 'helpful
   (hel-set-initial-state 'helpful-mode 'normal)
-  (put 'helpful-at-point 'multiple-cursors 'false))
+  (put 'helpful-at-point 'multiple-cursors nil))
 
 ;;;; Compilation
 
@@ -338,9 +338,9 @@ in the command loop, and the fake cursors can pick up on those instead."
   (put 'wdired--self-insert  'multiple-cursors t)
   (put 'wdired-next-line     'multiple-cursors t)
   (put 'wdired-previous-line 'multiple-cursors t)
-  (put 'wdired-finish-edit   'multiple-cursors 'false)
-  (put 'wdired-abort-changes 'multiple-cursors 'false)
-  (put 'wdired-exit          'multiple-cursors 'false)
+  (put 'wdired-finish-edit   'multiple-cursors nil)
+  (put 'wdired-abort-changes 'multiple-cursors nil)
+  (put 'wdired-exit          'multiple-cursors nil)
 
   (hel-advice-add 'wdired-change-to-dired-mode :before #'hel-deactivate-mark-a)
   (hel-advice-add 'wdired-change-to-dired-mode :before #'hel-delete-all-fake-cursors)

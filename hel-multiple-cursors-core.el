@@ -522,9 +522,9 @@ evaluate BODY, update fake CURSOR."
             ;; If it's a lambda, we can't know if it's supported or not -
             ;; so go ahead and assume it's ok.
             (not (symbolp command))
-            (pcase (get command 'multiple-cursors)
-              ('t t)
-              ('nil (hel--prompt-for-unknown-command command))))
+            (if-let* ((val (memq 'multiple-cursors (symbol-plist command))))
+                (cadr val)
+              (hel--prompt-for-unknown-command command)))
            (hel-save-window-scroll
              (hel-save-excursion
                (dolist (cursor (hel-all-fake-cursors))
@@ -611,14 +611,11 @@ in the buffer."
 and remember the choice.
 
 Return t if COMMMAND should be executed for all cursors."
-  (let ((for-all? (ignore-error quit ;; treat `C-g' as answer "no"
+  (let ((for-all? (ignore-error quit ;; treat "C-g" as answer "no"
                     (y-or-n-p (format "Do %S for all cursors?" command)))))
+    (put command 'multiple-cursors for-all?)
     (if for-all?
-        (progn
-          (put command 'multiple-cursors t)
-          (push command hel-commands-to-run-for-all-cursors))
-      ;; else
-      (put command 'multiple-cursors 'false)
+        (push command hel-commands-to-run-for-all-cursors)
       (push command hel-commands-to-run-once))
     (hel-save-whitelists-into-file)
     for-all?))
@@ -628,12 +625,12 @@ Return t if COMMMAND should be executed for all cursors."
   (unless hel--whitelist-file-loaded
     (load hel-whitelist-file 'noerror 'nomessage)
     (setq hel--whitelist-file-loaded t)
-    (mapc (lambda (command)
-            (put command 'multiple-cursors t))
-          hel-commands-to-run-for-all-cursors)
-    (mapc (lambda (command)
-            (put command 'multiple-cursors 'false))
-          hel-commands-to-run-once)))
+    (-each hel-commands-to-run-for-all-cursors
+      (lambda (command)
+        (put command 'multiple-cursors t)))
+    (-each hel-commands-to-run-once
+      (lambda (command)
+        (put command 'multiple-cursors nil)))))
 
 (defun hel--dump-whitelist (list-symbol)
   "Insert (setq \\='LIST-SYMBOL LIST-VALUE) into current buffer."
@@ -885,7 +882,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
 
 ;; Execute following commands only for MAIN cursor.
 (mapc (lambda (command)
-        (put command 'multiple-cursors 'false))
+        (put command 'multiple-cursors nil))
       '(hel-normal-state    ;; <escape>
         find-file-at-point  ;; gf
         browse-url-at-point ;; gx

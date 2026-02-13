@@ -145,8 +145,7 @@ parameters:
                            (map-apply (lambda (key value)
                                         (pcase key
                                           (:multiple-cursors
-                                           `(put ',command 'multiple-cursors
-                                                 ,(if (eq value t) t ''false)))
+                                           `(put ',command 'multiple-cursors ,value))
                                           (:merge-selections
                                            `(put ',command 'merge-selections
                                                  ,(if (symbolp value)
