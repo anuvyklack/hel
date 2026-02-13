@@ -364,7 +364,22 @@ with the first keymaps having higher priority.")
   "Specifications made by `hel-define-state'.
 Entries have the form (STATE . PLIST), where PLIST is a property
 list specifying various aspects of the state. To access a property,
-use `hel-state-property'.")
+use `hel-state-property' function.
+
+`:keymap'        Symbol `hel-STATE-state-map' with keymap in its variable cell
+               that will be active while Hel is in STATE.
+
+`:cursor'        Cursor apperance when Hel is in STATE.
+               Can be a cursor type as per `cursor-type', a color string
+               as passed to `set-cursor-color', a zero-argument function for
+               changing the cursor, a list of all the above, or a symbol
+               with such list in its variable cell.
+
+`:input-method'  When non-nil Hell will activate the enabled input method
+               in STATE.
+
+`:modes'         List of major and minor modes for which Hel intial state
+               is STATE.")
 
 (hel-defvar-local hel-input-method nil
   "Input method used in Hel Insert state.")

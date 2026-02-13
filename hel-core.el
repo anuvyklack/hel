@@ -166,21 +166,25 @@ BODY is executed each time the state is enabled or disabled.
 Optional KEY keyword arguments:
 
 `:keymap'        Keymap that will be active while Hel is in STATE.
-               Can be accessed via `hel-STATE-state-map' variable.
+               Can be accessed later via `hel-STATE-state-map' variable
+               or `hel-state-property' funciton.
 
 `:cursor'        Cursor apperance when Hel is in STATE.
                Can be a cursor type as per `cursor-type', a color string
                as passed to `set-cursor-color', a zero-argument function
                for changing the cursor, or a list of the above.
-               Can be accessed via `hel-STATE-state-cursor' variable.
+               Can be accessed later via `hel-state-property' function.
 
-`:input-method'  Activate enabled input method when Hel is in STATE.
+`:input-method'  When non-nil Hell will activate the enabled input method
+               on switching to STATE.
 
-`:enter-hook'    List of functions to run on each entry to STATE.
-               Can be accessed via `hel-STATE-state-enter-hook' variable.
+`:modes'         A list of major and minor modes for which Hel’s initial
+               state is STATE. Use `hel-set-initial-state' to register
+               additional modes later.
 
-`:exit-hook'     List of functions to run on each exit from STATE.
-               Can be accessed via `hel-STATE-state-exit-hook' variable.
+Also two hooks are defined which are run each time Hel enter or exit STATE:
+- `hel-STATE-state-enter-hook'
+- `hel-STATE-state-exit-hook'
 
 \(fn STATE DOC [[KEY VAL]...] BODY...)"
   (declare (indent defun)
@@ -190,93 +194,74 @@ Optional KEY keyword arguments:
                     [&rest [keywordp sexp]]
                     def-body)))
   (let* ((state-name (concat (capitalize (symbol-name state)) " state"))
-         (symbol (intern (format "hel-%s-state" state)))
-         (variable symbol)
-         (statefun symbol)
-         (cursor (intern (format "%s-cursor" symbol)))
+         (symbol     (intern (format "hel-%s-state" state)))
+         (variable   symbol)
+         (keymap     (intern (format "%s-map" symbol)))
          (enter-hook (intern (format "%s-enter-hook" symbol)))
-         (exit-hook (intern (format "%s-exit-hook" symbol)))
-         (keymap (intern (format "%s-map" symbol)))
-         (modes  (intern (format "%s-modes" symbol)))
-         key arg keymap-value cursor-value input-method
-         enter-hook-value exit-hook-value)
+         (exit-hook  (intern (format "%s-exit-hook" symbol))))
     ;; collect keywords
-    (while (keywordp (car-safe body))
-      (setq key (pop body)
-            arg (pop body))
-      (pcase key
-        (:keymap (setq keymap-value arg))
-        (:cursor (setq cursor-value arg))
-        (:input-method (setq input-method arg))
-        (:enter-hook (setq enter-hook-value (ensure-list arg)))
-        (:exit-hook (setq exit-hook-value (ensure-list arg)))))
-    ;; macro expansion
-    `(progn
-       (defvar ,cursor ,cursor-value
-         ,(format "Cursor for %s.
-May be a cursor type as per `cursor-type', a color string as passed
-to `set-cursor-color', a zero-argument function for changing the
-cursor, or a list of the above." state-name))
-       (defvar ,keymap ,(or keymap-value '(make-sparse-keymap))
-         ,(format "Global keymap for Hel %s." state-name))
-       (defvar ,modes nil
-         ,(format "List of major and minor modes for which Hel initial state is %s."
-                  state-name))
-       (defvar ,enter-hook nil ,(format "Hooks to run on entry %s." state-name))
-       (defvar ,exit-hook  nil ,(format "Hooks to run on exit %s." state-name))
-       (dolist (func ,enter-hook-value) (add-hook ',enter-hook func))
-       (dolist (func ,exit-hook-value)  (add-hook ',exit-hook func))
-       ;; Save state properties in `hel-state-properties' for runtime lookup.
-       (setf (alist-get ',state hel-state-properties)
-             '( :name ,state-name
-                :variable ,variable
-                :function ,statefun
-                :keymap ,keymap
-                :cursor ,cursor
-                :input-method ,input-method
-                :enter-hook ,enter-hook
-                :exit-hook ,exit-hook
-                :modes ,modes))
-       ;; State variable
-       (hel-defvar-local ,variable nil
-         ,(format "Non nil if Hel is in %s." state-name))
-       ;; State function
-       (defun ,statefun (&optional arg)
-         ,(format "Switch Hel into %s.
+    (cl-callf hel-split-keyword-args body)
+    (map-let ((:keymap keymap-value) :cursor :input-method :modes)
+             (car body)
+      (cl-callf cdr body)
+      ;; macro expansion
+      `(progn
+         ;; State variable
+         (hel-defvar-local ,variable nil ,(format "Non nil if Hel is in %s." state-name))
+         ;; Hooks
+         (defvar ,enter-hook nil ,(format "Hooks to run on entry %s." state-name))
+         (defvar ,exit-hook  nil ,(format "Hooks to run on exit %s." state-name))
+         ;; Keymap
+         (defvar ,keymap ,(or keymap-value '(make-sparse-keymap))
+           ,(format "Global keymap for Hel %s." state-name))
+         ;; Save state properties in `hel-state-properties' for runtime lookup.
+         (setf (alist-get ',state hel-state-properties)
+               '( :name         ,state-name
+                  :variable     ,variable
+                  :function     ,symbol
+                  :keymap       ,keymap
+                  :cursor       ,cursor
+                  :input-method ,input-method
+                  :modes        ,modes))
+         ;; State function
+         (defun ,symbol (&optional arg)
+           ,(format "Switch Hel into %s.
 When ARG is non-positive integer and Hel is in %s — disable it.\n\n%s"
-                  state-name state-name doc)
-         (interactive)
-         (if (and (numberp arg) (< arg 1))
-             ;; disable STATE
-             (when (eq hel-state ',state)
-               (setq hel-state nil
-                     hel-previous-state ',state
-                     ,variable nil)
-               ,@body
-               (run-hooks ',exit-hook))
-           ;; enable STATE
-           (unless hel-local-mode (hel-local-mode))
-           (hel-disable-current-state)
-           (setq hel-state ',state
-                 ,variable t)
-           (let (input-method-activate-hook
-                 input-method-deactivate-hook)
-             ,(if input-method
-                  '(activate-input-method hel-input-method)
-                '(deactivate-input-method)))
-           ,@body
-           ;; Switch color and shape of all cursors.
-           (setq hel--extend-selection nil)
-           (hel-update-cursor) ;; main cursor
-           (when hel-multiple-cursors-mode
-             (hel-save-window-scroll
-               (hel-save-excursion
-                 (dolist (cursor (hel-all-fake-cursors))
-                   (hel-with-fake-cursor cursor
-                     (setq hel--extend-selection nil))))))
-           (run-hooks ',enter-hook))
-         (hel-update-active-keymaps)
-         (force-mode-line-update)))))
+                    state-name state-name doc)
+           (interactive)
+           (if (and (numberp arg) (< arg 1))
+               ;; disable STATE
+               (when (eq hel-state ',state)
+                 (setq hel-state nil
+                       hel-previous-state ',state
+                       ,variable nil)
+                 ,@body
+                 (run-hooks ',exit-hook))
+             ;; enable STATE
+             (unless hel-local-mode (hel-local-mode))
+             (hel-disable-current-state)
+             (setq hel-state ',state
+                   ,variable t)
+             (let (input-method-activate-hook
+                   input-method-deactivate-hook)
+               ,(if input-method
+                    '(activate-input-method hel-input-method)
+                  '(deactivate-input-method)))
+             ,@body
+             ;; Switch color and shape of all cursors.
+             ;; main cursor
+             (setq hel--extend-selection nil)
+             (hel-update-cursor)
+             ;; fake cursors
+             (when hel-multiple-cursors-mode
+               (hel-save-window-scroll
+                 (hel-save-excursion
+                   (dolist (cursor (hel-all-fake-cursors))
+                     (hel-with-fake-cursor cursor
+                       (setq hel--extend-selection nil))))))
+             (run-hooks ',enter-hook))
+           (hel-update-active-keymaps)
+           (force-mode-line-update))))))
 
 (defun hel-state-p (symbol)
   "Return non-nil if SYMBOL corresponds to Hel state."
@@ -294,17 +279,18 @@ When ARG is non-positive integer and Hel is in %s — disable it.\n\n%s"
 
 (defun hel-disable-current-state ()
   "Disable current Hel state."
-  (-some-> hel-state
-    (hel-state-property :function)
-    (funcall -1)))
+  (when hel-state
+    (-> (hel-state-property hel-state :function)
+        (funcall -1))))
 
 (defun hel-state-property (state property)
   "Return the value of PROPERTY for STATE.
 PROPERTY is a keyword as used by `hel-define-state'.
 STATE is the state's symbolic name."
-  (let* ((state-properties (cdr (assq state hel-state-properties)))
-         (val (plist-get state-properties property)))
-    (if (memq property '(:keymap :cursor))
+  (let ((val (-> (alist-get state hel-state-properties)
+                 (plist-get property))))
+    (if (and (memq property '(:keymap :cursor))
+             (symbolp property))
         (symbol-value val)
       val)))
 
@@ -332,16 +318,16 @@ CHECKED-MODES is used internally and should not be set initially."
   (when (memq mode checked-modes)
     (error "Circular reference detected in ancestors of `%s'\n%s"
            major-mode checked-modes))
-  (let ((mode-alias (let ((func (symbol-function mode)))
-                      (if (symbolp func)
-                          func))))
-    (or (cl-loop for (state . properties) in hel-state-properties
-                 for modes = (-> (plist-get properties :modes)
-                                 (symbol-value))
-                 when (or (memq mode modes)
-                          (and mode-alias
-                               (memq mode-alias modes)))
-                 return state)
+  (let ((mode-alias (if-let* ((func (symbol-function mode))
+                              ((symbolp func)))
+                        func)))
+    (or (->> hel-state-properties
+             (-any (-lambda ((state . properties))
+                     (if-let* ((modes (plist-get properties :modes))
+                               ((or (memq mode modes)
+                                    (if mode-alias
+                                        (memq mode-alias modes)))))
+                         state))))
         (if-let* ((follow-parent)
                   (parent (get mode 'derived-mode-parent)))
             (hel-initial-state-for-mode parent t (cons mode checked-modes)))
@@ -355,12 +341,14 @@ CHECKED-MODES is used internally and should not be set initially."
   "Set the Hel initial STATE for the major MODE.
 MODE and STATE should be symbols."
   ;; Remove current settings.
-  (cl-loop for (_state . plist) in hel-state-properties
-           for modes = (plist-get plist :modes)
-           do (set modes (delq mode (symbol-value modes))))
+  (-each hel-state-properties
+    (-lambda ((_ . plist))
+      (setf (map-elt plist :modes)
+            (delq mode (map-elt plist :modes)))))
   ;; Add new settings.
-  (add-to-list (hel-state-property state :modes)
-               mode))
+  (cl-pushnew mode (-> hel-state-properties
+                       (map-elt state)
+                       (map-elt :modes))))
 
 ;;; Normal, Insert and Motion states
 
@@ -393,7 +381,7 @@ MODE and STATE should be symbols."
 ;;; Input-method
 
 (defun hel-activate-input-method ()
-  "Enable input method in states with `:input-method' non-nil."
+  "Enable input method in Hel states with `:input-method' property set."
   (let (input-method-activate-hook
         input-method-deactivate-hook)
     (when (and hel-local-mode hel-state)
