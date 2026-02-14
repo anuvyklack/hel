@@ -1754,10 +1754,10 @@ Do not auto-detect word boundaries in the search pattern."
 (defun hel-surround--read-char ()
   "Read char from minibuffer and return (LEFT . RIGHT) pair with strings
 to surround with."
-  (let* ((char (read-char "surround: " t))
-         (pair-or-fun-or-nil (-some-> (alist-get char hel-surround-alist)
-                               (plist-get :pair))))
-    (pcase pair-or-fun-or-nil
+  (let ((char (read-char "surround: " t)))
+    (pcase (-some-> hel-surround-alist
+             (map-elt char)
+             (map-elt :pair))
       ((and (pred functionp) fn)
        (funcall fn))
       ((and (pred consp) pair)
@@ -1813,9 +1813,9 @@ lines and reindent the region."
               (bounds (hel-surround--4-bounds char)))
     (-let* (((left-beg left-end right-beg right-end) bounds)
             (char (read-char "Insert pair: " t))
-            (pair-or-fun (-some-> (alist-get char hel-surround-alist)
-                           (plist-get :pair)))
-            ((left . right) (pcase pair-or-fun
+            ((left . right) (pcase (-some-> hel-surround-alist
+                                     (map-elt char)
+                                     (map-elt :pair))
                               ((and (pred functionp) fun)
                                (funcall fun))
                               ((and pair (guard pair))
