@@ -519,10 +519,12 @@ evaluate BODY, update fake CURSOR."
                 (get command 'hel-unsupported))
            (message "%S is not supported with multiple cursors" command))
           ((or
-            ;; If it's a lambda, we can't know if it's supported or not -
+            ;; If it's a lambda, we can't know if it's supported or not —
             ;; so go ahead and assume it's ok.
             (not (symbolp command))
-            (if-let* ((val (memq 'multiple-cursors (symbol-plist command))))
+            ;; If command has `multiple-cursors' property assigned — use it,
+            ;; else promt user and permanently store the decision.
+            (if-let* ((val (plist-member (symbol-plist command) 'multiple-cursors)))
                 (cadr val)
               (hel--prompt-for-unknown-command command)))
            (hel-save-window-scroll
