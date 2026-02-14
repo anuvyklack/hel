@@ -482,8 +482,9 @@ to the chosen one."
   "Switch to Insert state before region."
   :multiple-cursors nil
   (interactive "*")
-  (hel-with-each-cursor
-    (hel-ensure-region-direction -1))
+  (when (use-region-p)
+    (hel-with-each-cursor
+      (hel-ensure-region-direction -1)))
   (hel-insert-state 1))
 
 ;; a
@@ -491,10 +492,12 @@ to the chosen one."
   "Switch to Insert state after region."
   :multiple-cursors nil
   (interactive "*")
-  (hel-with-each-cursor
-    (hel-ensure-region-direction 1))
-  (when (and (hel-linewise-selection-p) (not (eobp)))
-    (backward-char))
+  (when (use-region-p)
+    (hel-with-each-cursor
+      (hel-ensure-region-direction 1)
+      (when (and (hel-linewise-selection-p)
+                 (not (eobp)))
+        (backward-char))))
   (hel-insert-state 1))
 
 ;; I
@@ -567,8 +570,9 @@ depending on DIRECTION."
   :multiple-cursors t
   (interactive "p")
   (hel-save-region
-    (hel-ensure-region-direction 1)
-    (unless (hel-linewise-selection-p)
+    (when (use-region-p)
+      (hel-ensure-region-direction 1))
+    (unless (hel-linewise-selection-p 1)
       (hel--forward-line 1))
     (newline count)))
 
@@ -578,7 +582,8 @@ depending on DIRECTION."
   :multiple-cursors t
   (interactive "p")
   (hel-save-region
-    (hel-ensure-region-direction -1)
+    (when (use-region-p)
+      (hel-ensure-region-direction -1))
     (hel--beginning-of-line)
     (newline count)))
 

@@ -859,9 +859,10 @@ If NOMSG is nil show `Mark set' message in echo area."
 YANK-FUNCTION should be a `yank' like function."
   (let ((region-dir (if (use-region-p) (hel-region-direction) 1))
         (deactivate-mark nil))
-    (hel-ensure-region-direction direction)
     (setq hel--yank-transform-linewise-selection?
-          (hel-linewise-selection-p direction))
+          (when (use-region-p)
+            (hel-ensure-region-direction direction)
+            (hel-linewise-selection-p direction)))
     (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
                                               yank-transform-functions))
               ;; Intercept `push-mark' so that any time `yank' calls it,
@@ -1118,8 +1119,7 @@ It is suitable to restore region with `hel-set-region':
 (defun hel-ensure-region-direction (direction)
   "Exchange point and mark if region direction mismatch DIRECTION.
 DIRECTION should be 1 or -1."
-  (when (and (use-region-p)
-             (/= direction (hel-region-direction)))
+  (when (/= direction (hel-region-direction))
     (hel--exchange-point-and-mark)))
 
 (defun hel-undo-command-p (command)
