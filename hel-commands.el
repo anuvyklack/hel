@@ -726,7 +726,9 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   (interactive "*p")
   (let ((deactivate-mark nil))
     (unless (eq last-command 'yank)
-      (setq hel--yank-transform-linewise-selection? (hel-linewise-selection-p)))
+      (setq hel--yank-transform-linewise-selection?
+            (and (use-region-p)
+                 (hel-linewise-selection-p (hel-region-direction)))))
     (let ((yank-transform-functions (cons #'hel--yank-transform
                                           yank-transform-functions))
           (yank-pop (or (command-remapping 'yank-pop)
@@ -752,7 +754,8 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   (when (use-region-p)
     (let ((deactivate-mark nil)
           (dir (hel-region-direction)))
-      (setq hel--yank-transform-linewise-selection? (hel-linewise-selection-p))
+      (setq hel--yank-transform-linewise-selection?
+            (hel-linewise-selection-p dir))
       (delete-region (region-beginning) (region-end))
       (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
                                                 yank-transform-functions))

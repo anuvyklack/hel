@@ -860,7 +860,8 @@ YANK-FUNCTION should be a `yank' like function."
   (let ((region-dir (if (use-region-p) (hel-region-direction) 1))
         (deactivate-mark nil))
     (hel-ensure-region-direction direction)
-    (setq hel--yank-transform-linewise-selection? (hel-linewise-selection-p))
+    (setq hel--yank-transform-linewise-selection?
+          (hel-linewise-selection-p direction))
     (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
                                               yank-transform-functions))
               ;; Intercept `push-mark' so that any time `yank' calls it,
@@ -943,16 +944,25 @@ positive — end of line."
   "Return the direction of region: -1 if point precedes mark, 1 otherwise."
   (if (< (point) (mark-marker)) -1 1))
 
-(defun hel-linewise-selection-p ()
-  "Return t if active region spawns full logical lines."
+(defun hel-linewise-selection-p (&optional direction)
+  "Return t if active region spawns full logical lines.
+If DIRECTION is provided — check if region spawns full logical line only
+on desired end of the region. Should be 1 or -1."
   (and (use-region-p)
        (save-excursion
-         (goto-char (region-beginning))
-         (bolp))
-       (save-excursion
-         (goto-char (region-end))
-         (or (bolp)
-             (eobp)))))
+         (let ((beg (region-beginning))
+               (end (region-end)))
+           (cond ((null direction)
+                  (and (progn (goto-char beg) (bolp))
+                       (progn (goto-char end) (bolp))))
+                 ((<= direction 0)
+                  (and (progn (goto-char beg) (bolp))
+                       (< 0 (- (line-number-at-pos end)
+                               (line-number-at-pos beg)))))
+                 (t
+                  (and (progn (goto-char end) (bolp))
+                       (< 0 (- (line-number-at-pos end)
+                               (line-number-at-pos beg))))))))))
 
 (defun hel-visual-lines-p ()
   "Return t if active region spawns visual lines."
