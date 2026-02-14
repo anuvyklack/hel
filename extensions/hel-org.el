@@ -279,7 +279,9 @@ If no selection — delete COUNT chars before point."
   :merge-selections t
   (interactive "*p")
   (if (use-region-p)
-      (kill-region nil nil t)
+      (progn
+        (kill-region nil nil t)
+        (hel-maybe-set-killed-rectangle))
     (org-delete-char (- count)))
   (hel-extend-selection -1))
 
