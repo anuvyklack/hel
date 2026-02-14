@@ -337,7 +337,7 @@ buffer if no sexp forward."
   "Extend the selection so that it consists of complete lines.
 When region is active: expand selection to line boundaries to encompass full
 line(s). With no region, select current line."
-  (unless (hel-logical-lines-p)
+  (unless (hel-linewise-selection-p)
     (if (use-region-p)
         (let ((beg (region-beginning))
               (end (region-end))
@@ -860,7 +860,7 @@ YANK-FUNCTION should be a `yank' like function."
   (let ((region-dir (if (use-region-p) (hel-region-direction) 1))
         (deactivate-mark nil))
     (hel-ensure-region-direction direction)
-    (setq hel--yank-transform-linewise-selection? (hel-logical-lines-p))
+    (setq hel--yank-transform-linewise-selection? (hel-linewise-selection-p))
     (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
                                               yank-transform-functions))
               ;; Intercept `push-mark' so that any time `yank' calls it,
@@ -943,7 +943,7 @@ positive — end of line."
   "Return the direction of region: -1 if point precedes mark, 1 otherwise."
   (if (< (point) (mark-marker)) -1 1))
 
-(defun hel-logical-lines-p ()
+(defun hel-linewise-selection-p ()
   "Return t if active region spawns full logical lines."
   (and (use-region-p)
        (save-excursion

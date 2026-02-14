@@ -65,7 +65,7 @@ are active — works like `hel-expand-line-selection'."
   :multiple-cursors t
   :merge-selections hel--extend-selection
   (interactive "p")
-  (if (and hel--extend-selection (hel-logical-lines-p))
+  (if (and hel--extend-selection (hel-linewise-selection-p))
       (hel-expand-line-selection count)
     ;; else
     (hel-maybe-deactivate-mark)
@@ -456,7 +456,7 @@ to the chosen one."
     (hel-delete-all-fake-cursors)
     (hel-push-point)
     (if hel--extend-selection
-        (let ((lines? (hel-logical-lines-p)))
+        (let ((lines? (hel-linewise-selection-p)))
           (hel-set-region (mark) pos)
           (if lines? (hel-expand-selection-to-full-lines)))
       ;; else
@@ -493,7 +493,7 @@ to the chosen one."
   (interactive "*")
   (hel-with-each-cursor
     (hel-ensure-region-direction 1))
-  (when (and (hel-logical-lines-p) (not (eobp)))
+  (when (and (hel-linewise-selection-p) (not (eobp)))
     (backward-char))
   (hel-insert-state 1))
 
@@ -540,7 +540,7 @@ depending on DIRECTION."
   (interactive "*")
   (hel-with-each-cursor
     (when (use-region-p) (hel-ensure-region-direction 1))
-    (if (and (hel-logical-lines-p) (not (eobp)))
+    (if (and (hel-linewise-selection-p) (not (eobp)))
         (backward-char)
       (move-end-of-line nil))
     (newline-and-indent)
@@ -568,7 +568,7 @@ depending on DIRECTION."
   (interactive "p")
   (hel-save-region
     (hel-ensure-region-direction 1)
-    (unless (hel-logical-lines-p)
+    (unless (hel-linewise-selection-p)
       (hel--forward-line 1))
     (newline count)))
 
@@ -589,7 +589,7 @@ depending on DIRECTION."
   (interactive "*")
   (hel-with-each-cursor
     (cond ((use-region-p)
-           (let ((logical-lines? (hel-logical-lines-p))
+           (let ((logical-lines? (hel-linewise-selection-p))
                  (visual-lines? (hel-visual-lines-p)))
              (kill-region nil nil t)
              (cond (logical-lines?
@@ -726,7 +726,7 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   (interactive "*p")
   (let ((deactivate-mark nil))
     (unless (eq last-command 'yank)
-      (setq hel--yank-transform-linewise-selection? (hel-logical-lines-p)))
+      (setq hel--yank-transform-linewise-selection? (hel-linewise-selection-p)))
     (let ((yank-transform-functions (cons #'hel--yank-transform
                                           yank-transform-functions))
           (yank-pop (or (command-remapping 'yank-pop)
@@ -752,7 +752,7 @@ With \\[universal-argument] paste the last coppied multiple selections from the
   (when (use-region-p)
     (let ((deactivate-mark nil)
           (dir (hel-region-direction)))
-      (setq hel--yank-transform-linewise-selection? (hel-logical-lines-p))
+      (setq hel--yank-transform-linewise-selection? (hel-linewise-selection-p))
       (delete-region (region-beginning) (region-end))
       (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
                                                 yank-transform-functions))
@@ -1781,7 +1781,7 @@ lines and reindent the region."
       (-let (((left . right) (hel-surround--read-char))
              (beg (copy-marker (region-beginning)))
              (end (copy-marker (region-end) t))
-             (linewise-selection? (hel-logical-lines-p)))
+             (linewise-selection? (hel-linewise-selection-p)))
         (when linewise-selection?
           (cl-callf s-trim left)
           (cl-callf s-trim right))
