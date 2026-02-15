@@ -1023,37 +1023,35 @@ entered regexp withing current selections."
 
 ;; &
 (hel-define-command hel-align-selections ()
-  "Align selections."
+  "Align selections by column."
   :multiple-cursors nil
   (interactive)
   (hel-with-real-cursor-as-fake
-    (let ((rest (-partition-by (lambda (cursor)
-                                 (line-number-at-pos (overlay-get cursor 'point)))
-                               (hel-all-fake-cursors :sort)))
-          cursors)
-      (while (progn (setq cursors (mapcar #'car rest))
-                    (length> cursors 1))
-        (setq rest (->> rest
-                        (mapcar #'cdr)
-                        (delq nil)))
-        (let ((column (-reduce-from (lambda (column cursor)
-                                      (goto-char (overlay-get cursor 'point))
-                                      (max column (current-column)))
-                                    0 cursors)))
-          ;; Align
-          (hel-save-window-scroll
-            (dolist (cursor cursors)
-              (hel-with-fake-cursor cursor
-                (unless (= (current-column) column)
-                  (let ((deactivate-mark nil)
-                        (padding (s-repeat (- column (current-column)) " ")))
-                    (cond ((and (use-region-p)
-                                (natnump (hel-region-direction)))
-                           (hel--exchange-point-and-mark)
-                           (insert padding)
-                           (hel--exchange-point-and-mark))
-                          (t
-                           (insert padding)))))))))))))
+    (dolist (cursors (->> (hel-all-fake-cursors :sort)
+                          ;; split cursors into groups by line
+                          (-partition-by (lambda (cursor)
+                                           (-> (overlay-get cursor 'point)
+                                               (line-number-at-pos))))
+                          ;; Transpose columns and rows to align all first
+                          ;; cursors in each line, than all second and so on.
+                          (hel-transpose)))
+      (let ((column (-reduce-from (lambda (column cursor)
+                                    (goto-char (overlay-get cursor 'point))
+                                    (max column (current-column)))
+                                  0 cursors)))
+        (hel-save-window-scroll
+          (dolist (cursor cursors)
+            (hel-with-fake-cursor cursor
+              (unless (= (current-column) column)
+                (let ((deactivate-mark nil)
+                      (padding (s-repeat (- column (current-column)) " ")))
+                  (cond ((and (use-region-p)
+                              (natnump (hel-region-direction)))
+                         (hel--exchange-point-and-mark)
+                         (insert padding)
+                         (hel--exchange-point-and-mark))
+                        (t
+                         (insert padding))))))))))))
 
 ;; C
 (hel-define-command hel-copy-selection (count)

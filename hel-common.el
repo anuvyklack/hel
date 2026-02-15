@@ -1288,6 +1288,17 @@ REST contains all other elements."
       (cl-callf cddr args)) ; advance by 2
     (cons plist args)))
 
+(defun hel-transpose (lol)
+  "Transpose list of lists.
+  ((1 2 3)    ((1 1 1)
+   (1 2)   =>  (2 2)
+   (1))        (3))"
+  (let (result)
+    (while (progn
+             (push (-map #'car lol) result)
+             (setq lol (-non-nil (-map #'cdr lol)))))
+    (nreverse result)))
+
 ;;; Advices
 
 (declare-function hel-extend-selection "hel-commands")
