@@ -1060,10 +1060,10 @@ that `match-beginning', `match-end' and `match-data' access."
   (eql (aref string (1- (length string)))
        ?\n))
 
-(defun hel-all-elements-are-equal-p (list)
-  "Return t if all elemetns in the LIST are `equal' each other."
+(cl-defun hel-all-elements-are-the-same-p (list &key (test #'equal))
+  "Return t if all elements in the LIST are the same."
   (let ((first (car list)))
-    (-all? (lambda (x) (equal first x))
+    (-all? (lambda (x) (funcall test first x))
            (cdr list))))
 
 (defun hel-cursor-is-bar-p ()
