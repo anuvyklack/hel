@@ -703,7 +703,7 @@ unless they all are equal. You can paste them later with `yank-rectangle'."
                      (-map (lambda (cursor)
                              (car-safe (overlay-get cursor 'kill-ring)))
                            (hel-all-fake-cursors :sort)))))
-      (unless (hel-all-elements-are-equal-p entries)
+      (unless (hel-all-elements-are-the-same-p entries)
         (setq killed-rectangle entries)))))
 
 ;; p
