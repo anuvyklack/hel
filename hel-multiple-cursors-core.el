@@ -124,7 +124,7 @@ at beginning and end of a single undo step and restores real and fake
 cursors positions and regions after undo/redo step.
 
 CURSORS-POSITIONS is an alist returned by `hel-cursors-positions' function."
-  (hel-position-cursors cursors-positions)
+  (hel-place-cursors cursors-positions)
   (push `(apply hel--undo-step-start ,cursors-positions)
         buffer-undo-list))
 
@@ -418,7 +418,7 @@ Real cursor has ID 0 and is the first element (`car') of the list."
           alist)
     alist))
 
-(defun hel-position-cursors (cursors-positions)
+(defun hel-place-cursors (cursors-positions)
   "Setup all cursors according to CURSORS-POSITIONS.
 CURSORS-POSITIONS is an alist of the form that `hel-cursors-positions' returns."
   (maphash (lambda (id cursor)
