@@ -1159,7 +1159,7 @@ You may restore them with %s (`hel-restore-cursors')."
   :multiple-cursors nil
   (interactive)
   (when hel--cursors-positions-history
-    (hel-position-cursors hel--cursors-positions-history)))
+    (hel-place-cursors hel--cursors-positions-history)))
 
 ;; M-minus
 (hel-define-command hel-merge-selections ()
