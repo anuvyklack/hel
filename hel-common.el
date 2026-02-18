@@ -148,15 +148,14 @@ COUNT minus number of steps moved; if backward, COUNT plus number moved.
 \(fn (DIRECTION COUNT) BODY...)"
   (declare (indent 1)
            (debug ((symbolp form) body)))
-  (let* ((dir (pop spec))
-         (count (pop spec))
-         (n (gensym "n")))
-    `(let* ((,n ,count)
-            (,dir (hel-sign ,n)))
-       (while (and (/= ,n 0)
-                   (/= (point) (progn ,@body (point))))
-         (cl-callf - ,n ,dir))
-       ,n)))
+  (cl-with-gensyms (n)
+    (-let (((dir count) spec))
+      `(let* ((,n ,count)
+              (,dir (hel-sign ,n)))
+         (while (and (/= ,n 0)
+                     (/= (point) (progn ,@body (point))))
+           (cl-callf - ,n ,dir))
+         ,n))))
 
 ;;; Things
 ;;;; `hel-line'
