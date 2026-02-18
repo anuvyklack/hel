@@ -74,10 +74,7 @@ flickering."
 The difference from `save-mark-and-excursion' is that both point and mark are
 saved as markers and correctly handle case when text was inserted before region."
   (declare (indent 0) (debug t))
-  (let ((pnt (gensym "point"))
-        (beg (gensym "region-beg"))
-        (end (gensym "region-end"))
-        (dir (gensym "region-dir")))
+  (cl-with-gensyms (pnt beg end dir)
     `(if (use-region-p)
          (let ((deactivate-mark nil)
                (,beg (copy-marker (region-beginning) t))
@@ -98,11 +95,9 @@ saved as markers and correctly handle case when text was inserted before region.
 
 (defmacro hel-restore-region-on-error (&rest body)
   (declare (indent 0) (debug t))
-  (let ((region (gensym "region"))
-        (point-pos (gensym "point"))
-        (something-goes-wrong? (make-symbol "something-goes-wrong?")))
+  (cl-with-gensyms (region point something-goes-wrong?)
     `(let ((,region (hel-region))
-           (,point-pos (point))
+           (,point (point))
            (,something-goes-wrong? t))
        (unwind-protect
            (prog1 (progn ,@body)
@@ -110,7 +105,7 @@ saved as markers and correctly handle case when text was inserted before region.
          (when ,something-goes-wrong?
            (if ,region
                (apply #'hel-set-region ,region)
-             (goto-char ,point-pos)))))))
+             (goto-char ,point)))))))
 
 (defmacro hel-define-command (command args &rest body)
   "Define Hel COMMAND.
