@@ -988,7 +988,7 @@ on desired end of the region. Should be 1 or -1."
 
 (defsubst hel-distance (x y) (abs (- y x)))
 
-(defun hel-search (string &optional direction limit regexp? visible?)
+(cl-defun hel-search (string &optional (direction 1) limit regexp? visible?)
   "Search for STRING toward the DIRECTION.
 
 DIRECTION can be either 1 — search forward, or -1 — search backward.
@@ -1004,7 +1004,6 @@ If VISIBLE? is non-nil skip invisible matches.
 
 When REGEXP? is non-nil this function modifies the match data
 that `match-beginning', `match-end' and `match-data' access."
-  (or direction (setq direction 1))
   (when-let* ((result (if regexp?
                           (re-search-forward string limit t direction)
                         (search-forward string limit t direction))))
@@ -1028,7 +1027,7 @@ If nothing found, wrap around the buffer and search up to the point."
         (if (re-search-forward regexp point t direction)
             (message "Wrapped around buffer")))))
 
-(defun hel-looking-at (string &optional direction regexp?)
+(cl-defun hel-looking-at (string &optional (direction 1) regexp?)
   "Return t if text directly after point toward the DIRECTION
 matches STRING.
 
@@ -1037,7 +1036,6 @@ otherwise it will be searched literally.
 
 When REGEXP? is non-nil this function modifies the match data
 that `match-beginning', `match-end' and `match-data' access."
-  (or direction (setq direction 1))
   (cond ((and regexp? (< 0 direction))
          (looking-at string))
         ((and regexp? (< direction 0))
@@ -1172,12 +1170,11 @@ of the full regexp match."
         (t
          (cons (match-beginning 0) (match-end 0)))))
 
-(defun hel-collect-positions (fun &optional start end)
+(cl-defun hel-collect-positions (fun &optional (start (window-start))
+                                               (end (window-end)))
   "Consecutively call FUN and collect point positions after each invocation.
 Finish as soon as point moves outside of START END buffer positions.
 FUN on each invocation should move point."
-  (or start (setq start (window-start)))
-  (or end (setq end (window-end)))
   (save-excursion
     (cl-loop with win = (get-buffer-window)
              for old-point = (point)
