@@ -942,23 +942,30 @@ entered regexp withing current selections."
   :multiple-cursors nil
   (interactive)
   (when (region-active-p)
+    (setq hel--cursors-positions-history (hel-cursors-positions))
     (hel-with-real-cursor-as-fake
       (let* ((cursors (hel-all-fake-cursors))
-             (ranges (-map (lambda (cursor)
-                             (if (overlay-get cursor 'mark-active)
-                                 (let ((point (marker-position
-                                               (overlay-get cursor 'point)))
-                                       (mark (marker-position
-                                              (overlay-get cursor 'mark))))
-                                   (if (< point mark)
-                                       (cons point mark)
-                                     (cons mark point)))))
-                           cursors)))
-        (-each cursors #'hel-hide-fake-cursor)
-        (if (hel-select-interactively-in ranges invert)
-            (-each cursors #'hel--delete-fake-cursor)
-          ;; Restore original cursors
-          (-each cursors #'hel-show-fake-cursor))))))
+             (ranges (->> cursors
+                          (-map (lambda (cursor)
+                                  (if (overlay-get cursor 'mark-active)
+                                      (let ((point (-> cursor
+                                                       (overlay-get 'point)
+                                                       (marker-position)))
+                                            (mark  (-> cursor
+                                                       (overlay-get 'mark)
+                                                       (marker-position))))
+                                        (if (< point mark)
+                                            (cons point mark)
+                                          (cons mark point))))))
+                          (delq nil))))
+        (-each cursors #'hel--delete-fake-cursor)
+        (setq hel--extend-selection nil)
+        (if (setq ranges (hel-search-interactively-in-noncontiguous-regions ranges invert))
+            (-each ranges (-lambda ((mark . point))
+                            (hel-create-fake-cursor point mark)))
+          ;; Else restore original cursors.
+          (hel-place-cursors hel--cursors-positions-history))))
+    (hel-auto-multiple-cursors-mode)))
 
 ;; S
 (hel-define-command hel-split-region ()
