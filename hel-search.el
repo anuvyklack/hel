@@ -41,7 +41,7 @@ DIRECTION must be either 1 or -1."
                                   :direction direction
                                   :face 'hel-search-highlight)))
     (unless (hel-highlight-equal hl hel-search--hl)
-      (when hel-search--hl (hel-highlight-delete hel-search--hl))
+      (when hel-search--hl (hel-highlight-cleanup hel-search--hl))
       (setq hel-search--hl hl)))
   (add-hook 'pre-command-hook  #'hel-highlight-search-pattern--cleanup-hook nil t)
   ;; Update highlighting after commands for which
@@ -55,7 +55,7 @@ DIRECTION must be either 1 or -1."
       (cancel-timer hel-search--timer)
       (setq hel-search--timer nil))
     (when hel-search--hl
-      (hel-highlight-delete hel-search--hl)
+      (hel-highlight-cleanup hel-search--hl)
       (setq hel-search--hl nil))
     (remove-hook 'pre-command-hook  #'hel-highlight-search-pattern--cleanup-hook t)
     (remove-hook 'post-command-hook #'hel-highlight-search-pattern--update-hook t)))
@@ -96,8 +96,8 @@ DIRECTION must be either 1 or -1."
            (equal (hel-highlight-direction h1) (hel-highlight-direction h2)))
        (equal (hel-highlight-invert h1) (hel-highlight-invert h2))))
 
-(defun hel-highlight-delete (hl)
-  "Destruct `hel-highlight' object."
+(defun hel-highlight-cleanup (hl)
+  "Cleanup all highlighting setup by `hel-highlight' object."
   (mapc #'delete-overlay (hel-highlight-overlays hl)))
 
 (defun hel-highlight-update (hl)
@@ -267,7 +267,7 @@ RANGES is a list of cons cells with positions (START . END)."
             ;; else
             (when hel-search--overlay
               (delete-overlay hel-search--overlay))
-            (hel-highlight-delete hl)
+            (hel-highlight-cleanup hl)
             (hel-echo "Search failed" 'error))
           (when (and (<= hel-search--window-start (point) hel-search--window-end)
                      (/= (window-start) hel-search--window-start))
@@ -300,7 +300,7 @@ RANGES is a list of cons cells with positions (START . END)."
       (delete-overlay hel-search--overlay)
       (setq hel-search--overlay nil))
     (when hel-search--hl
-      (hel-highlight-delete hel-search--hl)
+      (hel-highlight-cleanup hel-search--hl)
       (setq hel-search--hl nil))))
 
 ;;; Select
@@ -346,7 +346,7 @@ RANGES is a list of cons cells with positions (START . END)."
     (cancel-timer hel-search--timer)
     (setq hel-search--timer nil))
   (when hel-select--hl
-    (hel-highlight-delete hel-select--hl)
+    (hel-highlight-cleanup hel-select--hl)
     (setq hel-select--hl nil)))
 
 (defun hel-select--update (_ _ _)
@@ -500,11 +500,11 @@ If INVERT is non-nil — remove selections that match regexp."
                                  (backward-char)))))
                     ;; else
                     (prog1 nil
-                      (hel-highlight-delete hl))))))
+                      (hel-highlight-cleanup hl))))))
       (when (search direction)
         (let ((next (lambda () (interactive) (search direction)))
               (prev (lambda () (interactive) (search (- direction))))
-              (on-exit (lambda () (hel-highlight-delete hl))))
+              (on-exit (lambda () (hel-highlight-cleanup hl))))
           (set-transient-map (define-keymap
                                "n" next
                                "N" prev)
