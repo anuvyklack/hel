@@ -293,11 +293,13 @@ If no selection — delete COUNT chars before point."
   :merge-selections t
   (interactive "p")
   (if (use-region-p)
-      (condition-case err
-          (paredit-kill-region (region-beginning) (region-end))
-        (error
-         (hel-echo (error-message-string err) 'error)
-         (hel-set-region (mark t) (point))))
+      (progn
+        (condition-case err
+            (paredit-kill-region (region-beginning) (region-end))
+          (error
+           (hel-echo (error-message-string err) 'error)
+           (hel-set-region (mark t) (point))))
+        (hel-maybe-set-killed-rectangle))
     ;; else
     (paredit-backward-delete count))
   (hel-extend-selection -1))
