@@ -942,6 +942,7 @@ entered regexp withing current selections."
   :multiple-cursors nil
   (interactive)
   (when (region-active-p)
+    (setq hel--cursors-positions-history (hel-cursors-positions))
     (hel-with-real-cursor-as-fake
       (let* ((cursors (hel-all-fake-cursors))
              (ranges (-map (lambda (cursor)
@@ -954,11 +955,17 @@ entered regexp withing current selections."
                                        (cons point mark)
                                      (cons mark point)))))
                            cursors)))
-        (-each cursors #'hel-hide-fake-cursor)
-        (if (hel-select-interactively-in ranges invert)
-            (-each cursors #'hel--delete-fake-cursor)
-          ;; Restore original cursors
-          (-each cursors #'hel-show-fake-cursor))))))
+        (-each cursors #'hel--delete-fake-cursor)
+        (setq hel--extend-selection nil)
+        (if-let* ((ranges (let ((mark-active nil))
+                            (hel-search-interactively-in-noncontiguous-regions
+                             ranges invert))))
+            (progn
+              (-each ranges (-lambda ((mark . point))
+                              (hel-create-fake-cursor point mark))))
+          ;; Else restore original cursors.
+          (hel-place-cursors hel--cursors-positions-history))))
+    (hel-auto-multiple-cursors-mode)))
 
 ;; S
 (hel-define-command hel-split-region ()

@@ -193,6 +193,18 @@ RANGES is a list of cons cells with positions (START . END)."
                       (overlay-put 'face (hel-highlight-face hl)))
                     (hel-highlight-overlays hl))))
 
+(defun hel-highlight-ranges (ranges face &optional overlays)
+  "Put overlays with FACE over RANGES and return list with these overlays.
+Reuse existing OVERLAYS if provided."
+  (prog1 (-map (-lambda ((beg . end))
+                 (-doto (if overlays
+                            (move-overlay (pop overlays) beg end)
+                          (make-overlay beg end))
+                   (overlay-put 'face face)))
+               ranges)
+    ;; cleanup remaining overlays
+    (-each overlays #'delete-overlay)))
+
 ;;; Search
 
 (defun hel-read-regexp (prompt)
@@ -305,65 +317,65 @@ RANGES is a list of cons cells with positions (START . END)."
 
 ;;; Select
 
-(defvar hel-select--hl nil
-  "`hel-highlight' object for interactive select sessions.")
-
-(defun hel-select-interactively-in (ranges &optional invert)
-  "Inner function for `hel-select-regex' command."
-  (setq hel-select--hl (hel-highlight-create :buffer (current-buffer)
-                                             :face 'region
-                                             :ranges ranges
-                                             :invert invert))
-  (when-let* ((pattern (condition-case nil
-                           (minibuffer-with-setup-hook #'hel-select--start-session
-                             (hel-read-regexp (if invert "split: " "select: ")))
-                         (quit)))
-              ((stringp pattern))
-              ((not (string-empty-p pattern)))
-              (regexp (hel-pcre-to-elisp pattern))
-              (regions (-mapcat (-lambda ((beg . end))
-                                  (hel-regexp-match-ranges
-                                   regexp beg end invert))
-                                ranges)))
-    (hel-add-to-regex-history pattern)
-    (setq mark-active t
-          hel--extend-selection nil)
-    (cl-loop for (mark . point) in regions
-             do (hel-create-fake-cursor point mark))
-    :success))
-
-(defun hel-select--start-session ()
-  "Start interactive select minibuffer session."
-  (with-minibuffer-selected-window
-    (hel-highlight-entire-ranges hel-select--hl)
-    (setq mark-active nil))
-  (add-hook 'after-change-functions #'hel-select--update nil t)
-  (add-hook 'minibuffer-exit-hook #'hel-select--stop-session nil t))
-
-(defun hel-select--stop-session ()
-  "Stop interactive select minibuffer session."
-  (when hel-search--timer
-    (cancel-timer hel-search--timer)
-    (setq hel-search--timer nil))
-  (when hel-select--hl
-    (hel-highlight-cleanup hel-select--hl)
-    (setq hel-select--hl nil)))
-
-(defun hel-select--update (_ _ _)
-  (when hel-search--timer
-    (cancel-timer hel-search--timer))
-  (setq hel-search--timer
-        (run-at-time hel-update-highlight-delay nil
-                     #'hel-select--do-update)))
-
-(defun hel-select--do-update ()
-  (let ((hl hel-select--hl))
-    (setf (hel-highlight-regexp hl)
-          (-some-> (minibuffer-contents-no-properties)
-            (hel-pcre-to-elisp)))
-    (with-minibuffer-selected-window
-      (or (hel-highlight-update hl)
-          (hel-highlight-entire-ranges hl)))))
+;; TODO:
+;;   - show number of matches
+;;   - scroll window to first mathing if out of window scope
+;;   - open closed folds
+(defun hel-search-interactively-in-noncontiguous-regions (bounds &optional invert)
+  "Return a list with ranges that matches to interactively entered regexp.
+BOUNDS is a list of cons cells of the form (START . END) that defines the limits
+within which search will be performed."
+  (let ((face 'region)
+        timer
+        overlays
+        ;; count
+        minibuffer-content
+        (start-session (make-symbol "hel-select-interactively--start-session"))
+        (stop-session  (make-symbol "hel-select-interactively--stop-session"))
+        (after-change  (make-symbol "hel-select-interactively--after-change"))
+        (update        (make-symbol "hel-select-interactively--update"))
+        ;; (display-count (make-symbol "hel-select-interactively--display-count"))
+        )
+    (fset start-session
+          (lambda ()
+            (add-hook 'after-change-functions after-change nil t)
+            (add-hook 'minibuffer-exit-hook stop-session nil t)
+            (with-minibuffer-selected-window
+              (setq overlays (hel-highlight-ranges bounds face)))))
+    (fset after-change
+          (lambda (_beg _end _len)
+            (setq minibuffer-content (minibuffer-contents-no-properties))
+            (-some-> timer (cancel-timer))
+            (setq timer (run-at-time hel-update-highlight-delay nil update))))
+    (fset update
+          (lambda ()
+            (with-minibuffer-selected-window
+              (let ((ranges (and-let*
+                                (((not (string-empty-p minibuffer-content)))
+                                 (regexp (hel-pcre-to-elisp minibuffer-content))
+                                 ((-mapcat (-lambda ((beg . end))
+                                             (hel-regexp-match-ranges
+                                              regexp beg end invert))
+                                           bounds))))))
+                (setq overlays (hel-highlight-ranges (or ranges bounds)
+                                                     face overlays))))))
+    (fset stop-session
+          (lambda ()
+            (-some-> timer (cancel-timer))
+            (-each overlays #'delete-overlay)))
+    ;; main
+    (when-let* ((pattern (condition-case nil
+                             (minibuffer-with-setup-hook start-session
+                               (hel-read-regexp (if invert "split: " "select: ")))
+                           (quit))) ;; "C-g"
+                ((stringp pattern))
+                ((not (string-empty-p pattern)))
+                (regexp (hel-pcre-to-elisp pattern))
+                (ranges (-mapcat (-lambda ((beg . end))
+                                   (hel-regexp-match-ranges regexp beg end invert))
+                                 bounds)))
+      (hel-add-to-regex-history pattern)
+      ranges)))
 
 ;;; Filter
 
