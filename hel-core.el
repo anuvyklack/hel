@@ -290,7 +290,7 @@ STATE is the state's symbolic name."
   (let ((val (-> (alist-get state hel-state-properties)
                  (plist-get property))))
     (if (and (memq property '(:keymap :cursor))
-             (symbolp property))
+             (symbolp val))
         (symbol-value val)
       val)))
 
