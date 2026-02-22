@@ -1027,19 +1027,19 @@ entered regexp withing current selections."
   :multiple-cursors nil
   (interactive)
   (hel-with-real-cursor-as-fake
-    (dolist (cursors (->> (hel-all-fake-cursors :sort)
-                          ;; split cursors into groups by line
-                          (-partition-by (lambda (cursor)
-                                           (-> (overlay-get cursor 'point)
-                                               (line-number-at-pos))))
-                          ;; Transpose columns and rows to align all first
-                          ;; cursors in each line, than all second and so on.
-                          (hel-transpose)))
-      (let ((column (-reduce-from (lambda (column cursor)
-                                    (goto-char (overlay-get cursor 'point))
-                                    (max column (current-column)))
-                                  0 cursors)))
-        (hel-save-window-scroll
+    (hel-save-window-scroll
+      (dolist (cursors (->> (hel-all-fake-cursors :sort)
+                            ;; split cursors into groups by line
+                            (-partition-by (lambda (cursor)
+                                             (-> (overlay-get cursor 'point)
+                                                 (line-number-at-pos))))
+                            ;; Transpose columns and rows to align all first
+                            ;; cursors in each line, than all second and so on.
+                            (hel-transpose)))
+        (let ((column (-reduce-from (lambda (column cursor)
+                                      (goto-char (overlay-get cursor 'point))
+                                      (max column (current-column)))
+                                    0 cursors)))
           (dolist (cursor cursors)
             (hel-with-fake-cursor cursor
               (unless (= (current-column) column)
