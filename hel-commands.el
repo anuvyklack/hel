@@ -2037,7 +2037,7 @@ If the current buffer is not an indirect buffer, works like `widen'."
                              (cons buffer (buffer-local-value
                                            'hel--narrowed-base-buffer buffer)))))
                 (-remove (current-buffer))
-                (map-do #'kill-buffer)))
+                (seq-do #'kill-buffer)))
           ((switch-to-buffer base-buffer)
            (kill-buffer orig-buffer)))))
 
