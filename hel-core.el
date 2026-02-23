@@ -91,6 +91,8 @@
         ;; We will update its content on every Hel state change.
         (cl-pushnew 'hel-mode-map-alist emulation-mode-map-alists)
         (hel-load-whitelists)
+        (setf (map-elt minor-mode-overriding-map-alist 'hel-multiple-cursors-mode)
+              hel-multiple-cursors-mode-map)
         (add-hook 'pre-command-hook #'hel--pre-commad-hook nil t)
         (add-hook 'post-command-hook #'hel--post-command-hook 90 t)
         (add-hook 'after-revert-hook #'hel-delete-all-fake-cursors nil t)
@@ -108,6 +110,7 @@
     (setq hel-this-command nil
           hel--input-cache nil)
     (when hel-multiple-cursors-mode (hel-multiple-cursors-mode -1))
+    (cl-callf map-delete minor-mode-overriding-map-alist 'hel-multiple-cursors-mode)
     (hel-disable-current-state)
     (activate-input-method hel-input-method)))
 
