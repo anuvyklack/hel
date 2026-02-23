@@ -451,25 +451,17 @@ according to the Hel STATE."
             ;; Order matters: the first found binding will be accepted,
             ;; so earlier keymaps has higher priority.
             `(
-              ;; Edebug if active
+              ;; Edebug takes precedence over all other keymaps
               ,@(if edebug-mode
                     (list `(edebug-mode . ,edebug-mode-map)))
-              ;; ,@(if edebug-mode
-              ;;       (let ((map (or (hel-get-nested-hel-keymap edebug-mode-map state)
-              ;;                      edebug-mode-map)))
-              ;;         `((edebug-mode . ,map))))
               ;; Hel buffer local overriding map
-              ,@(if-let ((map (hel-get-nested-hel-keymap
-                               hel-overriding-local-map state)))
-                    (list `(:hel-override-map . ,map)))
+              ,@(if-let* ((map (hel-get-nested-hel-keymap hel-overriding-local-map state)))
+                    (list `(:hel-overriding-local-map . ,map)))
               ;; Hel keymaps nested in other keymaps
-              ,@(let (hel-map maps)
-                  (dolist (keymap (current-active-maps))
-                    (setq hel-map (hel-get-nested-hel-keymap keymap state))
-                    (when hel-map
-                      (push (cons (hel-minor-mode-for-keymap keymap) hel-map)
-                            maps)))
-                  (nreverse maps))
+              ,@(cl-loop for keymap in (current-active-maps)
+                         for hel-map = (hel-get-nested-hel-keymap keymap state)
+                         when hel-map
+                         collect (cons (hel-minor-mode-for-keymap keymap) hel-map))
               ;; Main state keymap
               ,(cons (hel-state-property state :variable)
                      (hel-state-property state :keymap))))))
