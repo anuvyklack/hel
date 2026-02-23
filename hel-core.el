@@ -193,75 +193,73 @@ Also two hooks are defined which are run each time Hel enter or exit STATE:
                     [&optional stringp]
                     [&rest [keywordp sexp]]
                     def-body)))
-  (let* ((state-name (concat (capitalize (symbol-name state)) " state"))
-         (symbol     (intern (format "hel-%s-state" state)))
-         (variable   symbol)
-         (keymap     (intern (format "%s-map" symbol)))
-         (enter-hook (intern (format "%s-enter-hook" symbol)))
-         (exit-hook  (intern (format "%s-exit-hook" symbol))))
-    ;; collect keywords
-    (cl-callf hel-split-keyword-args body)
-    (map-let ((:keymap keymap-value) :cursor :input-method :modes)
-             (car body)
-      (cl-callf cdr body)
-      ;; macro expansion
-      `(progn
-         ;; State variable
-         (hel-defvar-local ,variable nil ,(format "Non nil if Hel is in %s." state-name))
-         ;; Hooks
-         (defvar ,enter-hook nil ,(format "Hooks to run on entry %s." state-name))
-         (defvar ,exit-hook  nil ,(format "Hooks to run on exit %s." state-name))
-         ;; Keymap
-         (defvar ,keymap ,(or keymap-value '(make-sparse-keymap))
-           ,(format "Global keymap for Hel %s." state-name))
-         ;; Save state properties in `hel-state-properties' for runtime lookup.
-         (setf (alist-get ',state hel-state-properties)
-               '( :name         ,state-name
-                  :variable     ,variable
-                  :function     ,symbol
-                  :keymap       ,keymap
-                  :cursor       ,cursor
-                  :input-method ,input-method
-                  :modes        ,modes))
-         ;; State function
-         (defun ,symbol (&optional arg)
-           ,(format "Switch Hel into %s.
+  (-let* ((state-name (concat (capitalize (symbol-name state)) " state"))
+          (symbol     (intern (format "hel-%s-state" state)))
+          (variable   symbol)
+          (keymap     (intern (format "%s-map" symbol)))
+          (enter-hook (intern (format "%s-enter-hook" symbol)))
+          (exit-hook  (intern (format "%s-exit-hook" symbol)))
+          ;; collect keywords
+          ((kwargs . body) (hel-split-keyword-args body))
+          ((&plist :keymap keymap-value :cursor :input-method :modes) kwargs))
+    ;; macro expansion
+    `(progn
+       ;; State variable
+       (hel-defvar-local ,variable nil ,(format "Non nil if Hel is in %s." state-name))
+       ;; Hooks
+       (defvar ,enter-hook nil ,(format "Hooks to run on entry %s." state-name))
+       (defvar ,exit-hook  nil ,(format "Hooks to run on exit %s." state-name))
+       ;; Keymap
+       (defvar ,keymap ,(or keymap-value '(make-sparse-keymap))
+         ,(format "Global keymap for Hel %s." state-name))
+       ;; Save state properties in `hel-state-properties' for runtime lookup.
+       (setf (alist-get ',state hel-state-properties)
+             '( :name         ,state-name
+                :variable     ,variable
+                :function     ,symbol
+                :keymap       ,keymap
+                :cursor       ,cursor
+                :input-method ,input-method
+                :modes        ,modes))
+       ;; State function
+       (defun ,symbol (&optional arg)
+         ,(format "Switch Hel into %s.
 When ARG is non-positive integer and Hel is in %s — disable it.\n\n%s"
-                    state-name state-name doc)
-           (interactive)
-           (if (and (numberp arg) (< arg 1))
-               ;; disable STATE
-               (when (eq hel-state ',state)
-                 (setq hel-state nil
-                       hel-previous-state ',state
-                       ,variable nil)
-                 ,@body
-                 (run-hooks ',exit-hook))
-             ;; enable STATE
-             (unless hel-local-mode (hel-local-mode))
-             (hel-disable-current-state)
-             (setq hel-state ',state
-                   ,variable t)
-             (let (input-method-activate-hook
-                   input-method-deactivate-hook)
-               ,(if input-method
-                    '(activate-input-method hel-input-method)
-                  '(deactivate-input-method)))
-             ,@body
-             ;; Switch color and shape of all cursors.
-             ;; main cursor
-             (setq hel--extend-selection nil)
-             (hel-update-cursor)
-             ;; fake cursors
-             (when hel-multiple-cursors-mode
-               (hel-save-window-scroll
-                 (hel-save-excursion
-                   (dolist (cursor (hel-all-fake-cursors))
-                     (hel-with-fake-cursor cursor
-                       (setq hel--extend-selection nil))))))
-             (run-hooks ',enter-hook))
-           (hel-update-active-keymaps)
-           (force-mode-line-update))))))
+                  state-name state-name doc)
+         (interactive)
+         (if (and (numberp arg) (< arg 1))
+             ;; disable STATE
+             (when (eq hel-state ',state)
+               (setq hel-state nil
+                     hel-previous-state ',state
+                     ,variable nil)
+               ,@body
+               (run-hooks ',exit-hook))
+           ;; enable STATE
+           (unless hel-local-mode (hel-local-mode))
+           (hel-disable-current-state)
+           (setq hel-state ',state
+                 ,variable t)
+           (let (input-method-activate-hook
+                 input-method-deactivate-hook)
+             ,(if input-method
+                  '(activate-input-method hel-input-method)
+                '(deactivate-input-method)))
+           ,@body
+           ;; Switch color and shape of all cursors.
+           ;; main cursor
+           (setq hel--extend-selection nil)
+           (hel-update-cursor)
+           ;; fake cursors
+           (when hel-multiple-cursors-mode
+             (hel-save-window-scroll
+               (hel-save-excursion
+                 (dolist (cursor (hel-all-fake-cursors))
+                   (hel-with-fake-cursor cursor
+                     (setq hel--extend-selection nil))))))
+           (run-hooks ',enter-hook))
+         (hel-update-active-keymaps)
+         (force-mode-line-update)))))
 
 (defun hel-state-p (symbol)
   "Return non-nil if SYMBOL corresponds to Hel state."
@@ -545,27 +543,26 @@ Example:
   ;; new users. It should be a list of keys that would be removed from KEYMAP
   ;; before any keys would be bound.
   (declare (indent defun))
-  (-let (((kwargs . args) (hel-split-keyword-args args)))
-    (cl-assert (cl-evenp (length args)) nil
-               "The number of [KEY DEFINITION] pairs is not even")
-    (map-let (:state :unset) kwargs
-      (-let* ((maps (if state
-                        (-map (lambda (state)
-                                (cl-assert (hel-state-p state) t "Unknown Hel state")
-                                (or (hel-get-nested-hel-keymap keymap state t)
-                                    (hel-create-nested-hel-keymap keymap state)))
-                              (ensure-list state))
-                      (list keymap)))
-              ((bind unbind) (->> args
-                                  (-partition 2)
-                                  (-separate #'-second-item)))
-              (unbind (nconc (ensure-list unset)
-                             (-flatten unbind))))
-        (dolist (map maps)
-          (-each unbind (lambda (key)
-                          (keymap-unset map key t)))
-          (-each bind (-lambda ((key definition))
-                        (keymap-set map key definition)))))))
+  (-let* ((((&plist :state :unset) . args) (hel-split-keyword-args args))
+          (maps (if state
+                    (-map (lambda (state)
+                            (cl-assert (hel-state-p state) t "Unknown Hel state")
+                            (or (hel-get-nested-hel-keymap keymap state t)
+                                (hel-create-nested-hel-keymap keymap state)))
+                          (ensure-list state))
+                  (list keymap)))
+          (_ (cl-assert (cl-evenp (length args)) nil
+                        "The number of [KEY DEFINITION] pairs is not even"))
+          ((bind unbind) (->> args
+                              (-partition 2)
+                              (-separate #'-second-item)))
+          (unbind (nconc (ensure-list unset)
+                         (-flatten unbind))))
+    (dolist (map maps)
+      (-each unbind (lambda (key)
+                      (keymap-unset map key t)))
+      (-each bind (-lambda ((key definition))
+                    (keymap-set map key definition)))))
   keymap)
 
 (defun hel-keymap-global-set (&rest args)
@@ -590,21 +587,20 @@ Example:
 
 \(fn [:state STATE] &rest [KEY DEFINITION]...)"
   (declare (indent defun))
-  (-let (((kwargs . args) (hel-split-keyword-args args)))
-    (unless (cl-evenp (length args))
-      (user-error "The number of [KEY DEFINITION] pairs is not even"))
-    (map-let (:state) kwargs
-      (let ((maps (if state
-                      (-map (lambda (state)
-                              (cl-assert (hel-state-p state) t "Unknown Hel state")
-                              (hel-state-property state :keymap))
-                            (ensure-list state))
-                    (list (current-global-map)))))
-        (dolist (map maps)
-          (cl-loop for (key definition) on args by #'cddr
-                   do (if definition
-                          (keymap-set map key definition)
-                        (keymap-unset map key t))))))))
+  (-let* ((((&plist :state) . args) (hel-split-keyword-args args))
+          (maps (if state
+                    (-map (lambda (state)
+                            (cl-assert (hel-state-p state) t "Unknown Hel state")
+                            (hel-state-property state :keymap))
+                          (ensure-list state))
+                  (list (current-global-map)))))
+    (cl-assert (cl-evenp (length args)) nil
+               "The number of [KEY DEFINITION] pairs is not even")
+    (dolist (map maps)
+      (cl-loop for (key definition) on args by #'cddr
+               do (if definition
+                      (keymap-set map key definition)
+                    (keymap-unset map key t))))))
 
 (defun hel-keymap-local-set (&rest args)
   "Create keybinding from KEY to DEFINITION in current buffer local keymap.
