@@ -1863,34 +1863,6 @@ All children of the parent of the splitted window will be rebalanced."
   (interactive)
   (hel-window-vsplit (frame-root-window)))
 
-(hel-define-command hel-window-left (count)
-  "Move the cursor to new COUNT-th window left of the current one."
-  :multiple-cursors nil
-  (interactive "p")
-  (dotimes (_ count)
-    (windmove-left)))
-
-(hel-define-command hel-window-right (count)
-  "Move the cursor to new COUNT-th window right of the current one."
-  :multiple-cursors nil
-  (interactive "p")
-  (dotimes (_ count)
-    (windmove-right)))
-
-(hel-define-command hel-window-up (count)
-  "Move the cursor to new COUNT-th window up of the current one."
-  :multiple-cursors nil
-  (interactive "p")
-  (dotimes (_ count)
-    (windmove-up)))
-
-(hel-define-command hel-window-down (count)
-  "Move the cursor to new COUNT-th window down of the current one."
-  :multiple-cursors nil
-  (interactive "p")
-  (dotimes (_ count)
-    (windmove-down)))
-
 (defmacro hel-save-side-windows (&rest body)
   "Toggle side windows, evaluate BODY, restore side windows."
   (declare (indent defun) (debug (&rest form)))

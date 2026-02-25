@@ -384,10 +384,10 @@ use it."
   "p"   '("pin buffer to window" . toggle-window-dedicated)
 
   "w"   #'other-window
-  "h"   #'hel-window-left
-  "j"   #'hel-window-down
-  "k"   #'hel-window-up
-  "l"   #'hel-window-right
+  "h"   #'windmove-left
+  "j"   #'windmove-down
+  "k"   #'windmove-up
+  "l"   #'windmove-right
 
   "H"   #'hel-move-window-left
   "J"   #'hel-move-window-down
@@ -421,10 +421,10 @@ use it."
   "C-p" '("pin buffer to window" . toggle-window-dedicated)
   ;; Jump over windows
   "C-w" #'other-window
-  "C-h" #'hel-window-left
-  "C-j" #'hel-window-down
-  "C-k" #'hel-window-up
-  "C-l" #'hel-window-right
+  "C-h" #'windmove-left
+  "C-j" #'windmove-down
+  "C-k" #'windmove-up
+  "C-l" #'windmove-right
   ;; buffers
   "C-r" #'revert-buffer
   "C-d" #'kill-current-buffer

@@ -174,28 +174,23 @@ rate allows highlights to update while scrolling."
   :group 'hel)
 
 (defvar hel-keep-search-highlight-commands
-  '(hel-extend-selection
-    hel-rotate-selections-forward
-    hel-rotate-selections-backward
-    hel-search-next
-    hel-search-previous
+  '(hel-extend-selection  ; v
+    hel-rotate-selections-forward  ; )
+    hel-rotate-selections-backward ; (
+    hel-search-next       ; n
+    hel-search-previous   ; N
     ;; switch windows
-    hel-window-split
-    hel-window-vsplit
-    hel-window-delete
-    hel-window-delete
-    hel-window-left
-    hel-window-down
-    hel-window-up
-    hel-window-right
-    hel-window-left
-    hel-window-down
-    hel-window-up
-    hel-window-right
-    hel-move-window-left
-    hel-move-window-down
-    hel-move-window-up
-    hel-move-window-right
+    hel-window-split      ; C-w s
+    hel-window-vsplit     ; C-w v
+    hel-window-delete     ; C-w c
+    windmove-left         ; C-w h
+    windmove-right        ; C-w l
+    windmove-up           ; C-w k
+    windmove-down         ; C-w j
+    hel-move-window-left  ; C-w H
+    hel-move-window-down  ; C-w J
+    hel-move-window-up    ; C-w K
+    hel-move-window-right ; C-w L
     ;; scrolling
     pixel-scroll-start-momentum)
   "List of commands which should preserve search highlighting overlays.")
