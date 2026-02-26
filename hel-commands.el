@@ -2031,14 +2031,18 @@ If the current buffer is not an indirect buffer, works like `widen'."
                (not (buffer-live-p base-buffer)))
            (widen))
           (arg
-           (->> orig-buffer
-                (-unfold (lambda (buffer)
-                           (when buffer
-                             (cons buffer (buffer-local-value
-                                           'hel--narrowed-base-buffer buffer)))))
-                (-remove (current-buffer))
-                (seq-do #'kill-buffer)))
-          ((switch-to-buffer base-buffer)
+           (-let (((base-buffer . narrowed-buffers)
+                   (->> orig-buffer
+                        (-unfold (lambda (buffer)
+                                   (when buffer
+                                     (cons buffer (buffer-local-value
+                                                   'hel--narrowed-base-buffer
+                                                   buffer)))))
+                        (nreverse))))
+             (switch-to-buffer base-buffer)
+             (-each narrowed-buffers #'kill-buffer)))
+          (t
+           (switch-to-buffer base-buffer)
            (kill-buffer orig-buffer)))))
 
 ;; C-w :
