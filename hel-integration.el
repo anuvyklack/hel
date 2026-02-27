@@ -212,6 +212,8 @@ in the command loop, and the fake cursors can pick up on those instead."
                      'hel-forward-WORD-end     ; E
                      'hel-first-non-blank      ; gh
                      'hel-end-of-line-command  ; gl
+                     'hel-beginning-of-buffer  ; gg
+                     'hel-end-of-buffer        ; G
                      'hel-search-forward       ; /
                      'hel-search-backward      ; ?
                      'hel-search-next          ; n
