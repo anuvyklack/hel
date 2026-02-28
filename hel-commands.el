@@ -1580,7 +1580,7 @@ already there."
   (when-let* ((char (if (characterp last-command-event)
                         last-command-event
                       (get last-command-event 'ascii-character)))
-              (bounds (hel-surround--4-bounds char)))
+              (bounds (hel-surround--remove char)))
     (-let [(_ beg end _) bounds]
       (hel-set-region beg end))))
 
@@ -1591,7 +1591,7 @@ already there."
   (when-let* ((char (if (characterp last-command-event)
                         last-command-event
                       (get last-command-event 'ascii-character)))
-              (bounds (hel-surround--4-bounds char)))
+              (bounds (hel-surround--remove char)))
     (-let [(beg _ _ end) bounds]
       (hel-set-region beg end))))
 
@@ -1759,22 +1759,6 @@ Do not auto-detect word boundaries in the search pattern."
 
 ;;; Surround
 
-(defun hel-surround--read-char ()
-  "Read char from minibuffer and return (LEFT . RIGHT) pair with strings
-to surround with."
-  (let ((char (read-char "surround: " t)))
-    (pcase (-some-> hel-surround-alist
-             (map-elt char)
-             (map-elt :pair))
-      ((and (pred functionp) fn)
-       (funcall fn))
-      ((and (pred consp) pair)
-       pair)
-      (_ (cons (char-to-string char) (char-to-string char))))))
-
-;; Cache the function output to use with all cursors.
-(hel-cache-input hel-surround--read-char)
-
 ;; ms
 (hel-define-command hel-surround ()
   "Enclose the selected region in chosen delimiters.
@@ -1783,23 +1767,24 @@ lines and reindent the region."
   :multiple-cursors t
   (interactive)
   (when (use-region-p)
-    (hel-save-region
-      (-let (((left . right) (hel-surround--read-char))
-             (beg (copy-marker (region-beginning)))
-             (end (copy-marker (region-end) t))
-             (linewise-selection? (hel-linewise-selection-p)))
-        (when linewise-selection?
-          (cl-callf s-trim left)
-          (cl-callf s-trim right))
-        (goto-char beg)
-        (insert left)
-        (when linewise-selection? (newline))
-        (goto-char end)
-        (insert right)
-        (when linewise-selection? (newline))
-        (indent-region beg end)
-        (set-marker beg nil)
-        (set-marker end nil)))
+    (-when-let* ((key (read-char "Surround: " t))
+                 ((left . right) (hel-surround--insert key)))
+      (hel-save-region
+        (-let ((beg (copy-marker (region-beginning)))
+               (end (copy-marker (region-end) t))
+               (linewise-selection? (hel-linewise-selection-p)))
+          (when linewise-selection?
+            (cl-callf s-trim left)
+            (cl-callf s-trim right))
+          (goto-char beg)
+          (insert left)
+          (when linewise-selection? (newline))
+          (goto-char end)
+          (insert right)
+          (when linewise-selection? (newline))
+          (indent-region beg end)
+          (set-marker beg nil)
+          (set-marker end nil))))
     (hel-extend-selection -1)))
 
 ;; md
@@ -1807,7 +1792,7 @@ lines and reindent the region."
   :multiple-cursors t
   (interactive)
   (when-let* ((key (read-char "Delete pair: " t))
-              (bounds (hel-surround--4-bounds key)))
+              (bounds (hel-surround--remove key)))
     (-let (((left-beg left-end right-beg right-end) bounds)
            (deactivate-mark nil))
       (delete-region right-beg right-end)
@@ -1817,20 +1802,13 @@ lines and reindent the region."
 (hel-define-command hel-surround-change ()
   :multiple-cursors t
   (interactive)
-  (when-let* ((char (read-char "Delete pair: " t))
-              (bounds (hel-surround--4-bounds char)))
-    (-let* (((left-beg left-end right-beg right-end) bounds)
-            (char (read-char "Insert pair: " t))
-            ((left . right) (pcase (-some-> hel-surround-alist
-                                     (map-elt char)
-                                     (map-elt :pair))
-                              ((and (pred functionp) fun)
-                               (funcall fun))
-                              ((and pair (guard pair))
-                               pair)
-                              ('nil (cons char char))))
-            (deactivate-mark nil))
-      (save-mark-and-excursion
+  (when-let* ((remove-key (read-char "Delete pair: " t))
+              (insert-key (read-char "Insert pair: " t))
+              (4-bounds (hel-surround--remove remove-key)))
+    (-let (((left-beg left-end right-beg right-end) 4-bounds)
+           ((left . right) (hel-surround--insert insert-key))
+           (deactivate-mark nil))
+      (hel-save-region
         (delete-region right-beg right-end)
         (goto-char right-beg)
         (insert right)

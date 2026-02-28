@@ -201,25 +201,33 @@ rate allows highlights to update while scrolling."
   "List of commands which should preserve search highlighting overlays.")
 
 (hel-defvar-local hel-surround-alist
-  '((?\) :pair ("(" . ")") :balanced t)
-    (?\} :pair ("{" . "}") :balanced t)
-    (?\] :pair ("[" . "]") :balanced t)
-    (?\> :pair ("<" . ">") :balanced t)
-    (?\( :pair ("( " . " )")
-         :lookup (lambda () (hel-4-bounds-of-brackets-at-point ?\( ?\))))
-    (?\[ :pair ("[ " . " ]")
-         :lookup (lambda () (hel-4-bounds-of-brackets-at-point ?\[ ?\])))
-    (?\{ :pair ("{ " . " }")
-         :lookup (lambda () (hel-4-bounds-of-brackets-at-point ?{ ?})))
-    (?\< :pair ("< " . " >")
-         :lookup (lambda () (hel-4-bounds-of-brackets-at-point ?< ?>))
+  '((?\) :insert ("(" . ")")
+         :remove (:pattern ("(" . ")") :balanced t))
+    (?\} :insert ("{" . "}")
+         :remove (:pattern ("{" . "}") :balanced t))
+    (?\] :insert ("[" . "]")
+         :remove (:pattern ("[" . "]") :balanced t))
+    (?\> :insert ("<" . ">")
+         :remove (:pattern ("<" . ">") :balanced t))
+    (?\( :insert ("( " . " )")
+         :remove (lambda ()
+                   (hel-4-bounds-of-brackets-at-point ?\( ?\)))
          ;; or
-         ;; :lookup ("<[[:blank:]\n]*" . "[[:blank:]\n]*>")
-         ;; :regexp t
-         ;; :balanced t
+         ;; :remove ( :pattern ("([[:blank:]\n]*" . "[[:blank:]\n]*)")
+         ;;           :regexp t
+         ;;           :balanced t)
          )
-    (?\" :pair ("\"" . "\"")
-         :lookup (lambda ()
+    (?\[ :insert ("[ " . " ]")
+         :remove (lambda ()
+                   (hel-4-bounds-of-brackets-at-point ?\[ ?\])))
+    (?\{ :insert ("{ " . " }")
+         :remove (lambda ()
+                   (hel-4-bounds-of-brackets-at-point ?{ ?})))
+    (?\< :insert ("< " . " >")
+         :remove (lambda ()
+                   (hel-4-bounds-of-brackets-at-point ?< ?>)))
+    (?\" :insert ("\"" . "\"")
+         :remove (lambda ()
                    (-when-let ((beg . end) (hel-bounds-of-quoted-at-point ?\"))
                      (list beg (1+ beg) (1- end) end)))))
   "Association list with (KEY . SPEC) elements for Hel surrounding functionality.
@@ -228,39 +236,40 @@ This variable is buffer-local so that users can modify it from major-mode hooks.
 
 KEY is a character, SPEC is a plist with following keys:
 
-`:pair'    Cons cell (LEFT . RIGHT) with strings, or function that returns such
-         cons cell. The strigs that will be inserted by `hel-surround' and
-         `hel-surround-change' functions.
+`:insert'  What \"ms\" and \"mr\" commands will insert.
+           Cons cell (LEFT . RIGHT) with strings, or function that returns such
+         cons cell.
 
-`:lookup'  Any of:
+`:remove'  What \"md\" and \"mr\" commands will remove. Any of:
 
-         1. Cons cell with strings (LEFT . RIGHT), or function that return
-            such cons cell. LEFT and RIGHT should be patterns that will be
-            used to search of two substrings to delete in `hel-surround-delete'
-            and `hel-surround-change' functions. If not specified `:pair' value
-            will be used.
+         1. Property list:
+            `:pattern'  Cons cell with strings (LEFT . RIGHT), or function that
+                      return such cons cell. LEFT and RIGHT should be patterns
+                      that will be used to search of two substrings to delete.
+
+            `:regexp'   If non-nil then LEFT and RIGHT strings in `:pattern'
+                      will be treated as regexp patterns. Otherwise they will be
+                      searched literally.
+
+            `:balanced' When non-nil all nested balanced LEFT RIGHT pairs will
+                      be skipped. Otherwise the first found pattern will be
+                      accepted.
 
          2. Function that returns list with 4 positions:
 
                      (LEFT-START LEFT-END RIGHT-START RIGHT-END)
 
-            of START and END of LEFT and RIGHT delimeters.
-            Example:
-                       LEFT                              RIGHT
+            of START and END of left and right delimeters. Example:
+
                      |<tag> |Lorem ipsum dolor sit amet| </tag>|
                      ^      ^                          ^       ^
             LEFT-START      LEFT-END         RIGHT-START       RIGHT-END
 
-Following keys are taken into account only when `:lookup' argument is a cons
-cell with strings (LEFT . RIGHT) or a function, that returns such cons cell.
-If `:lookup' is a function that returns list with 4 positions, they will be
-ignored.
 
-`:regexp'    If non-nil then LEFT and RIGHT strings specified in `:lookup' will be
-           treated as regexp patterns. Otherwise they will be searched literally.
+SPEC can also be a cons cell (LEFT . RIGHT), which is a shortcut for:
 
-`:balanced'  When non-nil all nested balanced LEFT RIGHT pairs will be skipped.
-           Otherwise the first found pattern will be accepted.
+    (`:insert' (LEFT . RIGHT)
+     `:remove' (`:pattern' (LEFT . RIGHT)))
 
 See the default value for examples.")
 

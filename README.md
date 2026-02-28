@@ -1,3 +1,6 @@
+> [!CAUTION]
+> If you're here because your configuration broke after a recent update, I'm very sorry! I've just refactored `hel-surround` with breaking changes, and you'll need to adapt to the new `hel-surround-alist` format. As an excuse, I can say that it's much better now.
+
 # Hel — [Helix](https://helix-editor.com/) Emulation Layer for Emacs
 
 ## Key features

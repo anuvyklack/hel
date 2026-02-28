@@ -791,12 +791,12 @@ a parent with different boundaries or reaches a `section' element."
 (defun hel-surround-settings-for-org-mode ()
   "Configure Hel surround functionality for Org-mode."
   (dolist (char '(?/ ?* ?_ ?+ ?= ?~))
-    (push `(,char :pair ,(cons (char-to-string char)
-                               (char-to-string char))
-                  :lookup hel-surround--4-bounds-of-org-emphasis)
+    (push `(,char :insert ,(cons (char-to-string char)
+                                 (char-to-string char))
+                  :remove hel-org--4-bounds-of-org-emphasis-at-point)
           hel-surround-alist)))
 
-(defun hel-surround--4-bounds-of-org-emphasis ()
+(defun hel-org--4-bounds-of-org-emphasis-at-point ()
   (when (org-in-regexp org-emph-re 2)
     (list (match-beginning 2)
           (match-beginning 4)

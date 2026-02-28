@@ -477,45 +477,63 @@ If no THING at point select COUNT following THINGs."
 
 ;;; Surround
 
+(defun hel-surround--insert (char)
+  "For given CHAR according to `hel-surround-alist' `:insert' key return
+cons cell (LEFT . RIGHT) with strings to insert."
+  (pcase (alist-get char hel-surround-alist)
+    ('nil (cons (char-to-string char)
+                (char-to-string char)))
+    ((and (pred -cons-pair-p) pair)
+     pair)
+    ((and (pred plistp) spec)
+     (pcase (plist-get spec :insert)
+       ((and (pred functionp) fn)
+        (funcall fn))
+       ((and (pred -cons-pair-p) pair)
+        pair)))))
+
+(defun hel-surround--remove (char)
+  "For given CHAR according to `hel-surround-alist' `:remove' key return
+the list with 4 positions:
+  - before left delimiter
+  - after left delimiter
+  - before right delimiter
+  - after right delimiter
+or nil if nothing found."
+  (let ((spec (alist-get char hel-surround-alist)))
+    (if-let* ((spec)
+              (fun (plist-get spec :remove))
+              ((functionp fun)))
+        (funcall fun)
+      ;; else
+      (-let ((limits (bounds-of-thing-at-point 'defun))
+             ((&plist :pattern (left . right) :regexp :balanced)
+              (pcase spec
+                ((pred -cons-pair-p)
+                 `(:pattern ,spec))
+                ((pred plistp)
+                 (plist-get spec :remove))
+                ('nil
+                 `(:pattern ,(cons (char-to-string char)
+                                   (char-to-string char)))))))
+        (hel-surround-4-bounds-at-point left right limits regexp balanced)))))
+
 (defun hel-bounds-of-quoted-at-point (quote-mark)
   "Return a cons cell (START . END) with bounds of text region
 enclosed in QUOTE-MARKs."
   (if-let* ((limits (or (bounds-of-thing-at-point 'hel-comment)
                         (bounds-of-thing-at-point 'string))))
-      (-if-let ((beg _ _ end)
-                (hel-surround-4-bounds-at-point (char-to-string quote-mark)
-                                                (char-to-string quote-mark)
-                                                limits))
+      (-if-let ((beg _ _ end) (hel-surround-4-bounds-at-point
+                               (char-to-string quote-mark)
+                               (char-to-string quote-mark)
+                               limits))
           (cons beg end))
     ;; else
     (hel--bounds-of-quoted-at-point-ppss quote-mark)))
 
-(defun hel-surround--4-bounds (char)
-  "For given CHAR according to `hel-surround-alist' return
-the list (LEFT-BEG LEFT-END RIGHT-LEFT RIGHT-END) with 4 positions:
-before/after left delimiter and before/after right delimiter,"
-  (if-let* ((spec (alist-get char hel-surround-alist))
-            (pair-or-list (pcase (or (plist-get spec :lookup)
-                                     (plist-get spec :pair))
-                            ((and fn (pred functionp))
-                             (funcall fn))
-                            (val val))))
-      (pcase pair-or-list
-        ((and (pred -cons-pair-p) `(,left . ,right))
-         (hel-surround-4-bounds-at-point left right
-                                         (bounds-of-thing-at-point 'defun)
-                                         (plist-get spec :regexp)
-                                         (plist-get spec :balanced)))
-        ((and list (pred proper-list-p) (guard (length= list 4)))
-         list))
-    ;; else
-    (hel-surround-4-bounds-at-point (char-to-string char)
-                                    (char-to-string char)
-                                    (bounds-of-thing-at-point 'defun))))
-
 (defun hel-surround-4-bounds-at-point
     (left right &optional limits regexp? balanced?)
-  "Return the bounds of the text region enclosed in LEFT and RIGHT strings.
+  "Return 4 bounds of the text region enclosed in LEFT and RIGHT strings or nil.
 
 If LEFT and RIGHT are different, then point can be either: directly before
 LEFT,directly after RIGHT, or somewhere between them. If LEFT and RIGHT are
@@ -530,23 +548,63 @@ If REGEXP? is non-nil LEFT and RIGHT will be searched as regexp patterns
 If BALANCED? is non-nil all nested LEFT RIGHT pairs will be skipped.
 
 Return the list (LEFT-BEG LEFT-END RIGHT-LEFT RIGHT-END) with
-4 positions: before/after LEFT and before/after RIGHT."
+4 positions: before/after LEFT and before/after RIGHT, or nil."
   (save-excursion
     (when (string-equal left right)
       (setq balanced? nil))
-    (cond
-     ;; Check if we can use Parse-Partial-Sexp Scanner
-     ((and balanced?
-           (length= left 1)
-           (length= right 1)
-           (eq (char-syntax (string-to-char left)) ?\( )
-           (eq (char-syntax (string-to-char right)) ?\) ))
-      (-if-let ((beg . end)
-                (hel-bounds-of-brackets-at-point (string-to-char left)
-                                                 (string-to-char right)))
-          (list beg (1+ beg) (1- end) end)))
-     (t
-      (hel-surround--4-bounds-at-point-1 left right limits regexp? balanced?)))))
+    ;; Check if we can use Parse-Partial-Sexp Scanner
+    (if (and balanced?
+             (length= left 1)
+             (length= right 1)
+             (eq ?\( (char-syntax (string-to-char left)) )
+             (eq ?\) (char-syntax (string-to-char right)) ))
+        (-if-let ((beg . end) (hel-bounds-of-brackets-at-point
+                               (string-to-char left) (string-to-char right)))
+            (list beg (1+ beg) (1- end) end))
+      ;; else
+      (hel-surround--4-bounds-at-point-1 left right limits regexp? balanced?))))
+
+(defun hel-surround--4-bounds-at-point-1
+    (left right &optional limits regexp? balanced?)
+  "The internal function for `hel-surround-4-bounds-at-point' when
+Parse-Partial-Sexp Scanner can't be used."
+  (save-excursion
+    (let ((left-not-equal-right? (not (string-equal left right))))
+      (cond
+       ;; point is before LEFT
+       ((and left-not-equal-right?
+             (hel-looking-at left 1 regexp?))
+        (let* ((left-beg (point))
+               (left-end (if regexp? (match-end 0)
+                           (+ left-beg (length left)))))
+          (goto-char left-end)
+          (if-let* ((right-end (hel-surround-search-outward
+                                left right 1 limits regexp? balanced?))
+                    (right-beg (if regexp? (match-beginning 0)
+                                 (- right-end (length right)))))
+              (list left-beg left-end right-beg right-end))))
+       ;; point is after RIGHT
+       ((and left-not-equal-right?
+             (hel-looking-at right -1 regexp?))
+        (let* ((right-end (point))
+               (right-beg (if regexp? (match-beginning 0)
+                            (- right-end (length right)))))
+          (goto-char right-beg)
+          (if-let* ((left-beg (hel-surround-search-outward
+                               left right -1 limits regexp? balanced?))
+                    (left-end (if regexp? (match-end 0)
+                                (+ left-beg (length left)))))
+              (list left-beg left-end right-beg right-end))))
+       (t
+        (if-let* ((left-beg (hel-surround-search-outward
+                             left right -1 limits regexp? balanced?))
+                  (left-end (if regexp? (match-end 0)
+                              (+ left-beg (length left))))
+                  (right-end (hel-surround-search-outward
+                              left right 1 limits regexp? balanced?))
+                  (right-beg (if regexp? (match-beginning 0)
+                               (- right-end (length right)))))
+            (list left-beg left-end right-beg right-end)))))))
 
 (defun hel-bounds-of-brackets-at-point (left right)
   "Return the bounds of the balanced expression at point enclosed
@@ -630,46 +688,6 @@ Return the list (LEFT-BEG LEFT-END RIGHT-LEFT RIGHT-END) with 4 positions:
                            (point))))
           (list left-beg left-end right-beg right-end)))))
 
-(defun hel-surround--4-bounds-at-point-1 (left right &optional limits regexp? balanced?)
-  "The internal function for `hel-surround-4-bounds-at-point'."
-  (save-excursion
-    (let ((left-not-equal-right? (not (string-equal left right))))
-      (cond
-       ;; point is before LEFT
-       ((and left-not-equal-right?
-             (hel-looking-at left 1 regexp?))
-        (let* ((left-beg (point))
-               (left-end (if regexp? (match-end 0)
-                           (+ left-beg (length left)))))
-          (goto-char left-end)
-          (if-let* ((right-end (hel-surround-search-outward
-                                left right 1 limits regexp? balanced?))
-                    (right-beg (if regexp? (match-beginning 0)
-                                 (- right-end (length right)))))
-              (list left-beg left-end right-beg right-end))))
-       ;; point is after RIGHT
-       ((and left-not-equal-right?
-             (hel-looking-at right -1 regexp?))
-        (let* ((right-end (point))
-               (right-beg (if regexp? (match-beginning 0)
-                            (- right-end (length right)))))
-          (goto-char right-beg)
-          (if-let* ((left-beg (hel-surround-search-outward
-                               left right -1 limits regexp? balanced?))
-                    (left-end (if regexp? (match-end 0)
-                                (+ left-beg (length left)))))
-              (list left-beg left-end right-beg right-end))))
-       (t
-        (if-let* ((left-beg (hel-surround-search-outward
-                             left right -1 limits regexp? balanced?))
-                  (left-end (if regexp? (match-end 0)
-                              (+ left-beg (length left))))
-                  (right-end (hel-surround-search-outward
-                              left right 1 limits regexp? balanced?))
-                  (right-beg (if regexp? (match-beginning 0)
-                               (- right-end (length right)))))
-            (list left-beg left-end right-beg right-end)))))))
-
 (defun hel-surround-search-outward
     (left right &optional direction limits regexp? balanced?)
   "Return the position before LEFT or after RIGHT depending on DIRECTION.
@@ -743,9 +761,9 @@ balanced expressions."
   (save-excursion
     (let ((syntax-table (if (eq (char-syntax quote-mark) ?\")
                             (syntax-table)
-                          (let ((st (copy-syntax-table (syntax-table))))
-                            (modify-syntax-entry quote-mark "\"" st)
-                            st))))
+                          (let ((table (copy-syntax-table (syntax-table))))
+                            (modify-syntax-entry quote-mark "\"" table)
+                            table))))
       (with-syntax-table syntax-table
         (let* ((curpoint (point))
                (state (progn
