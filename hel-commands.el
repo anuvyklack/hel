@@ -1761,27 +1761,38 @@ Do not auto-detect word boundaries in the search pattern."
 
 ;; ms
 (hel-define-command hel-surround ()
-  "Enclose the selected region in chosen delimiters.
-If the region consist of full lines, insert delimiters on separate
-lines and reindent the region."
+  "Enclose the active region with the chosen delimiters.
+
+Left brackets — `(', `[', `{' — add extra spaces around the surrounded
+region. If the selection is linewise, the delimiters are placed on
+separate lines.
+
+Right brackets — `)', `]', `}' — do the opposite: they remove all
+spaces or newlines from the selection and are inserted tightly.
+
+For custom delimiters, the general rule is: if either delimiter
+contains a newline character, they are inserted on separate lines."
   :multiple-cursors t
   (interactive)
-  (when (use-region-p)
-    (-when-let* ((key (read-char "Surround: " t))
-                 ((left . right) (hel-surround--insert key)))
-      (hel-save-region
-        (-let ((beg (copy-marker (region-beginning)))
-               (end (copy-marker (region-end) t))
-               (linewise-selection? (hel-linewise-selection-p)))
-          (when linewise-selection?
-            (cl-callf s-trim left)
-            (cl-callf s-trim right))
+  (when-let* (((use-region-p))
+              (key (read-char "Surround: " t)))
+    (-let* (((left . right) (hel-surround--insert key))
+            (linewise? (or (string-search "\n" left)
+                           (string-search "\n" right))))
+      (if linewise?
+          (progn
+            (cl-callf string-trim left)
+            (cl-callf string-trim right))
+        (hel-trim-whitespaces-from-selection))
+      (let ((beg (copy-marker (region-beginning)))
+            (end (copy-marker (region-end) t)))
+        (hel-save-region
           (goto-char beg)
           (insert left)
-          (when linewise-selection? (newline))
+          (when linewise? (newline))
           (goto-char end)
           (insert right)
-          (when linewise-selection? (newline))
+          (when linewise? (newline))
           (indent-region beg end)
           (set-marker beg nil)
           (set-marker end nil))))
@@ -1789,6 +1800,7 @@ lines and reindent the region."
 
 ;; md
 (hel-define-command hel-surround-delete ()
+  "Delete surround."
   :multiple-cursors t
   (interactive)
   (when-let* ((key (read-char "Delete pair: " t))
@@ -1800,6 +1812,7 @@ lines and reindent the region."
 
 ;; mr
 (hel-define-command hel-surround-change ()
+  "Change surround."
   :multiple-cursors t
   (interactive)
   (when-let* ((remove-key (read-char "Delete pair: " t))

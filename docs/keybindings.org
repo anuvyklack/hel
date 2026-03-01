@@ -274,8 +274,17 @@ for =m= prefix. Also, this is in line with Emacs tradition which has commands li
 ** Surround
 
 - =mm= :: Go to matching bracket.
+
 - =ms= :: Surround selection.
+
+  Left brackets — =(=, =[=, ={= — add extra spaces around the surrounded region.
+  If the selection is linewise, the delimiters are placed on separate lines.
+  
+  Right brackets — =)=, =]=, =}= — do the opposite: they remove all spaces or
+  newlines from the selection and are inserted tightly.
+
 - =md= :: Delete surround.
+
 - =mr= :: Change (replace) surround.
 
 ** Search
