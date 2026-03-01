@@ -200,22 +200,23 @@ rate allows highlights to update while scrolling."
     pixel-scroll-start-momentum)
   "List of commands which should preserve search highlighting overlays.")
 
+;; TODO: add examples with `elisp-demos' package
 (hel-defvar-local hel-surround-alist
   '((?\) :insert ("(" . ")")
-         :remove (:pattern ("(" . ")") :balanced t))
+         :remove ("(" . ")") :balanced t)
     (?\} :insert ("{" . "}")
-         :remove (:pattern ("{" . "}") :balanced t))
+         :remove ("{" . "}") :balanced t)
     (?\] :insert ("[" . "]")
-         :remove (:pattern ("[" . "]") :balanced t))
+         :remove ("[" . "]") :balanced t)
     (?\> :insert ("<" . ">")
-         :remove (:pattern ("<" . ">") :balanced t))
+         :remove ("<" . ">") :balanced t)
     (?\( :insert ("( " . " )")
          :remove (lambda ()
                    (hel-4-bounds-of-brackets-at-point ?\( ?\)))
          ;; or
-         ;; :remove ( :pattern ("([[:blank:]\n]*" . "[[:blank:]\n]*)")
-         ;;           :regexp t
-         ;;           :balanced t)
+         ;; :remove ("([[:blank:]\n]*" . "[[:blank:]\n]*)")
+         ;; :regexp t
+         ;; :balanced t
          )
     (?\[ :insert ("[ " . " ]")
          :remove (lambda ()
@@ -234,42 +235,38 @@ rate allows highlights to update while scrolling."
 
 This variable is buffer-local so that users can modify it from major-mode hooks.
 
-KEY is a character, SPEC is a plist with following keys:
+KEY is a character, SPEC is a plist with ideologically 2 group of keys:
 
-`:insert'  What \"ms\" and \"mr\" commands will insert.
-           Cons cell (LEFT . RIGHT) with strings, or function that returns such
-         cons cell.
+1. What \"ms\" (`hel-surround') and \"mr\" (`hel-surround-change') will insert.
 
-`:remove'  What \"md\" and \"mr\" commands will remove. Any of:
+   `:insert'    Cons cell (LEFT . RIGHT) of strings, or a function that returns
+              such cons cell.
 
-         1. Property list:
-            `:pattern'  Cons cell with strings (LEFT . RIGHT), or function that
-                      return such cons cell. LEFT and RIGHT should be patterns
-                      that will be used to search of two substrings to delete.
+2. What \"md\" (`hel-surround-delete') and \"mr\" (`hel-surround-change') will remove.
 
-            `:regexp'   If non-nil then LEFT and RIGHT strings in `:pattern'
-                      will be treated as regexp patterns. Otherwise they will be
-                      searched literally.
+   Either a group of keys:
 
-            `:balanced' When non-nil all nested balanced LEFT RIGHT pairs will
-                      be skipped. Otherwise the first found pattern will be
-                      accepted.
+   `:remove'    Cons cell (LEFT . RIGHT) of strings, or a function that returns
+              such a cons cell. LEFT and RIGHT should be patterns used to search
+              for the two substrings to delete.
 
-         2. Function that returns list with 4 positions:
+   `:regexp'    If non-nil, treat LEFT and RIGHT from `:remove' as regular
+              expressions. Otherwise, search for them literally.
 
-                     (LEFT-START LEFT-END RIGHT-START RIGHT-END)
+   `:balanced'  When non-nil, skip all nested balanced LEFT/RIGHT pairs.
+              Otherwise, accept the first matching pair found.
 
-            of START and END of left and right delimeters. Example:
+   Or a single key
 
-                     |<tag> |Lorem ipsum dolor sit amet| </tag>|
-                     ^      ^                          ^       ^
-            LEFT-START      LEFT-END         RIGHT-START       RIGHT-END
+   `:remove'    Function that returns list with 4 positions:
 
+                       (LEFT-START LEFT-END RIGHT-START RIGHT-END)
 
-SPEC can also be a cons cell (LEFT . RIGHT), which is a shortcut for:
+              of START and END of left and right delimeters. Example:
 
-    (`:insert' (LEFT . RIGHT)
-     `:remove' (`:pattern' (LEFT . RIGHT)))
+                       |<tag> |Lorem ipsum dolor sit amet| </tag>|
+                       ^      ^                          ^       ^
+              LEFT-START      LEFT-END         RIGHT-START       RIGHT-END
 
 See the default value for examples.")
 

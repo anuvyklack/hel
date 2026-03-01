@@ -480,17 +480,16 @@ If no THING at point select COUNT following THINGs."
 (defun hel-surround--insert (char)
   "For given CHAR according to `hel-surround-alist' `:insert' key return
 cons cell (LEFT . RIGHT) with strings to insert."
-  (pcase (alist-get char hel-surround-alist)
-    ('nil (cons (char-to-string char)
-                (char-to-string char)))
+  (pcase (-some-> hel-surround-alist
+           (map-elt char)
+           (map-elt :insert))
+    ((and (pred functionp) fn)
+     (funcall fn))
     ((and (pred -cons-pair-p) pair)
      pair)
-    ((and (pred plistp) spec)
-     (pcase (plist-get spec :insert)
-       ((and (pred functionp) fn)
-        (funcall fn))
-       ((and (pred -cons-pair-p) pair)
-        pair)))))
+    ('nil
+     (cons (char-to-string char)
+           (char-to-string char)))))
 
 (defun hel-surround--remove (char)
   "For given CHAR according to `hel-surround-alist' `:remove' key return
@@ -507,15 +506,11 @@ or nil if nothing found."
         (funcall fun)
       ;; else
       (-let ((limits (bounds-of-thing-at-point 'defun))
-             ((&plist :pattern (left . right) :regexp :balanced)
-              (pcase spec
-                ((pred -cons-pair-p)
-                 `(:pattern ,spec))
-                ((pred plistp)
-                 (plist-get spec :remove))
-                ('nil
-                 `(:pattern ,(cons (char-to-string char)
-                                   (char-to-string char)))))))
+             ((&plist :remove (left . right) :regexp :balanced)
+              (if (null spec)
+                  `(:remove ,(cons (char-to-string char)
+                                   (char-to-string char)))
+                spec)))
         (hel-surround-4-bounds-at-point left right limits regexp balanced)))))
 
 (defun hel-bounds-of-quoted-at-point (quote-mark)
