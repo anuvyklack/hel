@@ -135,9 +135,9 @@ in the command loop, and the fake cursors can pick up on those instead."
       (2 'font-lock-variable-name-face nil t)))))
 
 ;; `emacs-lisp-mode' is inherited from `lisp-data-mode'.
-(add-hook 'lisp-data-mode-hook  #'hel-configure-for-emacs-lisp)
+(add-hook 'lisp-data-mode-hook 'hel--emacs-lisp-mode-h)
 
-(defun hel-configure-for-emacs-lisp ()
+(defun hel--emacs-lisp-mode-h ()
   ;; Add legacy quotes marks to Hel surround functionality.
   (let ((spec '(:insert ("`" . "'") :remove ("`" . "'"))))
     (setf (alist-get ?` hel-surround) spec)
