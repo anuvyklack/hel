@@ -831,6 +831,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
         indent-rigidly-right ;; <
         self-insert-command
         quoted-insert
+        insert-char          ;; C-x 8 RET
         next-line
         previous-line
         newline

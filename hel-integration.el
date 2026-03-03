@@ -71,7 +71,8 @@ in the command loop, and the fake cursors can pick up on those instead."
 (hel-cache-input read-quoted-char)
 (hel-cache-input read-from-kill-ring)
 (hel-cache-input read-char-from-minibuffer)
-(hel-cache-input register-read-with-preview)  ; used by read-string
+(hel-cache-input read-char-by-name) ; is used by `insert-char'
+(hel-cache-input register-read-with-preview)  ; is used by `read-string'
 
 ;;; Commands that don't work with multiple-cursors
 
