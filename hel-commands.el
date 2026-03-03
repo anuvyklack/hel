@@ -495,8 +495,7 @@ to the chosen one."
   (when (use-region-p)
     (hel-with-each-cursor
       (hel-ensure-region-direction 1)
-      (when (and (hel-linewise-selection-p)
-                 (not (eobp)))
+      (when (hel-linewise-selection-p)
         (backward-char))))
   (hel-insert-state 1))
 
@@ -543,7 +542,7 @@ depending on DIRECTION."
   (interactive "*")
   (hel-with-each-cursor
     (when (use-region-p) (hel-ensure-region-direction 1))
-    (if (and (hel-linewise-selection-p) (not (eobp)))
+    (if (hel-linewise-selection-p)
         (backward-char)
       (move-end-of-line nil))
     (newline-and-indent)

@@ -349,6 +349,7 @@ line(s). With no region, select current line."
       ;; else no region
       (-let [(beg . end) (bounds-of-thing-at-point 'hel-line)]
         (hel-set-region beg end direction)))
+    (hel--fix-newline-at-end-of-buffer)
     t))
 
 (defun hel-mark-inner-thing (thing &optional count)
@@ -874,6 +875,7 @@ YANK-FUNCTION should be a `yank' like function."
     (setq hel--yank-transform-linewise-selection?
           (when (use-region-p)
             (hel-ensure-region-direction direction)
+            (hel--fix-newline-at-end-of-buffer)
             (hel-linewise-selection-p direction)))
     (cl-letf ((yank-transform-functions (cons #'hel--yank-transform
                                               yank-transform-functions))
@@ -911,6 +913,23 @@ BEG, END position and done the indentation."
     (-let [(beg . end) (bounds-of-thing-at-point 'hel-line)]
       (dotimes (_ count)
         (funcall indent-function beg end)))))
+
+(defun hel--fix-newline-at-end-of-buffer ()
+  "If selection ends at the end of buffer, and buffer doesn't ends with newline
+character -- add it and adjust selection."
+  ;; This function assumes that region is active, but doesn't check it!
+  (if (< (mark-marker) (point))
+      (when (and (eobp) (not (bolp)))
+        (let ((deactivate-mark nil))
+          (insert ?\n)))
+    ;; else
+    (when (= (mark-marker) (point-max))
+      (save-excursion
+        (goto-char (mark-marker))
+        (when (and (eobp) (not (bolp)))
+          (let ((deactivate-mark nil))
+            (insert ?\n))
+          (move-marker (mark-marker) (point)))))))
 
 ;;; Utils
 
