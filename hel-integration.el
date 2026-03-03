@@ -157,7 +157,8 @@ in the command loop, and the fake cursors can pick up on those instead."
                   2))))
     (cl-pushnew i imenu-generic-expression :test #'equal)))
 
-(dolist (keymap (list emacs-lisp-mode-map lisp-data-mode-map))
+(dolist (keymap (list emacs-lisp-mode-map
+                      lisp-data-mode-map))
   (hel-keymap-set keymap :state 'normal
     "m `"   #'hel-mark-inner-legacy-quoted
     "m '"   #'hel-mark-inner-legacy-quoted

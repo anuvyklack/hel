@@ -91,9 +91,11 @@
         ;; We will update its content on every Hel state change.
         (cl-pushnew 'hel-mode-map-alist emulation-mode-map-alists)
         (hel-load-whitelists)
-        (setf (map-elt minor-mode-overriding-map-alist 'hel-multiple-cursors-mode)
+        ;; Multiple cursors related keys should take precedence over
+        ;; all others when `hel-multiple-cursors-mode' is active.
+        (setf (alist-get 'hel-multiple-cursors-mode minor-mode-overriding-map-alist)
               hel-multiple-cursors-mode-map)
-        (add-hook 'pre-command-hook #'hel--pre-commad-hook nil t)
+        (add-hook 'pre-command-hook  #'hel--pre-commad-hook nil t)
         (add-hook 'post-command-hook #'hel--post-command-hook 90 t)
         (add-hook 'after-revert-hook #'hel-delete-all-fake-cursors nil t)
         (setq hel-input-method current-input-method)
@@ -102,7 +104,7 @@
         (hel-switch-state (hel-initial-state)))
     ;; else
     (remove-hook 'post-command-hook #'hel--post-command-hook t)
-    (remove-hook 'pre-command-hook #'hel--pre-commad-hook t)
+    (remove-hook 'pre-command-hook  #'hel--pre-commad-hook t)
     (remove-hook 'after-revert-hook #'hel-delete-all-fake-cursors t)
     (remove-hook 'input-method-activate-hook #'hel-activate-input-method t)
     (remove-hook 'input-method-deactivate-hook #'hel-deactivate-input-method t)
