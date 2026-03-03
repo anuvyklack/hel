@@ -841,6 +841,8 @@ from being executed when `hel-multiple-cursors-mode' is active."
         delete-forward-char
         downcase-word
         end-of-line
+        eval-defun
+        eval-expression
         exchange-point-and-mark
         fill-region              ;; gq
         forward-char
@@ -868,6 +870,13 @@ from being executed when `hel-multiple-cursors-mode' is active."
         newline
         newline-and-indent
         next-line
+        org-cycle
+        org-delete-backward-char
+        org-force-self-insert
+        org-indent-region
+        org-metaup
+        org-return
+        org-self-insert-command
         previous-line
         quoted-insert            ;; C-q
         right-char
@@ -895,7 +904,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
         describe-prefix-bindings
         digit-argument
         edebug-next-mode
-        eval-expression
+        eval-buffer
         exit-minibuffer
         find-file-at-point       ;; gf
         hel-normal-state         ;; <escape>
@@ -916,6 +925,8 @@ from being executed when `hel-multiple-cursors-mode' is active."
         tab-bar-mouse-down-1
         tab-next
         tab-previous
+        toggle-frame-fullscreen
+        toggle-input-method
         top-level
         undefined
         undo

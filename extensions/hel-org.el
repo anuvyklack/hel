@@ -291,6 +291,7 @@ If no selection — delete COUNT chars before point."
 In items or headings, promote heading/item.
 In code blocks, indent lines
 In tables, move column to the left."
+  :multiple-cursors t
   (interactive "p")
   (cl-assert (/= count 0))
   (hel-indent #'hel-org-indent-left count))
