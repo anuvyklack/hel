@@ -823,113 +823,114 @@ from being executed when `hel-multiple-cursors-mode' is active."
 ;; Execute following commands for ALL cursor.
 (mapc (lambda (command)
         (put command 'multiple-cursors t))
-      '(keyboard-quit        ;; C-g
-        comment-dwim         ;; gc
-        fill-region          ;; gq
-        indent-region        ;; =
-        indent-rigidly-left  ;; >
-        indent-rigidly-right ;; <
-        self-insert-command
-        quoted-insert
-        insert-char          ;; C-x 8 RET
-        next-line
-        previous-line
+      '(append-next-kill
+        back-to-indentation
+        backward-char
+        backward-delete-char-untabify
+        backward-kill-word
+        backward-list
+        backward-paragraph
+        backward-sexp
+        backward-word
+        beginning-of-line
+        capitalize-word
+        comment-dwim             ;; gc
+        delete-backward-char
+        delete-blank-lines
+        delete-char
+        delete-forward-char
+        downcase-word
+        end-of-line
+        exchange-point-and-mark
+        fill-region              ;; gq
+        forward-char
+        forward-list
+        forward-paragraph
+        forward-sexp
+        forward-word
+        hippie-expand
+        indent-region            ;; =
+        indent-rigidly-left      ;; >
+        indent-rigidly-right     ;; <
+        insert-char              ;; C-x 8 RET
+        join-line
+        just-one-space
+        keyboard-quit            ;; C-g
+        kill-line
+        kill-region
+        kill-ring-save
+        kill-whole-line
+        kill-word
+        left-char
+        left-word
+        move-beginning-of-line
+        move-end-of-line
         newline
         newline-and-indent
-        delete-blank-lines
+        next-line
+        previous-line
+        quoted-insert            ;; C-q
+        right-char
+        right-word
+        self-insert-command
+        set-mark-command
         transpose-chars
         transpose-lines
         transpose-paragraphs
         transpose-regions
-        join-line
-        right-char
-        right-word
-        forward-char
-        forward-word
-        left-char
-        left-word
-        backward-char
-        backward-word
-        forward-paragraph
-        backward-paragraph
-        forward-sexp
-        backward-sexp
+        transpose-sexps
         upcase-word
-        downcase-word
-        capitalize-word
-        forward-list
-        backward-list
-        hippie-expand
         yank
         yank-pop
-        append-next-kill
-        kill-word
-        kill-line
-        kill-whole-line
-        kill-region
-        backward-kill-word
-        backward-delete-char-untabify
-        delete-char
-        delete-forward-char
-        delete-backward-char
-        just-one-space
-        zap-to-char
-        end-of-line
-        set-mark-command
-        exchange-point-and-mark
-        move-end-of-line
-        beginning-of-line
-        move-beginning-of-line
-        kill-ring-save
-        back-to-indentation))
+        zap-to-char))
 
 ;; Execute following commands only for MAIN cursor.
 (mapc (lambda (command)
         (put command 'multiple-cursors nil))
-      '(hel-normal-state    ;; <escape>
-        find-file-at-point  ;; gf
-        browse-url-at-point ;; gx
-        save-buffer
-        exit-minibuffer
-        minibuffer-complete-and-exit
-        eval-expression
-        undo
-        undo-redo
-        undo-tree-undo
-        undo-tree-redo
-        undo-fu-only-undo
-        undo-fu-only-redo
-        universal-argument
-        universal-argument-more
-        negative-argument
+      '(browse-url-at-point      ;; gx
+        delete-other-windows
+        describe-bindings
+        describe-function
+        describe-mode
+        describe-prefix-bindings
         digit-argument
+        edebug-next-mode
+        eval-expression
+        exit-minibuffer
+        find-file-at-point       ;; gf
+        hel-normal-state         ;; <escape>
+        kill-buffer-and-window
+        minibuffer-complete-and-exit
+        mouse-drag-region
+        mouse-set-point
+        mwheel-scroll
+        negative-argument
+        other-window
+        quit-window
+        repeat-complex-command
+        save-buffer
+        scroll-down-command
+        scroll-up-command
+        split-window-below
+        split-window-right
+        tab-bar-mouse-down-1
         tab-next
         tab-previous
-        tab-bar-mouse-down-1
         top-level
-        describe-mode
-        describe-function
-        describe-bindings
-        describe-prefix-bindings
+        undefined
+        undo
+        undo-redo
+        undo-fu-only-redo
+        undo-fu-only-undo
+        undo-tree-redo
+        undo-tree-undo
+        universal-argument
+        universal-argument-more
         view-echo-area-messages
-        other-window
-        kill-buffer-and-window
-        split-window-right
-        split-window-below
-        delete-other-windows
-        mwheel-scroll
-        scroll-up-command
-        scroll-down-command
-        mouse-set-point
-        mouse-drag-region
-        quit-window
+        windmove-down
         windmove-left
         windmove-right
-        windmove-up
-        windmove-down
-        repeat-complex-command
-        edebug-next-mode
-        undefined))
+        windmove-up))
 
 ;;; .
 (provide 'hel-multiple-cursors-core)
