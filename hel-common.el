@@ -959,8 +959,8 @@ positive — end of line."
 
 (defun hel-linewise-selection-p (&optional direction)
   "Return t if active region spawns full logical lines.
-If DIRECTION is provided — check if region spawns full logical line only
-on desired end of the region. Should be 1 or -1."
+DIRECTION: 1 or -1. If provided — check if region spawns at least one full
+logical line on desired end of the region."
   (and (use-region-p)
        (save-excursion
          (let ((beg (region-beginning))
@@ -970,10 +970,12 @@ on desired end of the region. Should be 1 or -1."
                        (progn (goto-char end) (bolp))))
                  ((<= direction 0)
                   (and (progn (goto-char beg) (bolp))
+                       ;; at least one full line is selected
                        (< 0 (- (line-number-at-pos end)
                                (line-number-at-pos beg)))))
                  (t
                   (and (progn (goto-char end) (bolp))
+                       ;; at least one full line is selected
                        (< 0 (- (line-number-at-pos end)
                                (line-number-at-pos beg))))))))))
 
