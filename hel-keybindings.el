@@ -178,7 +178,7 @@ use it."
   "C-S-i" #'hel-forward-global-mark-ring
   "g a"   #'describe-char
   "g c"   #'comment-dwim
-  "g i"   #'imenu
+  "g o"   #'imenu
   "g f"   #'find-file-at-point
   "g x"   #'browse-url-at-point
   "g q"   #'fill-region
@@ -197,7 +197,7 @@ use it."
 
   ;; Xref
   "g d" #'xref-find-definitions
-  "g D" #'xref-find-references
+  "g r" #'xref-find-references
   "[ x" #'xref-go-back
   "] x" #'xref-go-forward)
 

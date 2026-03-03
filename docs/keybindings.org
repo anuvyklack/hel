@@ -322,7 +322,7 @@ for =m= prefix. Also, this is in line with Emacs tradition which has commands li
 - =.=  :: repeat last command
 - =gc= :: comment selection
 
-- =gi= :: ~imenu~
+- =go= :: ~imenu~
 - =ga= :: Show various information about the position before cursor: code point,
   faces, overlays, etc.
 
@@ -343,7 +343,7 @@ for =m= prefix. Also, this is in line with Emacs tradition which has commands li
 
 - =C-w gd= :: Jump to definition in another window.
 
-- =gD= :: Find all references.
+- =gr= :: Find all references.
 
 - =[x= / =]x= ::
   Go to the *previous* / *next* position in xref history. It appeares to be very handy
