@@ -790,18 +790,29 @@ a parent with different boundaries or reaches a `section' element."
 
 (defun hel-surround-settings-for-org-mode ()
   "Configure Hel surround functionality for Org-mode."
-  (dolist (char '(?/ ?* ?_ ?+ ?= ?~))
-    (push `(,char :insert ,(cons (char-to-string char)
-                                 (char-to-string char))
-                  :remove hel-org--4-bounds-of-org-emphasis-at-point)
-          hel-surround-alist)))
+  (-each '((?= :insert ("=" . "=") :remove hel-org--4-bounds-of-org-verbatim-at-point)
+           (?~ :insert ("~" . "~") :remove hel-org--4-bounds-of-org-verbatim-at-point)
+           (?/ :insert ("/" . "/") :remove hel-org--4-bounds-of-org-emphasis-at-point)
+           (?* :insert ("*" . "*") :remove hel-org--4-bounds-of-org-emphasis-at-point)
+           (?_ :insert ("_" . "_") :remove hel-org--4-bounds-of-org-emphasis-at-point)
+           (?+ :insert ("+" . "+") :remove hel-org--4-bounds-of-org-emphasis-at-point))
+    (-lambda ((item &as key . _))
+      (unless (assq key hel-surround-alist)
+        (push item hel-surround-alist)))))
+
+(defun hel-org--4-bounds-of-org-verbatim-at-point ()
+  (when (org-in-regexp org-verbatim-re 2)
+    (list (match-beginning 2)
+          (match-beginning 4)
+          (match-end 4)
+          (match-end 2))))
 
 (defun hel-org--4-bounds-of-org-emphasis-at-point ()
   (when (org-in-regexp org-emph-re 2)
     (list (match-beginning 2)
           (match-beginning 4)
-          (match-end 2)
-          (match-end 4))))
+          (match-end 4)
+          (match-end 2))))
 
 ;;; .
 (provide 'hel-org)
