@@ -127,14 +127,14 @@
           (apply #'advice-add fun-how-advice))
         (when hel-want-minibuffer
           (add-hook 'minibuffer-setup-hook #'hel-local-mode))
-        (cl-pushnew #'hel--fundamental-mode-hack window-buffer-change-functions)
+        (add-hook 'window-buffer-change-functions #'hel--fundamental-mode-hack)
         (add-hook 'window-configuration-change-hook #'hel-update-cursor)
         (add-to-list 'mode-line-misc-info '(:eval (hel-multiple-cursors--indicator))))
     ;; else
     (cl-loop for (fun _how advice) in hel--advices
              do (advice-remove fun advice))
     (remove-hook 'minibuffer-setup-hook #'hel-local-mode)
-    (cl-callf2 cl-remove #'hel--fundamental-mode-hack window-buffer-change-functions)
+    (remove-hook 'window-buffer-change-functions #'hel--fundamental-mode-hack)
     (remove-hook 'window-configuration-change-hook #'hel-update-cursor)))
 
 (defun hel--initialize ()
