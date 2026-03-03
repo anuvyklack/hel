@@ -1043,14 +1043,16 @@ entered regexp withing current selections."
             (hel-with-fake-cursor cursor
               (unless (= (current-column) column)
                 (let ((deactivate-mark nil)
-                      (padding (s-repeat (- column (current-column)) " ")))
-                  (cond ((and (use-region-p)
-                              (natnump (hel-region-direction)))
-                         (hel--exchange-point-and-mark)
-                         (insert padding)
-                         (hel--exchange-point-and-mark))
-                        (t
-                         (insert padding))))))))))))
+                      ;; 32 is the ASCII code for the space character.
+                      (padding (make-string (- column (current-column)) 32)))
+                  (if (and (use-region-p)
+                           (natnump (hel-region-direction)))
+                      (progn
+                        (hel--exchange-point-and-mark)
+                        (insert padding)
+                        (hel--exchange-point-and-mark))
+                    ;; else
+                    (insert padding)))))))))))
 
 ;; C
 (hel-define-command hel-copy-selection (count)
