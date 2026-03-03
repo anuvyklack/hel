@@ -140,8 +140,8 @@ in the command loop, and the fake cursors can pick up on those instead."
 (defun hel--emacs-lisp-mode-h ()
   ;; Add legacy quotes marks to Hel surround functionality.
   (let ((spec '(:insert ("`" . "'") :remove ("`" . "'"))))
-    (setf (alist-get ?` hel-surround) spec)
-    (setf (alist-get ?' hel-surround) spec))
+    (setf (alist-get ?` hel-surround-alist) spec)
+    (setf (alist-get ?' hel-surround-alist) spec))
   ;;
   ;; Teach `imenu' about Hel macros.
   (dolist (i (eval-when-compile
