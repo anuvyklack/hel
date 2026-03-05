@@ -1043,8 +1043,7 @@ entered regexp withing current selections."
             (hel-with-fake-cursor cursor
               (unless (= (current-column) column)
                 (let ((deactivate-mark nil)
-                      ;; 32 is the ASCII code for the space character.
-                      (padding (make-string (- column (current-column)) 32)))
+                      (padding (make-string (- column (current-column)) ?\s)))
                   (if (and (use-region-p)
                            (natnump (hel-region-direction)))
                       (progn
