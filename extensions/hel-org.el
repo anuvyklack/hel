@@ -250,7 +250,10 @@ cursor is already at that position, go to the start of the text."
                           hel--extend-selection)
                       (mark)
                     (point))
-                  (progn (org-beginning-of-line) (point))))
+                  (progn (org-beginning-of-line)
+                         (skip-syntax-forward " " (line-end-position))
+                         (backward-prefix-chars)
+                         (point))))
 
 ;; org-end-of-line
 
