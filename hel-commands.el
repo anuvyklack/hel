@@ -1894,7 +1894,7 @@ All children of the parent of the splitted window will be rebalanced."
 (defmacro hel-save-side-windows (&rest body)
   "Toggle side windows, evaluate BODY, restore side windows."
   (declare (indent defun) (debug (&rest form)))
-  (let ((sides (make-symbol "sidesvar")))
+  (cl-with-gensyms (sides)
     `(let ((,sides (window-with-parameter 'window-side)))
        (when ,sides (window-toggle-side-windows))
        (unwind-protect

@@ -439,8 +439,7 @@ CURSORS-POSITIONS is an alist of the form that `hel-cursors-positions' returns."
 (defmacro hel-save-window-scroll (&rest body)
   "Save the window scroll position, evaluate BODY, restore it."
   (declare (indent 0) (debug t))
-  (let ((win-start (make-symbol "win-start"))
-        (win-hscroll (make-symbol "win-hscroll")))
+  (cl-with-gensyms (win-start win-hscroll)
     `(let ((,win-start (copy-marker (window-start)))
            (,win-hscroll (window-hscroll)))
        ,@body
@@ -452,7 +451,7 @@ CURSORS-POSITIONS is an alist of the form that `hel-cursors-positions' returns."
   "Like `save-excursion' but additionally save and restore all
 the data needed for multiple cursors functionality."
   (declare (indent 0) (debug t))
-  (let ((state (make-symbol "point-state")))
+  (cl-with-gensyms (state)
     `(let ((,state (hel--conserve-main-cursor-state)))
        (save-excursion ,@body)
        (hel--restore-main-cursor-state ,state))))
@@ -552,7 +551,7 @@ makes sense for fake cursor."
   "Temporarily convert real cursor into fake-cursor with ID 0.
 Restore it after BODY evaluation if it is still alive."
   (declare (indent 0) (debug t))
-  (let ((real-cursor (make-symbol "real-cursor")))
+  (cl-with-gensyms (real-cursor)
     `(let ((,real-cursor (hel--create-fake-cursor-1 0 (point) (mark t))))
        (unwind-protect (progn ,@body)
          (cond ((hel-overlay-live-p ,real-cursor)
