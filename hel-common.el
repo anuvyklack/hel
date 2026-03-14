@@ -45,12 +45,11 @@ Works only with THINGs, that returns the count of steps left to move,
 such as `hel-word', `hel-sentence', `hel-line', `paragraph'."
   (or count (setq count 1))
   (if (zerop count) 0
-    (let ((dir (hel-sign count))
-          (rest (hel-forward-following-thing thing count)))
-      (when (and (/= rest count)
-                 (natnump dir)) ; moving forward
-        (-when-let ((beg . _) (bounds-of-thing-at-point thing))
-          (goto-char beg)))
+    (let ((rest (hel-forward-following-thing thing count)))
+      (when-let* (((/= rest count))
+                  ((natnump count)) ; moving forward
+                  (bounds (bounds-of-thing-at-point thing)))
+        (goto-char (car bounds)))
       rest)))
 
 (defun hel-forward-end-of-thing (thing &optional count)
