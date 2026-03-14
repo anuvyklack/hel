@@ -228,7 +228,7 @@ Use visual line when `visual-line-mode' is active."
                               (t
                                (forward-thing thing count)))
                         (point))
-                      dir)
+                      (unless hel--extend-selection dir))
       (hel-reveal-point-when-on-top))))
 
 ;; {
