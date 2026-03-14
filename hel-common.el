@@ -430,29 +430,29 @@ If no THING at point select COUNT following THINGs."
   (hel-restore-region-on-error
     (let ((point-pos (point))
           (dir (hel-sign count)))
-      (if (hel-end-of-buffer-p dir)
-          (user-error (if (< dir 0) "Beginning of buffer" "End of buffer"))
-        ;; else
-        (hel-push-point point-pos)
-        (let ((start (if hel--extend-selection
-                         (mark)
-                       (when (-if-let ((thing-beg . thing-end)
-                                       (bounds-of-thing-at-point thing))
-                                 ;; We are at the boundary of the THING toward
-                                 ;; the motion direction.
-                                 (= (point)
-                                    (if (< dir 0) thing-beg thing-end))
-                               ;; No thing at point at all.
-                               t)
-                         (hel-forward-following-thing thing dir)
-                         (forward-thing thing (- dir)))
-                       (point)))
-              (end (progn (forward-thing thing count)
-                          (point))))
-          (hel-set-region start end)
-          (when (= (region-beginning) (region-end))
-            (hel-mark-thing-forward thing dir))
-          (hel-reveal-point-when-on-top))))))
+      (if (< dir 0)
+          (when (bobp) (user-error "Beginning of buffer"))
+        (when (eobp) (user-error "End of buffer")))
+      (hel-push-point point-pos)
+      (let ((start (if hel--extend-selection
+                       (mark)
+                     (when (-if-let ((thing-beg . thing-end)
+                                     (bounds-of-thing-at-point thing))
+                               ;; We are at the boundary of the THING toward
+                               ;; the motion direction.
+                               (= (point)
+                                  (if (< dir 0) thing-beg thing-end))
+                             ;; No thing at point at all.
+                             t)
+                       (hel-forward-following-thing thing dir)
+                       (forward-thing thing (- dir)))
+                     (point)))
+            (end (progn (forward-thing thing count)
+                        (point))))
+        (hel-set-region start end)
+        (when (= (region-beginning) (region-end))
+          (hel-mark-thing-forward thing dir))
+        (hel-reveal-point-when-on-top)))))
 
 (defun hel--mark-a-word (thing)
   "Inner implementation of `hel-mark-a-word' and `hel-mark-a-WORD' commands."
@@ -937,9 +937,6 @@ character -- add it and adjust selection."
   "Exchange point and mark."
   (goto-char (prog1 (marker-position (mark-marker))
                (set-marker (mark-marker) (point)))))
-
-(defsubst hel-end-of-buffer-p (direction)
-  (if (< direction 0) (bobp) (eobp)))
 
 (defun hel-bolp ()
   "Like `bolp' but consider visual lines when `visual-line-mode' is enabled."

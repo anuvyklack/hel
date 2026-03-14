@@ -207,31 +207,29 @@ Use visual line when `visual-line-mode' is active."
           this-command 'next-line)))
 
 ;; }
-(hel-define-command hel-forward-paragraph (count &optional move-to-end?)
+(hel-define-command hel-forward-paragraph (count &optional move-to-bound?)
   "Select to the beginning of the COUNT-th next paragraph."
   :multiple-cursors t
   :merge-selections t
   (interactive "p")
   (let ((thing 'hel-paragraph)
-        (initial-pos (point))
         (dir (hel-sign count)))
     (hel-restore-region-on-error
-      ;; (if (eolp) (forward-char))
-      (if (hel-end-of-buffer-p dir)
-          (user-error (if (< dir 0) "Beginning of buffer" "End of buffer"))
-        ;; else
-        (hel-push-point initial-pos)
-        (hel-set-region (if hel--extend-selection (mark) (point))
-                        (progn
-                          (cond ((and (< dir 0) move-to-end?)
-                                 (hel-forward-end-of-thing thing count))
-                                ((and (< 0 dir) (not move-to-end?))
-                                 (hel-forward-beginning-of-thing thing count))
-                                (t
-                                 (forward-thing thing count)))
-                          (point))
-                        dir)
-        (hel-reveal-point-when-on-top)))))
+      (if (< dir 0)
+          (when (bobp) (user-error "Beginning of buffer"))
+        (when (eobp) (user-error "End of buffer")))
+      (hel-push-point (point))
+      (hel-set-region (if hel--extend-selection (mark) (point))
+                      (progn
+                        (cond ((and (< dir 0) move-to-bound?)
+                               (hel-forward-end-of-thing thing count))
+                              ((and (< 0 dir) (not move-to-bound?))
+                               (hel-forward-beginning-of-thing thing count))
+                              (t
+                               (forward-thing thing count)))
+                        (point))
+                      dir)
+      (hel-reveal-point-when-on-top))))
 
 ;; {
 (hel-define-command hel-backward-paragraph (count)

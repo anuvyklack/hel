@@ -94,6 +94,7 @@ saved as markers and correctly handle case when text was inserted before region.
            (set-marker ,pnt nil))))))
 
 (defmacro hel-restore-region-on-error (&rest body)
+  "Restore initial region if error occured during BODY evaluation."
   (declare (indent 0) (debug t))
   (cl-with-gensyms (region point something-goes-wrong?)
     `(let ((,region (hel-region))
