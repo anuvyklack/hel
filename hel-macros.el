@@ -13,6 +13,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'map)
 (require 'dash)
 
 (defmacro hel-defvar-local (symbol &optional initvalue docstring)

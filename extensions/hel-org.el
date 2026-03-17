@@ -15,7 +15,7 @@
 ;; Integration Hel with Org-mode.
 ;;
 ;;; Code:
-;; (require 'hel-outline)
+(require 'hel-macros)
 (require 'org)
 
 ;;; Keybindings
