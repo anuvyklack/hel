@@ -16,10 +16,11 @@
 ;;
 ;;; Code:
 
-(require 's)
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'hel-macros))
 (require 'dash)
 (require 'pcre2el)
-(require 'cl-lib)
 (require 'thingatpt)
 (require 'hel-common)
 (require 'hel-core)

@@ -16,11 +16,10 @@
 ;;
 ;;; Code:
 
+(eval-when-compile (require 'cl-lib))
 (require 'dash)
 (require 'hel-common)
 (require 'hel-multiple-cursors-core)
-
-(declare-function hel-update-cursor "hel-core")
 
 (defvar hel-search--timer nil)
 (defvar hel-search--buffer nil)
