@@ -1,0 +1,58 @@
+* hel-paredit
+
+Hel extension for Lisp S-expressions editing.
+
+** Enable
+#+begin_src emacs-lisp
+;; Dependencie
+(use-package paredit :ensure t)
+
+(use-package hel-paredit
+  ;; This is example. Add major-modes you need.
+  :hook (emacs-lisp-mode-hook . hel-paredit-mode))
+#+end_src
+
+** Usage
+*** Structural editing of S-expressions
+
+The most noticeable feature is "AST" climbing (in quotes because Lisp code *is*
+its AST — which is yet another reason why Lisp is superior):
+
++ =M-i= / =M-o= or =C-j= / =C-k= — select a *nested* / *enclosing* AST node.
+
++ =M-p= / =M-n= or =C-h= / =C-l= — select the *previous* / *next* AST node.
+
++ =H= / =L= — select the enclosing node in the AST tree and place the cursor
+  *before* / *after* it.
+
+#+begin_quote
+To enable the =C-h=, =C-j=, =C-k=, =C-l= keys, set ~hel-want-C-hjkl-keys~ to ~t~ before Hel
+is loaded (this is the default).
+#+end_quote
+
+Try it yourself. Since I started using it, I have no idea how I ever edited
+without it — it’s one of the best and most natural ways to work with
+S-expressions.
+
+*** Slurping & Barfing
+
+- =<= / =>= ::
+  Place cursor before an opening delimiter to *slurp* / *barf* the S-expression at
+  that end, or place the cursor after a closing delimiter to operate on it. It’s
+  quite intuitive — give it a try. Inspired by [[https://github.com/emacs-evil/evil-cleverparens][evil-cleverparens]].
+
+*** Other
+
+- =W=, =B=, =E=, =miW=, =maW= :: WORD text objects ignores parentheses.
+
+- =M-r= :: Raise S-expression.
+
+- =M-?= :: Convolute S-expression.
+
+  #+begin_src
+  (let ((x 5)             (frob
+        (y 3))       ->    |(let ((x 5)
+    (frob |(zwonk))               (y 3))
+    (wibblethwop))            (zwonk)
+                              (wibblethwop)))
+  #+end_src

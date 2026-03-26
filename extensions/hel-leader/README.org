@@ -1,0 +1,38 @@
+* hel-leader
+** Enable
+#+begin_src emacs-lisp
+;; Dependencie
+(use-package s :ensure t)
+
+(use-package hel-leader)
+#+end_src
+
+** Usage
+
+- =Space= ::
+  Space key will act according to following rules:
+
+  - =x= is translated to =C-x C-=
+  - =c= is translated to =C-c C-=
+    - After this, =SPC= toggles the =C-= modifier.
+    - If the translation results in an undefined binding, the last key falls
+      back to an unmodified version (e.g. if =C-c C-a= is undefined, it falls
+      back to =C-c a=).
+  - =m= is translated to =M-=
+  - =g= is translated to =C-M-=
+  - Any other key is translated to =C-c <key>=. =C-c= is the native Emacs leader
+    key chord.
+
+- =C-w space= ::
+  The same as =Space= but the result buffer of the invoked command (if any) will
+  be opened in new window. This works the same as =C-w n space=.
+
+Examples:
+
+| Input       | Translation |
+|-------------+-------------|
+| =SPC a=       | =C-c a=       |
+| =SPC c t t=   | =C-c C-t C-t= |
+| =SPC x m t=   | =C-x M-t=     |
+| =SPC g x=     | =C-M-x=       |
+| =SPC x SPC p= | =C-x p=       |

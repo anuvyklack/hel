@@ -1,5 +1,6 @@
 > [!CAUTION]
-> If you're here because your configuration broke after a recent update, I'm very sorry! I've just refactored `hel-surround` with breaking changes. You need to rename `:lookup` key to `:remove` in `hel-surround-alist` variable. In my defense, the whole design of surround module become more cleaner and symmetric which will pay off.
+> Breaking changes on 27.03.2026:\
+> Extensions are moved into their own folders, you need to update installation recipe, check the [Installation](#installation) section.
 
 # Hel — [Helix](https://helix-editor.com/) Emulation Layer for Emacs
 
@@ -54,7 +55,7 @@ deserves credit.
 
 Hel is not yet on MELPA. You can install it directly from Github.
 
-### Emacs' built-in package manager
+### [Elpaca](https://github.com/progfolio/elpaca)
 
 This is the most minimal example of the `init.el` file:
 
@@ -65,14 +66,12 @@ This is the most minimal example of the `init.el` file:
                          ("gnu"    . "https://elpa.gnu.org/packages/")
                          ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 ;; Dependencies
-(use-package s :ensure t)
 (use-package dash :ensure t)
 (use-package avy :ensure t)
 (use-package pcre2el :ensure t)
-(use-package paredit :ensure t)
 
 (use-package hel
-  :vc (:url "https://github.com/anuvyklack/hel.git" :rev "main")
+  :elpaca (:url "https://github.com/anuvyklack/hel.git" :rev "main")
   :custom (inhibit-startup-screen t)
   :config (hel-mode))
 
@@ -81,14 +80,28 @@ This is the most minimal example of the `init.el` file:
 
 ### [Elpaca](https://github.com/progfolio/elpaca)
 
-You also need to install dependencies the same way as in the example for
-built-in package manager.
+```emacs-lisp
+(elpaca 'dash)
+(elpaca 'avy)
+(elpaca 'pcre2el)
+
+(elpaca '(hel :host github :repo "anuvyklack/hel"
+              :files (:defaults "extensions/**/*.el"))
+  (setopt inhibit-startup-screen t)
+  (hel-mode))
+```
+
+### [Straight](https://github.com/radian-software/straight.el)
 
 ```emacs-lisp
-(use-package hel
-  :ensure (hel :host github :repo "anuvyklack/hel" :files (:defaults "**"))
-  :custom (inhibit-startup-screen t)
-  :config (hel-mode))
+(straight-use-package 'dash)
+(straight-use-package 'avy)
+(straight-use-package 'pcre2el)
+
+(straight-use-package '(hel :host github :repo "anuvyklack/hel"
+                            :files (:defaults "extensions/**/*.el")))
+(setopt inhibit-startup-screen t)
+(hel-mode)
 ```
 
 ## Documentation

@@ -1,0 +1,35 @@
+* hel-org
+
+The Hel extension that integrates it with Org mode.
+
+** Enable
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'hel-org))
+#+end_src
+
+Using ~use-package~:
+#+begin_src emacs-lisp
+(use-package hel-org
+  :after org)
+#+end_src
+
+** Usage
+
+- =gh= — When in headline, and ~org-special-ctrl-a/e~ is ~t~, on the first attempt
+  move to where the headline text starts, i.e. after the stars and after a
+  possible TODO keyword. The same for list item. If cursor is already at that
+  position, go to the start of the text.
+
+- All Hel keys under =m= prefix work with Org markup:
+  - select: =mi=, =ma=,
+  - surround =ms=, =md=, =mr=
+
+- =<= / =>= — *promote* / *demote* subtree or list item.
+
+- Org AST navigation:
+  - =M-i=, =M-n=, =M-p=, =M-o=
+  - =C-h=, =C-j=, =C-k=, =C-l=
+
+- =[ RET= / =] RET= — Inserts *above* / *below* depending on context a new heading, list
+  item or table row.
