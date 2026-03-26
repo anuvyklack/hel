@@ -1,18 +1,14 @@
-;;; hel-commands.el --- Interactive commands -*- lexical-binding: t; -*-
+;;; hel-commands.el --- Interactive commands -*- lexical-binding: t -*-
 ;;
 ;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
-;; Version: 0.0.1
+;; Version: 0.9.0
 ;; Homepage: https://github.com/anuvyklack/hel
 ;; Package-Requires: ((emacs "29.1"))
 ;;
 ;; This file is not part of GNU Emacs.
-;;
-;;; Commentary:
-;;
-;;  Hel interactive commands.
 ;;
 ;;; Code:
 
@@ -587,7 +583,7 @@ depending on DIRECTION."
 
 ;; c
 (hel-define-command hel-change ()
-  "Delete region and enter Insert state."
+  "Delete region and switch to Insert state."
   :multiple-cursors nil
   (interactive "*")
   (hel-with-each-cursor
@@ -618,8 +614,8 @@ depending on DIRECTION."
 ;; } => {|}
 ;; d
 (hel-define-command hel-cut (count)
-  "Kill (cut) text in region. I.e. delete text and put it in the `kill-ring'.
-If no selection — delete COUNT chars before point."
+  "Kill (cut) text in selection — i.e. delete it and put in the `kill-ring'.
+Without selection delete COUNT characters before point."
   :multiple-cursors t
   :merge-selections t
   (interactive "*p")
@@ -633,7 +629,7 @@ If no selection — delete COUNT chars before point."
 ;; D
 (hel-define-command hel-delete (count)
   "Delete text in region, without modifying the `kill-ring'.
-If no selection — delete COUNT chars after point."
+Without selection delete COUNT characters after point."
   :multiple-cursors t
   :merge-selections t
   (interactive "*p")

@@ -1,11 +1,11 @@
-;;; hel.el --- Helix Emulation Layer -*- lexical-binding: t; -*-
+;;; hel.el --- Helix Emulation Layer -*- lexical-binding: t -*-
 ;;
 ;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Created: March 27, 2025
-;; Version: 0.0.1
+;; Version: 0.9.0
 ;; Homepage: https://github.com/anuvyklack/hel
 ;; Package-Requires: ((emacs "29.1"))
 ;;

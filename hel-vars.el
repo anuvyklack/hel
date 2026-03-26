@@ -1,18 +1,14 @@
-;;; hel-vars.el --- Settings and variables -*- lexical-binding: t; -*-
+;;; hel-vars.el --- Settings and variables -*- lexical-binding: t -*-
 ;;
 ;; Copyright © 2025-2026 Yuriy Artemyev
 ;;
 ;; Author: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
-;; Version: 0.0.1
+;; Version: 0.9.0
 ;; Homepage: https://github.com/anuvyklack/hel
 ;; Package-Requires: ((emacs "29.1"))
 ;;
 ;; This file is not part of GNU Emacs.
-;;
-;;; Commentary:
-;;
-;; Hel settings and variables.
 ;;
 ;;; Code:
 

@@ -1,4 +1,4 @@
-;;; hel-paredit.el --- Hel with Paredit -*- lexical-binding: t; -*-
+;;; hel-paredit.el --- Extend Hel for Lisp s-exps editing -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2025 Yuriy Artemyev
 ;;
@@ -9,10 +9,6 @@
 ;; Package-Requires: ((emacs "29.1"))
 ;;
 ;; This file is not part of GNU Emacs.
-;;
-;;; Commentary:
-;;
-;; Integration Hel with Paredit.
 ;;
 ;;; Code:
 

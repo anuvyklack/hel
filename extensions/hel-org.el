@@ -237,7 +237,6 @@ cursors in the buffer."
 ;; gh
 (hel-define-command hel-org-first-non-blank ()
   "Move point to beginning of current visible line skipping indentation.
-
 If this is a headline, and `org-special-ctrl-a/e' is not nil or symbol
 `reversed', on the first attempt move to where the headline text starts, i.e.
 after the stars and after a possible TODO keyword. The same for list item. If
