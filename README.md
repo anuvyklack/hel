@@ -107,7 +107,6 @@ This is the most minimal example of the `init.el` file:
 ## Documentation
 
 - [Keybindings](docs/keybindings.org)
-- [Extensions](docs/extensions.org)
 - [Customizations](docs/customization.org)
 
 ## Differences from Helix text editor
@@ -171,6 +170,13 @@ alternatives in Emacs.
 - `r` — replace (TODO)
 - `M-u`, `M-U` — traverse undo tree
 - `q`, `Q` — record keyboard macros
+
+## Extensions
+
+- [hel-leader](extensions/hel-leader)
+- [hel-org](extensions/hel-org)
+- [hel-paredit](extensions/hel-paredit)
+- [hel-vterm](extensions/hel-vterm)
 
 ## Tips
 

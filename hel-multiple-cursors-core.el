@@ -584,6 +584,10 @@ disable if only one."
              (hel-any-fake-cursors-p))
     (hel-multiple-cursors-mode 'toggle)))
 
+(defun hel-disable-multiple-cursors-mode ()
+  (when hel-multiple-cursors-mode
+    (hel-multiple-cursors-mode -1)))
+
 (defun hel--disable-minor-modes-incompatible-with-multiple-cursors ()
   "Disable incompatible minor modes while there are multiple cursors
 in the buffer."

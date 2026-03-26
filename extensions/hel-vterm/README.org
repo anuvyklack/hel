@@ -1,0 +1,30 @@
+* hel-vterm
+
+The Hel extension that integrates it with [[https://github.com/akermu/emacs-libvterm][Vterm]].
+
+** Enable
+#+begin_src emacs-lisp
+(with-eval-after-load 'vterm
+  (require 'hel-vterm))
+#+end_src
+
+Using ~use-package~:
+#+begin_src emacs-lisp
+(use-package hel-vterm
+  :after vterm)
+#+end_src
+
+** Usage
+
+This extension replaces Vterm's ~vterm-copy-mode~ (=C-c C-t=) with Hel. ~vterm~ starts
+with Hel enabled: =i= — switch to Insert state, =Esc= — switch to Normal state.
+=C-c C-t= disables it — all keys are passed inside terminal now. Consequent
+=C-c C-t= switches Hel on.
+
+*** Key bindings
+
+| Key     | Action                 |
+|---------+------------------------|
+| =C-c C-t= | toggle Hel on/off      |
+| =[[= / =]]= | previous / next prompt |
+
