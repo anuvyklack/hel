@@ -168,6 +168,10 @@ in the command loop, and the fake cursors can pick up on those instead."
     "m a `" #'hel-mark-a-legacy-quoted
     "m a '" #'hel-mark-a-legacy-quoted))
 
+(hel-keymap-set emacs-lisp-compilation-mode-map
+  "g"   nil
+  ", r" #'emacs-lisp-compilation-recompile)
+
 (hel-define-command hel-mark-inner-legacy-quoted ()
   :multiple-cursors t
   :merge-selections t
