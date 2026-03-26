@@ -536,11 +536,8 @@ Example:
       \"b\" nil) ; unbind
 
 \(fn KEYMAP [:state STATE] &rest [KEY DEFINITION]...)"
-  ;; `:unset' keyword argument is not documented intentionally to not distract
-  ;; new users. It should be a list of keys that would be removed from KEYMAP
-  ;; before any keys would be bound.
   (declare (indent defun))
-  (-let* ((((&plist :state :unset) . args) (hel-split-keyword-args args))
+  (-let* ((((&plist :state) . args) (hel-split-keyword-args args))
           (maps (if state
                     (-map (lambda (state)
                             (cl-assert (hel-state-p state) t "Unknown Hel state")
@@ -553,8 +550,7 @@ Example:
           ((bind unbind) (->> args
                               (-partition 2)
                               (-separate #'-second-item)))
-          (unbind (nconc (ensure-list unset)
-                         (-flatten unbind))))
+          (unbind (-flatten unbind)))
     (dolist (map maps)
       (-each unbind (lambda (key)
                       (keymap-unset map key t)))
