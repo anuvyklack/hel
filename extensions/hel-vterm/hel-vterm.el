@@ -83,7 +83,6 @@
   "Switch to Insert state after selection."
   :multiple-cursors nil
   (interactive)
-  (vterm-goto-char (1+ (point)))
   (hel-with-each-cursor
     (when (use-region-p)
       (hel-ensure-region-direction 1)
@@ -123,7 +122,10 @@
                                   (vterm--get-prompt-point))
                              (min (region-end)
                                   (vterm--get-end-of-line)))
+      ;; else
+      (vterm-goto-char (point))
       (vterm-send-backspace)))
+  (vterm-goto-char (point))
   (hel-insert-state 1))
 
 ;; d
@@ -138,6 +140,8 @@ Without selection delete character before point."
                                 (vterm--get-prompt-point))
                            (min (region-end)
                                 (vterm--get-end-of-line)))
+    ;; else
+    (vterm-goto-char (point))
     (vterm-send-backspace))
   (hel-extend-selection -1))
 
@@ -153,6 +157,8 @@ Without selection delete character after point."
                                 (vterm--get-prompt-point))
                            (min (region-end)
                                 (vterm--get-end-of-line)))
+    ;; else
+    (vterm-goto-char (point))
     (vterm-send-delete))
   (hel-extend-selection -1))
 
