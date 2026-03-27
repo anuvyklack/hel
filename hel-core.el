@@ -29,8 +29,9 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'map)
 (require 'dash)
-(require 'hel-macros)
+(eval-when-compile (require 'hel-macros))
 (require 'hel-vars)
 (require 'hel-common)
 (require 'hel-multiple-cursors-core)
@@ -515,6 +516,7 @@ keymap will be ignored."
   (and-let* ((prompt (keymap-prompt keymap))
              ((string-prefix-p "Hel keymap" prompt)))))
 
+;;;###autoload (autoload 'hel-keymap-set "hel" nil t)
 (defun hel-keymap-set (keymap &rest args)
   "Create keybinding from KEY to DEFINITION in KEYMAP.
 
@@ -558,6 +560,7 @@ Example:
                     (keymap-set map key definition)))))
   keymap)
 
+;;;###autoload (autoload 'hel-keymap-global-set "hel" nil t)
 (defun hel-keymap-global-set (&rest args)
   "Create keybinding from KEY to DEFINITION in `global-map'.
 

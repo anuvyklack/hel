@@ -13,11 +13,12 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'dash)
+(require 'map)
 (require 'thingatpt)
+(require 'dash)
 (require 'pcre2el)
 (require 'pulse)
-(require 'hel-macros)
+(eval-when-compile (require 'hel-macros))
 (require 'hel-vars)
 
 ;;; Motions
@@ -130,27 +131,6 @@ Move over visual line when `visual-line-mode' is active."
   (hel-set-region (if hel--extend-selection (mark) (point))
                   (progn (forward-thing thing count)
                          (point))))
-
-(defmacro hel-motion-loop (spec &rest body)
-  "Loop a certain number of times.
-Evaluate BODY repeatedly COUNT times with DIRECTION bound to 1 or -1,
-depending on the sign of COUNT. Each iteration must move point; if point
-does not change, the loop immediately quits.
-
-Returns the count of steps left to move.  If moving forward, that is
-COUNT minus number of steps moved; if backward, COUNT plus number moved.
-
-\(fn (DIRECTION COUNT) BODY...)"
-  (declare (indent 1)
-           (debug ((symbolp form) body)))
-  (cl-with-gensyms (n)
-    (-let (((dir count) spec))
-      `(let* ((,n ,count)
-              (,dir (hel-sign ,n)))
-         (while (and (/= ,n 0)
-                     (/= (point) (progn ,@body (point))))
-           (cl-callf - ,n ,dir))
-         ,n))))
 
 ;;; Things
 ;;;; `hel-line'

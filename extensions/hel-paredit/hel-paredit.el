@@ -12,7 +12,9 @@
 ;;
 ;;; Code:
 
-(require 'hel)
+(eval-when-compile (require 'hel-macros))
+(require 'hel-core)
+(require 'hel-common)
 (require 'paredit)
 
 ;;; Minor mode

@@ -58,6 +58,27 @@ when `hel-mode' is toggled on or off"
      (when hel-mode
        (advice-add ,symbol ,how ,function))))
 
+(defmacro hel-motion-loop (spec &rest body)
+  "Loop a certain number of times.
+Evaluate BODY repeatedly COUNT times with DIRECTION bound to 1 or -1,
+depending on the sign of COUNT. Each iteration must move point; if point
+does not change, the loop immediately quits.
+
+Returns the count of steps left to move.  If moving forward, that is
+COUNT minus number of steps moved; if backward, COUNT plus number moved.
+
+\(fn (DIRECTION COUNT) BODY...)"
+  (declare (indent 1)
+           (debug ((symbolp form) body)))
+  (cl-with-gensyms (n)
+    (-let (((dir count) spec))
+      `(let* ((,n ,count)
+              (,dir (hel-sign ,n)))
+         (while (and (/= ,n 0)
+                     (/= (point) (progn ,@body (point))))
+           (cl-callf - ,n ,dir))
+         ,n))))
+
 (defmacro hel-recenter-point-on-jump (&rest body)
   "Recenter point on jumps during BODY evaluating if it lands out of the screen.
 This macro calls `redisplay' internally and should be used with care to avoid

@@ -43,7 +43,7 @@
 
 (require 's)
 (require 'dash)
-(require 'hel-macros)
+(eval-when-compile (require 'hel-macros))
 (require 'hel-core)
 
 ;;; Keybindings

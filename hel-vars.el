@@ -12,7 +12,7 @@
 ;;
 ;;; Code:
 
-(require 'hel-macros)
+(eval-when-compile (require 'hel-macros))
 
 (defvar hel-mode nil)
 (declare-function hel-local-mode "hel-core")
@@ -417,6 +417,9 @@ use `hel-state-property' function.
 `hel-smooth-scroll-down' commands.
 Determine how many lines should be scrolled.
 Default value is 0 - scroll half the screen.")
+
+(defvar hel--advices nil
+  "Inner variable for `hel-define-advice'.")
 
 (defvar hel-window-map (make-sparse-keymap)
   "Keymap for window-related commands.")

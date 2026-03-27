@@ -12,7 +12,9 @@
 ;;
 ;;; Code:
 
-(eval-when-compile (require 'cl-lib))
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'hel-macros))
 (require 'dash)
 (require 'hel-common)
 (require 'hel-multiple-cursors-core)

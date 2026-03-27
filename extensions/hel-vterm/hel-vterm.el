@@ -12,7 +12,7 @@
 ;;
 ;;; Code:
 
-(provide 'hel-macros)
+(eval-when-compile (require 'hel-macros))
 (require 'hel-core)
 (require 'vterm)
 

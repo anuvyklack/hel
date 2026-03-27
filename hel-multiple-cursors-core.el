@@ -35,8 +35,10 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'hel-macros))
 (require 'dash)
-(require 'cl-lib)
 (require 'subr-x)
 (require 'rect)
 (require 'hel-common)
