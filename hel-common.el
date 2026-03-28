@@ -513,7 +513,9 @@ or nil if nothing found."
   "Return a cons cell (START . END) with bounds of text region
 enclosed in QUOTE-MARKs."
   (if-let* ((limits (or (bounds-of-thing-at-point 'hel-comment)
-                        (bounds-of-thing-at-point 'string))))
+                        (bounds-of-thing-at-point 'string)
+                        (if (org-at-table-p)
+                            (cons (org-table-begin) (org-table-end))))))
       (-if-let ((beg _ _ end) (hel-surround-4-bounds-at-point
                                (char-to-string quote-mark)
                                (char-to-string quote-mark)
