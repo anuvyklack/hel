@@ -70,10 +70,9 @@ COUNT minus number of steps moved; if backward, COUNT plus number moved.
 \(fn (DIRECTION COUNT) BODY...)"
   (declare (indent 1)
            (debug ((symbolp form) body)))
-  (cl-with-gensyms (n)
-    (-let (((dir count) spec))
-      `(let* ((,n ,count)
-              (,dir (hel-sign ,n)))
+  (-let (((dir count) spec))
+    (macroexp-let2 symbolp n count
+      `(let ((,dir (hel-sign ,n)))
          (while (and (/= ,n 0)
                      (/= (point) (progn ,@body (point))))
            (cl-callf - ,n ,dir))
