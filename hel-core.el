@@ -207,7 +207,8 @@ Also two hooks are defined which are run each time Hel enter or exit STATE:
           (exit-hook  (intern (format "%s-exit-hook" symbol)))
           ;; collect keywords
           ((kwargs . body) (hel-split-keyword-args body))
-          ((&plist :keymap keymap-value :cursor :input-method :modes) kwargs))
+          ((&plist :keymap keymap-value
+                   :cursor :input-method :modes) kwargs))
     ;; macro expansion
     `(progn
        ;; State variable
@@ -639,34 +640,32 @@ KEY / DEFINITION pairs.
 (defun hel-update-cursor ()
   "Update the cursor shape and color for current Hel state in current buffer."
   (when (eq (window-buffer) (current-buffer))
-    (hel-set-cursor-type-and-color
-     (hel-state-property hel-state :cursor))
+    (apply #'hel-set-cursor-type-and-color
+           (hel-state-property hel-state :cursor))
     (when hel--extend-selection
       (set-cursor-color (face-attribute 'hel-extend-selection-cursor
                                         :background)))))
 
-(defun hel-set-cursor-type-and-color (&optional specs)
+(defun hel-set-cursor-type-and-color (&rest specs)
   "Change the cursor's apperance according to SPECS.
 SPECS may be a cursor type as per `cursor-type', a color string as passed
 to `set-cursor-color', a zero-argument function for changing the cursor,
 or a list of the above."
-  (setq specs (cond ((null specs) '(t))
-                    ((not (or (functionp specs)
-                              (proper-list-p specs)))
-                     (list specs))
-                    (t specs)))
-  (dolist (spec specs)
-    (pcase spec
-      ((and color (pred stringp))
-       ;; Cursor color can only be set for each frame but not for each buffer.
-       ;; Also `set-cursor-color' forces a redisplay, so only call it when the
-       ;; color actually changes.
-       (unless (equal color (frame-parameter nil 'cursor-color))
-         (set-cursor-color color)))
-      ((and fun (pred functionp))
-       (ignore-errors (funcall fun)))
-      (type
-       (setq cursor-type type)))))
+  (dolist (x specs)
+    (cond ((facep x)
+           (let ((color (face-attribute x :background)))
+             ;; Cursor color can only be set for each frame but not for each
+             ;; buffer. Also `set-cursor-color' forces a redisplay, so only
+             ;; call it when the color actually changes.
+             (unless (equal color (frame-parameter nil 'cursor-color))
+               (set-cursor-color color))))
+          ((stringp x)
+           (unless (equal x (frame-parameter nil 'cursor-color))
+             (set-cursor-color x)))
+          ((functionp x)
+           (ignore-errors (funcall x)))
+          (t
+           (setq cursor-type x)))))
 
 ;;; .
 (provide 'hel-core)

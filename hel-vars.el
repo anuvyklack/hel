@@ -17,88 +17,18 @@
 (defvar hel-mode nil)
 (declare-function hel-local-mode "hel-core")
 
-;;; Customizable variables
-
 (defgroup hel nil
   "Hel emulation."
   :group 'emulations
   :prefix 'hel-)
 
-(defcustom hel-want-minibuffer t
-  "Whether to enable Hel in minibuffer(s)."
-  :type 'boolean
-  :group 'hel
-  :set (lambda (symbol value)
-         (set-default symbol value)
-         (if (and hel-mode value)
-             (add-hook 'minibuffer-setup-hook #'hel-local-mode)
-           (remove-hook 'minibuffer-setup-hook #'hel-local-mode))))
-
-(defcustom hel-use-pcre-regex t
-  "If non-nil use PCRE regexp syntax instead of Emacs one."
-  :type 'integer
-  :group 'hel)
-
-(defcustom hel-regex-history-max 16
-  "Maximum length of regexp search ring before oldest elements are thrown away."
-  :type 'integer
-  :group 'hel)
-
-(defcustom hel-want-zz-scroll-to-center nil
-  "If non-nil `zz` keybinding will scroll current line to center of the screen.
-This variable must be set before Hel is loaded!"
-  :type 'boolean
-  :group 'hel)
-
-(defcustom hel-want-C-hjkl-keys t
-  "If non-nil, bind `C-h', `C-j', `C-k', `C-l' to commands for crawling the AST.
-To access help commands, use `F1' instead of `C-h'.
-AST stands for Abstract Syntax Tree.
-
-These commands are also bound to `M-i', `M-n', `M-p', `M-o' for compatibility
-with the Hel text editor.
-
-This variable must be set before Hel is loaded!"
-  :type 'boolean
-  :group 'hel)
+;;; Appearence
 
 (defcustom hel-match-fake-cursor-style t
   "If non-nil, attempt to match the `cursor-type' that the user has selected.
 We only can match `bar' and `box' types.
 If nil, the `box' cursor type will be used for all fake cursors."
   :type 'boolean
-  :group 'hel)
-
-(defcustom hel-reactivate-selection-after-insert-state t
-  "When non-nil, the selection will be reactivated on exiting Insert state if it
-was active on entering it."
-  :type 'boolean
-  :group 'hel)
-
-(defcustom hel-normal-state-cursor
-  `(bar ,(face-attribute 'cursor :background))
-  "Cursor apperance when Hel is in Norman state.
-Can be a cursor type as per `cursor-type', a color string as passed to
-`set-cursor-color', a zero-argument function for changing the cursor,
-or a list of the above."
-  :type '(set symbol (cons symbol symbol) string function)
-  :group 'hel)
-
-(defcustom hel-insert-state-cursor
-  `(box ,(face-attribute 'cursor :background))
-  "Cursor apperance when Hel is in Insert state.
-Can be a cursor type as per `cursor-type', a color string as passed to
-`set-cursor-color', a zero-argument function for changing the cursor,
-or a list of the above."
-  :type '(set symbol (cons symbol symbol) string function)
-  :group 'hel)
-
-(defcustom hel-motion-state-cursor '(hbar . 4)
-  "Cursor apperance when Hel is in Motion state.
-Can be a cursor type as per `cursor-type', a color string as passed to
-`set-cursor-color', a zero-argument function for changing the cursor, or
-a list of the above."
-  :type '(set symbol (cons symbol symbol) string function)
   :group 'hel)
 
 (defcustom hel-bar-fake-cursor ?\u2000
@@ -129,10 +59,114 @@ shifting subsequent content to the right."
                            (t
                             (char-to-string ?\u2000))))))
 
+(defcustom hel-normal-state-cursor '(bar cursor)
+  "Cursor apperance when Hel is in Norman state.
+Can be any of the following, or a list of them:
+- a `cursor-type';
+- a face whose `:background' attribute will be used;
+- a color string as passed to `set-cursor-color';
+- a zero-argument function that changes the cursor."
+  :type '(set symbol (cons symbol symbol) string function)
+  :group 'hel)
+
+(defcustom hel-insert-state-cursor '(box cursor)
+  "Cursor apperance when Hel is in Insert state.
+Can be any of the following, or a list of them:
+- a `cursor-type';
+- a face whose `:background' attribute will be used;
+- a color string as passed to `set-cursor-color';
+- a zero-argument function that changes the cursor."
+  :type '(set symbol (cons symbol symbol) string function)
+  :group 'hel)
+
+(defcustom hel-motion-state-cursor '((hbar . 4) cursor)
+  "Cursor apperance when Hel is in Motion state.
+Can be any of the following, or a list of them:
+- a `cursor-type';
+- a face whose `:background' attribute will be used;
+- a color string as passed to `set-cursor-color';
+- a zero-argument function that changes the cursor."
+  :type '(set symbol (cons symbol symbol) string function)
+  :group 'hel)
+
+(defface hel-extend-selection-cursor
+  `((t ( :height ,(window-default-font-height)
+         :background "orange")))
+  "Face for all cursors when extending selection (\"v\" key) is active."
+  :group 'hel)
+
+(defface hel-normal-state-fake-cursor
+  `((t ( :height ,(window-default-font-height)
+         :foreground "black"
+         :background "red")))
+  "The face used for fake cursors when Hel is in the Normal state."
+  :group 'hel)
+
+(defface hel-insert-state-fake-cursor
+  `((t ( :height ,(window-default-font-height)
+         :foreground "white"
+         :background "SkyBlue3")))
+  "Face for fake cursors when Hel is in the Insert state."
+  :group 'hel)
+
+(defface hel-search-highlight '((t :inherit lazy-highlight))
+  "Face for lazy highlighting all matches during search."
+  :group 'hel)
+
+(defface hel-mode-line-cursors-indicator '((t :inherit warning))
+  "Face for indicator with active cursors number in mode lilne."
+  :group 'hel)
+
+;;; Customizable variables
+
+(defcustom hel-want-minibuffer t
+  "Whether to enable Hel in minibuffer(s)."
+  :type 'boolean
+  :group 'hel
+  :set (lambda (symbol value)
+         (set-default symbol value)
+         (if (and hel-mode value)
+             (add-hook 'minibuffer-setup-hook #'hel-local-mode)
+           (remove-hook 'minibuffer-setup-hook #'hel-local-mode))))
+
+(defcustom hel-use-pcre-regex t
+  "If non-nil use PCRE regexp syntax instead of Emacs one."
+  :type 'integer
+  :group 'hel)
+
 (defcustom hel-multiple-cursors-mode-line-indicator
   #("  Cursors: %s " 1 14 (face hel-mode-line-cursors-indicator))
   "What to display in the mode line while `hel-multiple-cursors-mode' is active."
   :type '(choice string (const nil))
+  :group 'hel)
+
+(defcustom hel-regex-history-max 16
+  "Maximum length of regexp search ring before oldest elements are thrown away."
+  :type 'integer
+  :group 'hel)
+
+(defcustom hel-want-zz-scroll-to-center nil
+  "If non-nil `zz` keybinding will scroll current line to center of the screen.
+This variable must be set before Hel is loaded!"
+  :type 'boolean
+  :group 'hel)
+
+(defcustom hel-want-C-hjkl-keys t
+  "If non-nil, bind `C-h', `C-j', `C-k', `C-l' to commands for crawling the AST.
+To access help commands, use `F1' instead of `C-h'.
+AST stands for Abstract Syntax Tree.
+
+These commands are also bound to `M-i', `M-n', `M-p', `M-o' for compatibility
+with the Hel text editor.
+
+This variable must be set before Hel is loaded!"
+  :type 'boolean
+  :group 'hel)
+
+(defcustom hel-reactivate-selection-after-insert-state t
+  "When non-nil, the selection will be reactivated on exiting Insert state if it
+was active on entering it."
+  :type 'boolean
   :group 'hel)
 
 (defcustom hel-whitelist-file (locate-user-emacs-file "hel-multiple-cursors")
@@ -328,34 +362,6 @@ list of categories."
   :type '(alist :key-type (choice character (const nil))
                 :value-type (choice character (const nil)))
   :group 'hel-cjk)
-
-;;; Faces
-
-(defface hel-normal-state-fake-cursor
-  `((t ( :height ,(window-default-font-height)
-         :background "red")))
-  "The face used for fake cursors when Hel is in Normal state."
-  :group 'hel)
-
-(defface hel-insert-state-fake-cursor
-  '((t ( :foreground "white"
-         :background "SkyBlue3")))
-  "The face used for fake cursors when Hel is in Insert state."
-  :group 'hel)
-
-(defface hel-extend-selection-cursor
-  `((t ( :height ,(window-default-font-height)
-         :background "orange")))
-  "The face used for cursors when extending selection is active."
-  :group 'hel)
-
-(defface hel-search-highlight '((t :inherit lazy-highlight))
-  "Face for lazy highlighting all matches during search."
-  :group 'hel)
-
-(defface hel-mode-line-cursors-indicator '((t :inherit warning))
-  "Face for indicator with active cursors number in mode lilne."
-  :group 'hel)
 
 ;;; Variables
 
