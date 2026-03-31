@@ -55,7 +55,7 @@ deserves credit.
 
 Hel is not yet on MELPA. You can install it directly from Github.
 
-### [Elpaca](https://github.com/progfolio/elpaca)
+### Emacs built-in package manager
 
 This is the most minimal example of the `init.el` file:
 
@@ -71,7 +71,7 @@ This is the most minimal example of the `init.el` file:
 (use-package pcre2el :ensure t)
 
 (use-package hel
-  :elpaca (:url "https://github.com/anuvyklack/hel.git" :rev "main")
+  :vc (:url "https://github.com/anuvyklack/hel.git" :rev "main")
   :custom (inhibit-startup-screen t)
   :config (hel-mode))
 
