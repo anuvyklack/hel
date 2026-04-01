@@ -1,4 +1,4 @@
-* [Unreleased]
+* [0.10.0]
 ** Added
 
 - =gv= — restore last multiple cursors positions.

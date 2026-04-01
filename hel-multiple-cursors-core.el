@@ -4,7 +4,7 @@
 ;;
 ;; Authors: Yuriy Artemyev <anuvyklack@gmail.com>
 ;; Maintainer: Yuriy Artemyev <anuvyklack@gmail.com>
-;; Version: 0.9.0
+;; Version: 0.10.0
 ;; Homepage: https://github.com/anuvyklack/hel
 ;; Package-Requires: ((emacs "29.1"))
 ;;
