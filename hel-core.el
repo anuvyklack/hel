@@ -157,6 +157,9 @@ ensures `hel-local-mode' is activated in such cases."
              (null hel-local-mode))
     (hel-local-mode 1)))
 
+(hel-define-advice select-window (:after (&rest _))
+  (hel-update-cursor))
+
 (hel-advice-add 'use-global-map :after #'hel-update-active-keymaps-a)
 (hel-advice-add 'use-local-map  :after #'hel-update-active-keymaps-a)
 
@@ -178,8 +181,8 @@ Optional KEY keyword arguments:
 
 `:cursor'        Cursor apperance when Hel is in STATE.
                Can be a cursor type as per `cursor-type', a color string
-               as passed to `set-cursor-color', a zero-argument function
-               for changing the cursor, or a list of the above.
+               as passed to `set-cursor-color', a list of them, or a
+               zero-argument function for changing the cursor appearence.
                Can be accessed later via `hel-state-property' function.
 
 `:input-method'  When non-nil Hell will activate the enabled input method
@@ -222,13 +225,13 @@ Also two hooks are defined which are run each time Hel enter or exit STATE:
          ,(format "Global keymap for Hel %s." state-name))
        ;; Save state properties in `hel-state-properties' for runtime lookup.
        (setf (alist-get ',state hel-state-properties)
-             '( :name         ,state-name
-                :variable     ,variable
-                :function     ,symbol
-                :keymap       ,keymap
-                :cursor       ,cursor
-                :input-method ,input-method
-                :modes        ,modes))
+             (list :name         ,state-name
+                   :variable     ',variable
+                   :function     ',symbol
+                   :keymap       ,keymap
+                   :cursor       ,cursor
+                   :input-method ,input-method
+                   :modes        ,modes))
        ;; State function
        (defun ,symbol (&optional arg)
          ,(format "Switch Hel into %s.
@@ -293,12 +296,8 @@ When ARG is non-positive integer and Hel is in %s — disable it.\n\n%s"
   "Return the value of PROPERTY for STATE.
 PROPERTY is a keyword as used by `hel-define-state'.
 STATE is the state's symbolic name."
-  (let ((val (-> (alist-get state hel-state-properties)
-                 (plist-get property))))
-    (if (and (memq property '(:keymap :cursor))
-             (symbolp val))
-        (symbol-value val)
-      val)))
+  (-> (alist-get state hel-state-properties)
+      (plist-get property)))
 
 (defun hel-initial-state (&optional buffer)
   "Return the state in which Hel should start in BUFFER."
@@ -360,29 +359,34 @@ MODE and STATE should be symbols."
 
 (hel-define-state normal
   "Normal state."
-  :cursor hel-normal-state-cursor
-  :keymap (define-keymap :full t :suppress t))
+  :keymap (define-keymap :full t :suppress t)
+  :cursor (list hel-normal-state-cursor-type
+                (lambda ()
+                  (if hel--extend-selection
+                      'hel-extend-selection-cursor
+                    'hel-normal-state-main-cursor))))
 
 (hel-define-state insert
   "Insert state."
-  :cursor hel-insert-state-cursor
+  :cursor (list hel-insert-state-cursor-type
+                'hel-insert-state-main-cursor) ; face
   :input-method t
   (if hel-insert-state
       (progn
-        (when (and hel-reactivate-selection-after-insert-state
-                   (region-active-p))
-          (setq hel--region-was-active-on-insert t))
+        (setq hel--region-was-active-on-insert
+              (and hel-reactivate-selection-after-insert-state
+                   (region-active-p)))
         (hel-with-each-cursor
           (deactivate-mark)))
     ;; else
     (when hel--region-was-active-on-insert
-      (setq hel--region-was-active-on-insert nil)
       (hel-with-each-cursor
         (activate-mark)))))
 
 (hel-define-state motion
   "Motion state."
-  :cursor hel-motion-state-cursor)
+  :cursor (list hel-motion-state-cursor-type
+                'hel-motion-state-main-cursor)) ; face
 
 ;;; Input-method
 
@@ -639,34 +643,35 @@ KEY / DEFINITION pairs.
 ;; window-cursor-type
 
 (defun hel-update-cursor ()
-  "Update the cursor shape and color for current Hel state in current buffer."
+  "Update the main cursor appearence in current buffer according to
+current Hel state."
   (when (eq (window-buffer) (current-buffer))
-    (apply #'hel-set-cursor-type-and-color
-           (hel-state-property hel-state :cursor))
-    (when hel--extend-selection
-      (set-cursor-color (face-attribute 'hel-extend-selection-cursor
-                                        :background)))))
+    (when-let* ((x (hel-state-property hel-state :cursor)))
+      (if (proper-list-p x)
+          (-each x #'hel-set-cursor)
+        (funcall #'hel-set-cursor x)))))
 
-(defun hel-set-cursor-type-and-color (&rest specs)
-  "Change the cursor's apperance according to SPECS.
-SPECS may be a cursor type as per `cursor-type', a color string as passed
-to `set-cursor-color', a zero-argument function for changing the cursor,
-or a list of the above."
-  (dolist (x specs)
-    (cond ((facep x)
-           (let ((color (face-attribute x :background)))
-             ;; Cursor color can only be set for each frame but not for each
-             ;; buffer. Also `set-cursor-color' forces a redisplay, so only
-             ;; call it when the color actually changes.
-             (unless (equal color (frame-parameter nil 'cursor-color))
-               (set-cursor-color color))))
-          ((stringp x)
-           (unless (equal x (frame-parameter nil 'cursor-color))
-             (set-cursor-color x)))
-          ((functionp x)
-           (ignore-errors (funcall x)))
-          (t
-           (setq cursor-type x)))))
+(defun hel-set-cursor (arg)
+  "Set the main cursor's apperance.
+ARG may be a cursor type as per `cursor-type', a color string as passed
+to `set-cursor-color', a face the `:background' attribute of which will be used,
+or a function with no arguments that returns any of above."
+  (cond ((facep arg)
+         (hel--set-cursor-color (face-background arg nil t)))
+        ((stringp arg)
+         (hel--set-cursor-color arg))
+        ((functionp arg)
+         (-some-> (ignore-errors (funcall arg))
+           (hel-set-cursor)))
+        (t
+         (setq cursor-type arg))))
+
+(defun hel--set-cursor-color (color)
+  ;; Cursor color can only be set for each frame but not for each
+  ;; buffer. Also `set-cursor-color' forces a redisplay, so only
+  ;; call it when the color actually changes.
+  (unless (equal color (frame-parameter nil 'cursor-color))
+    (set-cursor-color color)))
 
 ;;; .
 (provide 'hel-core)

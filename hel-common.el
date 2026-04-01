@@ -1149,7 +1149,7 @@ that `match-beginning', `match-end' and `match-data' access."
                          (frame-parameter nil 'cursor-type)
                        cursor-type)))
     (or (eq cursor-type 'bar)
-        (and (listp cursor-type)
+        (and (consp cursor-type)
              (eq (car cursor-type) 'bar)))))
 
 (defun hel-set-region (start end &optional direction)

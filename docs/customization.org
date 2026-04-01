@@ -122,11 +122,15 @@ structure and examples.
 
 ** Faces
 
-- ~hel-normal-state-fake-cursor~ ::
-  Face used for fake cursors when Hel is in Normal state.
+- ~hel-normal-state-main-cursor~ :: Face for main cursor when Hel in Normal state.
 
-- ~hel-insert-state-fake-cursor~ ::
-  Face used for fake cursors when Hel is in Insert state.
+- ~hel-insert-state-main-cursor~ :: Face for main cursor when Hel in Insert state.
+
+- ~hel-motion-state-main-cursor~ :: Face for main cursor when Hel in Motion state.
+
+- ~hel-normal-state-fake-cursor~ :: Face for fake cursors when Hel in Normal state.
+
+- ~hel-insert-state-fake-cursor~ :: Face for fake cursors when Hel in Insert state.
 
 - ~hel-extend-selection-cursor~ ::
   Face used for all cursors when extending selection is active (=v= key).

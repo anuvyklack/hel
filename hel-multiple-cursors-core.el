@@ -237,7 +237,10 @@ Return CURSOR."
       (cond ((and hel-match-fake-cursor-style
                   (hel-cursor-is-bar-p))
              (overlay-put cursor 'face nil)
-             (overlay-put cursor 'before-string (propertize hel-bar-fake-cursor 'face face))
+             (overlay-put cursor 'before-string
+                          (propertize hel-bar-fake-cursor 'face
+                                      `(,face
+                                        (:height ,(window-default-font-height)))))
              (overlay-put cursor 'after-string nil))
             ((eolp)
              (overlay-put cursor 'face nil)

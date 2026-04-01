@@ -16,6 +16,7 @@
 (require 'map)
 (require 'dash)
 (require 'hel-vars)
+(require 'hel-common)
 
 (defmacro hel-define-advice (symbol args &rest body)
   "Wrapper around `define-advice' that automatically add/remove advice

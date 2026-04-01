@@ -12,6 +12,8 @@
 ;;
 ;;; Code:
 
+(require 'map)
+
 (defgroup hel nil
   "Hel emulation."
   :group 'emulations
@@ -64,54 +66,85 @@ shifting subsequent content to the right."
                                    (t
                                     (char-to-string ?\u2000))))))
 
-(defcustom hel-normal-state-cursor '(bar cursor)
-  "Cursor apperance when Hel is in Norman state.
-Can be any of the following, or a list of them:
-- a `cursor-type';
-- a face whose `:background' attribute will be used;
-- a color string as passed to `set-cursor-color';
-- a zero-argument function that changes the cursor."
-  :type '(set symbol (cons symbol symbol) string function)
+(let ((type '(choice (const :tag "Frame default" t) (const :tag "Filled box" box)
+                     (cons :tag "Box with specified size" (const box) integer)
+                     (const :tag "Hollow cursor" hollow) (const :tag "Vertical bar" bar)
+                     (cons :tag "Vertical bar with specified height" (const bar) integer)
+                     (const :tag "Horizontal bar" hbar)
+                     (cons :tag "Horizontal bar with specified width" (const hbar) integer)
+                     (const :tag "None " nil))))
+  (defcustom hel-normal-state-cursor-type 'bar
+    "`cursor-type' used when Hel is in Normal state."
+    :type type
+    :group 'hel
+    :set (lambda (symbol value)
+           (set-default symbol value)
+           (when (bound-and-true-p hel-state-properties)
+             (setcar (-> hel-state-properties
+                         (map-elt 'normal)
+                         (map-elt :cursor))
+                     value))))
+  (defcustom hel-insert-state-cursor-type 'box
+    "`cursor-type' used when Hel is in Insert state."
+    :type type
+    :group 'hel
+    :set (lambda (symbol value)
+           (set-default symbol value)
+           (when (bound-and-true-p hel-state-properties)
+             (setcar (-> hel-state-properties
+                         (map-elt 'insert)
+                         (map-elt :cursor))
+                     value))))
+  (defcustom hel-motion-state-cursor-type '(hbar . 4)
+    "`cursor-type' used when Hel is in Motion state."
+    :type type
+    :group 'hel
+    :set (lambda (symbol value)
+           (set-default symbol value)
+           (when (bound-and-true-p hel-state-properties)
+             (setcar (-> hel-state-properties
+                         (map-elt 'motion)
+                         (map-elt :cursor))
+                     value)))))
+
+(make-obsolete-variable 'hel-normal-state-cursor 'hel-normal-state-cursor-type "0.10")
+(make-obsolete-variable 'hel-insert-state-cursor 'hel-insert-state-cursor-type "0.10")
+(make-obsolete-variable 'hel-motion-state-cursor 'hel-motion-state-cursor-type "0.10")
+
+(defface hel-normal-state-main-cursor
+  `((t :background ,(face-background 'cursor)))
+  "The `:background' attribute of this face defines the color of the main cursor
+when Hel is in  Normal state. All other attributes are ignored."
   :group 'hel)
 
-(defcustom hel-insert-state-cursor '(box cursor)
-  "Cursor apperance when Hel is in Insert state.
-Can be any of the following, or a list of them:
-- a `cursor-type';
-- a face whose `:background' attribute will be used;
-- a color string as passed to `set-cursor-color';
-- a zero-argument function that changes the cursor."
-  :type '(set symbol (cons symbol symbol) string function)
+(defface hel-insert-state-main-cursor
+  '((t :inherit hel-normal-state-main-cursor))
+  "The `:background' attribute of this face defines the color of the main cursor
+when Hel is in Insert state. All other attributes are ignored."
   :group 'hel)
 
-(defcustom hel-motion-state-cursor '((hbar . 4) cursor)
-  "Cursor apperance when Hel is in Motion state.
-Can be any of the following, or a list of them:
-- a `cursor-type';
-- a face whose `:background' attribute will be used;
-- a color string as passed to `set-cursor-color';
-- a zero-argument function that changes the cursor."
-  :type '(set symbol (cons symbol symbol) string function)
+(defface hel-motion-state-main-cursor
+  '((t :inherit hel-normal-state-main-cursor))
+  "The `:background' attribute of this face defines the color of the cursor when
+Hel is in Motion state. All other attributes are ignored."
   :group 'hel)
 
 (defface hel-extend-selection-cursor
-  `((t ( :height ,(window-default-font-height)
-         :background "orange")))
-  "Face for all cursors when extending selection (\"v\" key) is active."
+  '((t :background "orange"))
+  "Face that defines the color of all cursors when when extending selection
+(\"v\" key) is active."
   :group 'hel)
 
 (defface hel-normal-state-fake-cursor
-  `((t ( :height ,(window-default-font-height)
-         :foreground "black"
-         :background "red")))
-  "The face used for fake cursors when Hel is in the Normal state."
+  '((t :foreground "black"
+       :background "red"))
+  "Face for fake cursors when Hel is in Normal state."
   :group 'hel)
 
 (defface hel-insert-state-fake-cursor
-  `((t ( :height ,(window-default-font-height)
-         :foreground "white"
-         :background "SkyBlue3")))
-  "Face for fake cursors when Hel is in the Insert state."
+  '((t :foreground "white"
+       :background "SkyBlue3"))
+  "Face for fake cursors when Hel is in Insert state."
   :group 'hel)
 
 (defface hel-search-highlight '((t :inherit lazy-highlight))

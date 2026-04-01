@@ -862,17 +862,13 @@ With no selection upcase the character after point."
 If ARG positive number — enable, negative — disable.
 When called interactively — toggle extending selection."
   :multiple-cursors t
-  (interactive `(,(if hel--extend-selection -1 1)))
-  (pcase arg
-    (-1 (setq hel--extend-selection nil)
-        (unless hel-executing-command-for-fake-cursor
-          (hel-update-cursor)))
-    (_ (setq hel--extend-selection t)
-       (or (region-active-p)
-           (set-mark (point)))
-       (unless hel-executing-command-for-fake-cursor
-         (set-cursor-color (face-attribute 'hel-extend-selection-cursor
-                                           :background))))))
+  (interactive (list (if hel--extend-selection -1 1)))
+  (setq hel--extend-selection (/= arg -1))
+  (when (and hel--extend-selection
+             (not (region-active-p)))
+    (set-mark (point)))
+  (unless hel-executing-command-for-fake-cursor
+    (hel-update-cursor)))
 
 ;; ;
 (hel-define-command hel-collapse-selection ()

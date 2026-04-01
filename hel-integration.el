@@ -19,8 +19,8 @@
 (eval-when-compile (require 'hel-macros))
 (require 'hel-vars)
 (require 'hel-multiple-cursors-core)
-(require 'hel-core)
 (require 'hel-common)
+(require 'hel-core)
 (require 'hel-commands)
 
 ;;; Integration multiple cursors with Emacs functionality
@@ -90,6 +90,16 @@ in the command loop, and the fake cursors can pick up on those instead."
 ;; Replace it with `just-one-space' while multiple-cursors are active.
 (hel-keymap-set hel-multiple-cursors-mode-map
   "<remap> <cycle-spacing>" #'just-one-space)
+
+;;; Update cursor color on theme change
+
+(add-hook 'enable-theme-functions  'hel--handle-theme-change)
+(add-hook 'disable-theme-functions 'hel--handle-theme-change)
+
+(defun hel--handle-theme-change (_theme)
+  (set-face-attribute 'hel-normal-state-main-cursor nil
+                      :background (face-background 'cursor))
+  (hel-update-cursor))
 
 ;;; Advices for built-in commands
 

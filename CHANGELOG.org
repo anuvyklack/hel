@@ -13,6 +13,27 @@
 - =gD= (~xref-find-references~) moved to =gr= to leave =gD= for LSP's "go to
   declaration".
 
-- ~hel-surround-alist~ variable format has beed changed.
+- *[BREAKING]*
+  ~hel-surround-alist~ variable format has beed changed.
+
+- *[BREAKING]*
+  The mechanism for switching the shape and color of the main cursors has been
+  reworked. The single variables for main cursor appearence in each state are
+  removed and replaced with two variables: main cursor shape and face.
+
+  - Removed:
+    - ~hel-normal-state-cursor~
+    - ~hel-insert-state-cursor~
+    - ~hel-motion-state-cursor~
+
+  - Added:
+    - Shape:
+      - ~hel-normal-state-cursor-type~
+      - ~hel-insert-state-cursor-type~
+      - ~hel-motion-state-cursor-type~
+    - Faces:
+      - ~hel-normal-state-main-cursor~
+      - ~hel-insert-state-main-cursor~
+      - ~hel-motion-state-main-cursor~
 
 * [0.9.0]
