@@ -519,15 +519,14 @@ depending on DIRECTION."
       (let ((current-line 0))
         (-each (hel-all-fake-cursors :sort)
           (lambda (cursor)
-            (let ((line (line-number-at-pos
-                         (overlay-get cursor 'point))))
-              (if (eql line current-line)
+            (let ((line (line-number-at-pos (overlay-get cursor 'point))))
+              (if (= line current-line)
                   (hel--delete-fake-cursor cursor)
                 (setq current-line line))))))))
   (hel-with-each-cursor
-    (if (natnump direction)
-        (hel-end-of-line)
-      (hel-first-non-blank))
+    (if (< direction 0)
+        (hel-first-non-blank)
+      (hel-end-of-line))
     (set-marker (mark-marker) (point)))
   (hel-insert-state 1))
 

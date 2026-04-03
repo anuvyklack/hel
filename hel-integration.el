@@ -188,7 +188,7 @@ in the command loop, and the fake cursors can pick up on those instead."
   (-when-let ((beg _ _ end) (hel-surround-4-bounds-at-point "`" "'"))
     (hel-set-region beg end)))
 
-;;; Built-In packages
+;;; Built-in packages
 ;;;; Button
 
 (hel-advice-add 'forward-button  :before #'hel-deactivate-mark-a)

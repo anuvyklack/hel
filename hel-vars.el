@@ -57,12 +57,12 @@ shifting subsequent content to the right."
   :type '(set character string)
   :group 'hel
   :set (lambda (symbol value)
-         (set symbol (cond ((characterp value)
-                            (char-to-string value))
-                           ((and (stringp value) (length= value 1))
-                            value)
-                           (t
-                            (char-to-string ?\u2000))))))
+         (set-default symbol (cond ((characterp value)
+                                    (char-to-string value))
+                                   ((and (stringp value) (length= value 1))
+                                    value)
+                                   (t
+                                    (char-to-string ?\u2000))))))
 
 (defcustom hel-normal-state-cursor '(bar cursor)
   "Cursor apperance when Hel is in Norman state.

@@ -149,13 +149,13 @@
 
 (defun hel--fundamental-mode-hack (_)
   "Activate `hel-local-mode' in current buffer if it is in `fundamental-mode'.
-Emacs sometimes creates random empty buffers in `fundamental-mode'. For
-these buffers, `after-change-major-mode-hook' is not called, so they
-remain invisible to `define-globalized-minor-mode'. This function ensures
-`hel-local-mode' is activated in such cases."
-  (if (and (eq major-mode 'fundamental-mode)
-           (null hel-local-mode))
-      (hel-local-mode 1)))
+Emacs sometimes creates random empty buffers in `fundamental-mode'.
+For these buffers `after-change-major-mode-hook' is not called, so
+they remain invisible to `define-globalized-minor-mode'. This function
+ensures `hel-local-mode' is activated in such cases."
+  (when (and (eq major-mode 'fundamental-mode)
+             (null hel-local-mode))
+    (hel-local-mode 1)))
 
 (hel-advice-add 'use-global-map :after #'hel-update-active-keymaps-a)
 (hel-advice-add 'use-local-map  :after #'hel-update-active-keymaps-a)

@@ -23,8 +23,8 @@ with Hel enabled: =i= — switch to Insert state, =Esc= — switch to Normal sta
 
 *** Key bindings
 
-| Key     | Action                 |
-|---------+------------------------|
-| =C-c C-t= | toggle Hel on/off      |
-| =[[= / =]]= | previous / next prompt |
+| Key     | Action                            |
+|---------+-----------------------------------|
+| =C-c C-t= | toggle Hel on/off in vterm buffer |
+| =[[= / =]]= | previous / next prompt            |
 
