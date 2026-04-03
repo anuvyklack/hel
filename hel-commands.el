@@ -18,9 +18,10 @@
 (require 'dash)
 (require 'pcre2el)
 (require 'thingatpt)
+(require 'hel-vars)
 (require 'hel-common)
-(require 'hel-core)
 (require 'hel-multiple-cursors-core)
+(require 'hel-core)
 (require 'hel-search)
 (require 'avy)
 

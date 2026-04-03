@@ -12,9 +12,9 @@
 ;;
 ;;; Code:
 
+(require 'hel-core)
 (require 'hel-commands)
 (require 'hel-scrolling)
-(require 'hel-core)
 
 ;;; Universal argument
 

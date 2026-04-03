@@ -28,14 +28,15 @@
 ;;
 ;;; Code:
 
+(eval-when-compile (require 'hel-macros))
 (require 'cl-lib)
 (require 'map)
 (require 'dash)
-(eval-when-compile (require 'hel-macros))
 (require 'hel-vars)
 (require 'hel-common)
 (require 'hel-multiple-cursors-core)
 
+;; Declarations
 (defvar edebug-mode nil)
 (defvar edebug-mode-map)
 (declare-function hel-delete-all-fake-cursors "hel-commands")
@@ -156,11 +157,11 @@ remain invisible to `define-globalized-minor-mode'. This function ensures
            (null hel-local-mode))
       (hel-local-mode 1)))
 
-(hel-define-advice select-window (:after (&rest _))
-  (hel-update-cursor))
-
 (hel-advice-add 'use-global-map :after #'hel-update-active-keymaps-a)
 (hel-advice-add 'use-local-map  :after #'hel-update-active-keymaps-a)
+
+(hel-define-advice select-window (:after (&rest _))
+  (hel-update-cursor))
 
 ;;; Hel states
 

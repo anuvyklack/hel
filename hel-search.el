@@ -16,6 +16,7 @@
   (require 'cl-lib)
   (require 'hel-macros))
 (require 'dash)
+(require 'hel-vars)
 (require 'hel-common)
 (require 'hel-multiple-cursors-core)
 

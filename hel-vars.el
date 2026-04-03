@@ -12,15 +12,20 @@
 ;;
 ;;; Code:
 
-(eval-when-compile (require 'hel-macros))
-
-(defvar hel-mode nil)
-(declare-function hel-local-mode "hel-core")
-
 (defgroup hel nil
   "Hel emulation."
   :group 'emulations
   :prefix 'hel-)
+
+(defmacro hel-defvar-local (symbol &optional initvalue docstring)
+  "The same as `defvar-local' but additionaly marks SYMBOL as permanent
+buffer local variable."
+  (declare (indent defun)
+           (doc-string 3)
+           (debug (symbolp &optional form stringp)))
+  `(prog1 (defvar ,symbol ,initvalue ,docstring)
+     (make-variable-buffer-local ',symbol)
+     (put ',symbol 'permanent-local t)))
 
 ;;; Appearence
 
@@ -119,6 +124,8 @@ Can be any of the following, or a list of them:
 
 ;;; Customizable variables
 
+(defvar hel-mode nil)
+
 (defcustom hel-want-minibuffer t
   "Whether to enable Hel in minibuffer(s)."
   :type 'boolean
@@ -126,8 +133,8 @@ Can be any of the following, or a list of them:
   :set (lambda (symbol value)
          (set-default symbol value)
          (if (and hel-mode value)
-             (add-hook 'minibuffer-setup-hook #'hel-local-mode)
-           (remove-hook 'minibuffer-setup-hook #'hel-local-mode))))
+             (add-hook 'minibuffer-setup-hook 'hel-local-mode)
+           (remove-hook 'minibuffer-setup-hook 'hel-local-mode))))
 
 (defcustom hel-use-pcre-regex t
   "If non-nil use PCRE regexp syntax instead of Emacs one."

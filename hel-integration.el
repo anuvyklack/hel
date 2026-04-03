@@ -17,8 +17,9 @@
 ;;; Code:
 
 (eval-when-compile (require 'hel-macros))
-(require 'hel-core)
+(require 'hel-vars)
 (require 'hel-multiple-cursors-core)
+(require 'hel-core)
 (require 'hel-common)
 (require 'hel-commands)
 

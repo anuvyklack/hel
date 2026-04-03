@@ -15,19 +15,7 @@
 (eval-when-compile (require 'cl-lib))
 (require 'map)
 (require 'dash)
-
-(defmacro hel-defvar-local (symbol &optional initvalue docstring)
-  "The same as `defvar-local' but additionaly marks SYMBOL as permanent
-buffer local variable."
-  (declare (indent defun)
-           (doc-string 3)
-           (debug (symbolp &optional form stringp)))
-  `(prog1 (defvar ,symbol ,initvalue ,docstring)
-     (make-variable-buffer-local ',symbol)
-     (put ',symbol 'permanent-local t)))
-
-(defvar hel--advices nil
-  "Inner variable for `hel-define-advice'.")
+(require 'hel-vars)
 
 (defmacro hel-define-advice (symbol args &rest body)
   "Wrapper around `define-advice' that automatically add/remove advice
@@ -53,81 +41,9 @@ when `hel-mode' is toggled on or off.
   "Wrapper around `advice-add' that automatically add/remove advice
 when `hel-mode' is toggled on or off"
   `(progn
-     (cl-pushnew (list ,symbol ,how ,function) hel--advices
-                 :test #'equal)
+     (cl-pushnew (list ,symbol ,how ,function) hel--advices :test #'equal)
      (when hel-mode
        (advice-add ,symbol ,how ,function))))
-
-(defmacro hel-motion-loop (spec &rest body)
-  "Loop a certain number of times.
-Evaluate BODY repeatedly COUNT times with DIRECTION bound to 1 or -1,
-depending on the sign of COUNT. Each iteration must move point; if point
-does not change, the loop immediately quits.
-
-Returns the count of steps left to move.  If moving forward, that is
-COUNT minus number of steps moved; if backward, COUNT plus number moved.
-
-\(fn (DIRECTION COUNT) BODY...)"
-  (declare (indent 1)
-           (debug ((symbolp form) body)))
-  (-let (((dir count) spec))
-    (macroexp-let2 symbolp n count
-      `(let ((,dir (hel-sign ,n)))
-         (while (and (/= ,n 0)
-                     (/= (point) (progn ,@body (point))))
-           (cl-callf - ,n ,dir))
-         ,n))))
-
-(defmacro hel-recenter-point-on-jump (&rest body)
-  "Recenter point on jumps during BODY evaluating if it lands out of the screen.
-This macro calls `redisplay' internally and should be used with care to avoid
-flickering."
-  (declare (indent 0) (debug t))
-  `(let ((scroll-conservatively 0))
-     (prog1 (progn ,@body)
-       ;; Update the screen so that the temporary value for
-       ;; `scroll-conservatively' is taken into account.
-       (unless hel-executing-command-for-fake-cursor
-         (redisplay)))))
-
-(defmacro hel-save-region (&rest body)
-  "Evaluate BODY with preserving original region.
-The difference from `save-mark-and-excursion' is that both point and mark are
-saved as markers and correctly handle case when text was inserted before region."
-  (declare (indent 0) (debug t))
-  (cl-with-gensyms (pnt beg end dir)
-    `(if (use-region-p)
-         (let ((deactivate-mark nil)
-               (,beg (copy-marker (region-beginning) t))
-               (,end (copy-marker (region-end)))
-               (,dir (hel-region-direction)))
-           (unwind-protect
-               (save-excursion ,@body)
-             (hel-set-region ,beg ,end ,dir)
-             (set-marker ,beg nil)
-             (set-marker ,end nil)))
-       ;; else
-       (let ((,pnt (copy-marker (point) t)))
-         (unwind-protect
-             (save-excursion ,@body)
-           (if mark-active (deactivate-mark))
-           (goto-char ,pnt)
-           (set-marker ,pnt nil))))))
-
-(defmacro hel-restore-region-on-error (&rest body)
-  "Restore initial region if error occured during BODY evaluation."
-  (declare (indent 0) (debug t))
-  (cl-with-gensyms (region point something-goes-wrong?)
-    `(let ((,region (hel-region))
-           (,point (point))
-           (,something-goes-wrong? t))
-       (unwind-protect
-           (prog1 (progn ,@body)
-             (setq ,something-goes-wrong? nil))
-         (when ,something-goes-wrong?
-           (if ,region
-               (apply #'hel-set-region ,region)
-             (goto-char ,point)))))))
 
 (defmacro hel-define-command (command args &rest body)
   "Define Hel COMMAND.
