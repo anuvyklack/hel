@@ -97,7 +97,7 @@ in the command loop, and the fake cursors can pick up on those instead."
   (set-face-attribute 'hel-normal-state-main-cursor nil :background color)
   (hel-update-cursor))
 
-(hel-advice-add set-cursor-color :after #'hel--update-main-cursor-color)
+(hel-advice-add 'set-cursor-color :after #'hel--update-main-cursor-color)
 
 (defun hel--handle-theme-change (_theme)
   (hel--update-main-cursor-color (face-background 'cursor)))
