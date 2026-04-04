@@ -93,13 +93,24 @@ in the command loop, and the fake cursors can pick up on those instead."
 
 ;;; Update cursor color on theme change
 
-(add-hook 'enable-theme-functions  'hel--handle-theme-change)
-(add-hook 'disable-theme-functions 'hel--handle-theme-change)
+(defun hel--update-main-cursor-color (color)
+  (set-face-attribute 'hel-normal-state-main-cursor nil :background color)
+  (hel-update-cursor))
+
+(hel-advice-add set-cursor-color :after #'hel--update-main-cursor-color)
 
 (defun hel--handle-theme-change (_theme)
-  (set-face-attribute 'hel-normal-state-main-cursor nil
-                      :background (face-background 'cursor))
-  (hel-update-cursor))
+  (hel--update-main-cursor-color (face-background 'cursor)))
+
+(defun hel--handle-theme-change-h ()
+  (if hel-mode
+      (progn
+        (add-hook 'enable-theme-functions  #'hel--handle-theme-change)
+        (add-hook 'disable-theme-functions #'hel--handle-theme-change))
+    (remove-hook 'enable-theme-functions  #'hel--handle-theme-change)
+    (remove-hook 'disable-theme-functions #'hel--handle-theme-change)))
+
+(add-hook 'hel-mode-hook #'hel--handle-theme-change-h)
 
 ;;; Advices for built-in commands
 
