@@ -215,6 +215,36 @@ in the command loop, and the fake cursors can pick up on those instead."
 (hel-advice-add 'forward-button  :before #'hel-deactivate-mark-a)
 (hel-advice-add 'backward-button :before #'hel-deactivate-mark-a)
 
+;;;; Backtrace and Debug
+
+(with-eval-after-load 'backtrace
+  (hel-keymap-set backtrace-mode-map :state 'motion
+    "j"   'backtrace-forward-frame   ;; "n"
+    "k"   'backtrace-backward-frame) ;; "p"
+  ;; <local leader>
+  (hel-keymap-set backtrace-mode-map
+    ", v" 'backtrace-toggle-locals
+    ", #" 'backtrace-toggle-print-circle
+    ", :" 'backtrace-toggle-print-gensym
+    ", +" 'backtrace-multi-line
+    ", -" 'backtrace-single-line
+    ", ." 'backtrace-expand-ellipses))
+
+(with-eval-after-load 'debug
+  ;; `debugger-mode-map' is inherited from `backtrace-mode-map'
+  (hel-keymap-set debugger-mode-map
+    "J"   'debugger-jump
+    ;; <local leader>
+    ", b" 'debugger-frame
+    ", c" 'debugger-continue
+    ", j" 'debugger-jump
+    ", r" 'debugger-return-value
+    ", u" 'debugger-frame-clear
+    ", d" 'debugger-step-through
+    ", l" 'debugger-list-functions
+    ", e" 'debugger-eval-expression
+    ", R" 'debugger-record-expression))
+
 ;;;; Edebug
 
 (with-eval-after-load 'edebug
