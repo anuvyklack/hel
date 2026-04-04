@@ -203,7 +203,9 @@ in the command loop, and the fake cursors can pick up on those instead."
     "h"     nil ; unding `edebug-goto-here'
     "s"     #'edebug-step-mode
     "H"     #'edebug-goto-here
-    "C-c h" #'edebug-goto-here)) ; <leader> h
+    "C-c h" #'edebug-goto-here) ; <leader> h
+  (hel-keymap-set edebug-mode-map :state 'normal
+    "<escape>" #'hel-normal-state-escape))
 
 ;;;; Eldoc
 
