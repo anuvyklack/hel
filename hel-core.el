@@ -667,11 +667,11 @@ or a function with no arguments that returns any of above."
          (setq cursor-type arg))))
 
 (defun hel--set-cursor-color (color)
-  ;; Cursor color can only be set for each frame but not for each
-  ;; buffer. Also `set-cursor-color' forces a redisplay, so only
-  ;; call it when the color actually changes.
+  ;; Cursor color can only be set for each frame but not for each buffer, also
+  ;; `modify-frame-parameters' forces a redisplay, so only call it when the
+  ;; color actually changes.
   (unless (equal color (frame-parameter nil 'cursor-color))
-    (set-cursor-color color)))
+    (modify-frame-parameters (selected-frame) `((cursor-color . ,color)))))
 
 ;;; .
 (provide 'hel-core)
