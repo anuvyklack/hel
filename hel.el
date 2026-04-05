@@ -18,10 +18,15 @@
 ;;; Code:
 
 (require 'hel-vars)
+(require 'hel-macros)
+(require 'hel-common)
+(require 'hel-multiple-cursors-core)
 (require 'hel-core)
 (require 'hel-commands)
-(require 'hel-keybindings)
+(require 'hel-search)
+(require 'hel-scrolling)
 (require 'hel-integration)
+(require 'hel-keybindings)
 
 (provide 'hel)
 ;;; hel.el ends here
