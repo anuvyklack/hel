@@ -798,23 +798,44 @@ a parent with different boundaries or reaches a `section' element."
   "Configure Hel surround functionality for Org-mode."
   (-each '((?= :insert ("=" . "=") :remove hel-org--4-bounds-of-org-verbatim-at-point)
            (?~ :insert ("~" . "~") :remove hel-org--4-bounds-of-org-verbatim-at-point)
-           (?/ :insert ("/" . "/") :remove hel-org--4-bounds-of-org-emphasis-at-point)
-           (?* :insert ("*" . "*") :remove hel-org--4-bounds-of-org-emphasis-at-point)
-           (?_ :insert ("_" . "_") :remove hel-org--4-bounds-of-org-emphasis-at-point)
-           (?+ :insert ("+" . "+") :remove hel-org--4-bounds-of-org-emphasis-at-point))
+           (?/ :insert ("/" . "/") :remove hel-org--4-bounds-of-italic-at-point)
+           (?* :insert ("*" . "*") :remove hel-org--4-bounds-of-bold-at-point)
+           (?_ :insert ("_" . "_") :remove hel-org--4-bounds-of-underlined-at-point)
+           (?+ :insert ("+" . "+") :remove hel-org--4-bounds-of-strike-through-at-point))
     (-lambda ((item &as key . _))
       (unless (assq key hel-surround-alist)
         (push item hel-surround-alist)))))
 
-(defun hel-org--4-bounds-of-org-verbatim-at-point ()
-  (when (org-in-regexp org-verbatim-re 2)
+;; /
+(defun hel-org--4-bounds-of-italic-at-point ()
+  (or (hel-org--4-bounds-of-org-emphasis-at-point)
+      (hel-surround--4-bounds-at-point-1 "/" "/")))
+
+;; *
+(defun hel-org--4-bounds-of-bold-at-point ()
+  (or (hel-org--4-bounds-of-org-emphasis-at-point)
+      (hel-surround--4-bounds-at-point-1 "*" "*")))
+
+;; _
+(defun hel-org--4-bounds-of-underlined-at-point ()
+  (or (hel-org--4-bounds-of-org-emphasis-at-point)
+      (hel-surround--4-bounds-at-point-1 "_" "_")))
+
+;; +
+(defun hel-org--4-bounds-of-strike-through-at-point ()
+  (or (hel-org--4-bounds-of-org-emphasis-at-point)
+      (hel-surround--4-bounds-at-point-1 "+" "+")))
+
+(defun hel-org--4-bounds-of-org-emphasis-at-point ()
+  (when (org-in-regexp org-emph-re 2)
     (list (match-beginning 2)
           (match-beginning 4)
           (match-end 4)
           (match-end 2))))
 
-(defun hel-org--4-bounds-of-org-emphasis-at-point ()
-  (when (org-in-regexp org-emph-re 2)
+;; = or ~
+(defun hel-org--4-bounds-of-org-verbatim-at-point ()
+  (when (org-in-regexp org-verbatim-re 2)
     (list (match-beginning 2)
           (match-beginning 4)
           (match-end 4)
