@@ -402,9 +402,13 @@ In tables, move column to the right."
     ;; Add a new list item (carrying over checkboxes if necessary)
     ((or 'plain-list 'item)
      (let ((orig-point (point))
-           (check-box? (progn (org-beginning-of-item)
-                              (org-at-item-checkbox-p))))
-       (if (< direction 0) (org-beginning-of-item) (org-end-of-item))
+           (check-box? (save-excursion
+                         (org-beginning-of-item)
+                         (org-at-item-checkbox-p))))
+       (if (< direction 0)
+           (org-beginning-of-item)
+         (org-end-of-item)
+         (skip-chars-backward "\r\n"))
        (org-insert-item check-box?)))
     ;; Add a new table row
     ((or `table `table-row)
