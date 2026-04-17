@@ -18,12 +18,12 @@ Using ~use-package~:
 
 - =gh= — When in headline, and ~org-special-ctrl-a/e~ is ~t~, on the first attempt
   move to where the headline text starts, i.e. after the stars and after a
-  possible TODO keyword. The same for list item. If cursor is already at that
+  possible =TODO= keyword. The same for list item. If cursor is already at that
   position, go to the start of the text.
 
 - All Hel keys under =m= prefix work with Org markup:
-  - select: =mi=, =ma=,
-  - surround =ms=, =md=, =mr=
+  - select: =mi=, =ma=
+  - surround: =ms=, =md=, =mr=
 
 - =<= / =>= — *promote* / *demote* subtree or list item.
 

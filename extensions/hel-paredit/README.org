@@ -26,6 +26,7 @@ its AST — which is yet another reason why Lisp is superior):
   *before* / *after* it.
 
 #+begin_quote
+[!NOTE]
 To enable the =C-h=, =C-j=, =C-k=, =C-l= keys, set ~hel-want-C-hjkl-keys~ to ~t~ before Hel
 is loaded (this is the default).
 #+end_quote
@@ -47,12 +48,12 @@ S-expressions.
 
 - =M-r= :: Raise S-expression.
 
-- =M-?= :: Convolute S-expression.
+- =M-?= :: Convolute S-expression:
 
   #+begin_src
   (let ((x 5)             (frob
         (y 3))       ->    |(let ((x 5)
-    (frob |(zwonk))               (y 3))
-    (wibblethwop))            (zwonk)
-                              (wibblethwop)))
+    (frob                        (y 3))
+     |(zwonk))                (zwonk)
+    (wibblethwop))            (wibblethwop)))
   #+end_src

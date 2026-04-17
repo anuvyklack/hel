@@ -94,11 +94,11 @@ If nil hel-leader will look under \"C-c\" prefix."
 
 (defvar-keymap hel-leader-map
   :doc "hel-leader service keys."
-  "DEL" #'hel-leader-undo ;; DEL in Emacs corresponds to the backspace key
+  "DEL"         #'hel-leader-undo ;; DEL in Emacs corresponds to the backspace key
   "<backspace>" #'hel-leader-undo
-  "ESC" #'hel-leader-quit
-  "<escape>" #'hel-leader-quit
-  "C-g" #'hel-leader-quit
+  "ESC"         #'hel-leader-quit
+  "<escape>"    #'hel-leader-quit
+  "C-g"         #'hel-leader-quit
   ;; "<remap> <keyboard-quit>" #'hel-leader-quit
   )
 
