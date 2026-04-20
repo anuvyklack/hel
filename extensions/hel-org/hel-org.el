@@ -121,12 +121,6 @@
   (org-defkey map (kbd "M-J") 'org-calendar-forward-year)
   (org-defkey map (kbd "M-K") 'org-calendar-backward-year))
 
-(with-eval-after-load 'org-capture
-  (hel-keymap-set org-capture-mode-map :state 'normal
-    "Z R" 'org-capture-refile
-    "Z Z" 'org-capture-finalize
-    "Z Q" 'org-capture-kill))
-
 (with-eval-after-load 'org-table
   (hel-keymap-set org-table-fedit-map :state 'normal
     "z x" 'org-table-fedit-finish
@@ -154,6 +148,24 @@
             (if org-src--allow-write-back
                 (format "Edit, then exit with %s or abort with %s" ZZ ZQ)
               (format "Exit with %s or abort with %s" ZZ ZQ))))))
+
+;;;; org-capture
+
+(with-eval-after-load 'org-capture
+  (hel-keymap-set org-capture-mode-map :state 'normal
+    "Z R" 'org-capture-refile
+    "Z Z" 'org-capture-finalize
+    "Z Q" 'org-capture-kill))
+
+(add-hook 'org-capture-mode-hook hel--org-capture-h)
+
+(defun hel--org-capture-h ()
+  (hel-update-active-keymaps)
+  (setq header-line-format
+        (format "Capture buffer.  Finish %s, refile %s, abort `%s'."
+                (propertize "Z Z" 'face 'help-key-binding)
+                (propertize "Z R" 'face 'help-key-binding)
+                (propertize "Z Q" 'face 'help-key-binding))))
 
 ;;;; Repeat mode
 
