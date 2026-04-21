@@ -157,7 +157,7 @@
     "Z Z" 'org-capture-finalize
     "Z Q" 'org-capture-kill))
 
-(add-hook 'org-capture-mode-hook hel--org-capture-h)
+(add-hook 'org-capture-mode-hook 'hel--org-capture-h)
 
 (defun hel--org-capture-h ()
   (hel-update-active-keymaps)
