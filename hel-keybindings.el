@@ -369,8 +369,8 @@ use it."
 
 (hel-keymap-set hel-window-map
   ;; windows
-  "RET" #'same-window-prefix
-  "n"   #'other-window-prefix
+  "RET" '("open next command in same window" . same-window-prefix)
+  "n"   '("open next command in other window" . other-window-prefix)
   "s"   '("split window horizontally" . hel-window-split)
   "v"   '("split window vertically" . hel-window-vsplit)
   "S"   '("split root window horizontally" . hel-root-window-split)
@@ -379,16 +379,16 @@ use it."
   "o"   '("close other windows" . delete-other-windows)
   "p"   '("pin buffer to window" . toggle-window-dedicated)
 
-  "w"   #'other-window
-  "h"   #'windmove-left
-  "j"   #'windmove-down
-  "k"   #'windmove-up
-  "l"   #'windmove-right
+  "w"   '("goto other window" . other-window)
+  "h"   '("goto window left" . windmove-left)
+  "j"   '("goto window down" . windmove-down)
+  "k"   '("goto window up" . windmove-up)
+  "l"   '("goto window right" . windmove-right)
 
-  "H"   #'hel-move-window-left
-  "J"   #'hel-move-window-down
-  "K"   #'hel-move-window-up
-  "L"   #'hel-move-window-right
+  "H"   '("move window left" . hel-move-window-left)
+  "J"   '("move window down" . hel-move-window-down)
+  "K"   '("move window up" . hel-move-window-up)
+  "L"   '("move window right" . hel-move-window-right)
 
   ;; buffers
   "r"   #'revert-buffer
@@ -399,7 +399,7 @@ use it."
   "z"   #'bury-buffer ; mnemonics: "z" is the last letter
   "x"   #'scratch-buffer
   ;; xref
-  "g d" #'xref-find-definitions-other-window
+  "g d" #'("find definitions in other window" . xref-find-definitions-other-window)
 
   ":"   #'hel-execute-extended-command-other-window
   "C-:" #'hel-execute-extended-command-for-buffer-other-window
@@ -408,13 +408,13 @@ use it."
 
   ;; Duplicate all keys with ctrl prefix.
   "C-n" #'other-window-prefix
-  "C-s" '("split window horizontally" . hel-window-split)
-  "C-v" '("split window vertically" . hel-window-vsplit)
-  "C-S" '("split root window horizontally" . hel-root-window-split)
-  "C-V" '("split root window vertically" . hel-root-window-vsplit)
-  "C-c" '("close window" . hel-window-delete)
-  "C-o" '("close other windows" . delete-other-windows)
-  "C-p" '("pin buffer to window" . toggle-window-dedicated)
+  "C-s" #'hel-window-split
+  "C-v" #'hel-window-vsplit
+  "C-S" #'hel-root-window-split
+  "C-V" #'hel-root-window-vsplit
+  "C-c" #'hel-window-delete
+  "C-o" #'delete-other-windows
+  "C-p" #'toggle-window-dedicated
   ;; Jump over windows
   "C-w" #'other-window
   "C-h" #'windmove-left
@@ -428,6 +428,11 @@ use it."
   "C-b" #'clone-indirect-buffer-other-window
   "C-x" #'scratch-buffer
   "C-z" #'bury-buffer)
+
+;; Don't show "C-w C-" duplicates in which-key popup.
+(with-eval-after-load 'which-key
+  (add-to-list 'which-key-replacement-alist
+               '(("^C-w C-[a-z]" . nil) . ignore)))
 
 ;;; Insert state
 
