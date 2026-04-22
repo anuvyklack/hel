@@ -422,6 +422,19 @@ in the command loop, and the fake cursors can pick up on those instead."
         (t
          (wdired-exit))))
 
+;;;; image-mode
+
+(with-eval-after-load 'image-mode
+  (hel-keymap-set image-mode-map :state 'motion
+    "C-y" 'image-previous-line
+    "C-e" 'image-next-line
+    "C-b" 'image-scroll-right
+    "C-f" 'image-scroll-left
+    "C-d" 'image-scroll-up
+    "C-u" 'image-scroll-down
+    "z h" 'image-scroll-right
+    "z l" 'image-scroll-left))
+
 ;;;; Messages buffer
 
 (hel-set-initial-state 'messages-buffer-mode 'normal)
