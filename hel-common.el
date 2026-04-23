@@ -953,15 +953,21 @@ YANK-FUNCTION should be a `yank' like function."
   "Indent active region COUNT times. With no selection indent current line.
 INDENT-FUNCTION should be a `indent-rigidly-left' like function that takes
 BEG, END position and done the indentation."
-  (if (use-region-p)
-      (hel-save-region
-        (dotimes (_ count)
-          (funcall indent-function (region-beginning) (region-end)))
-        (hel-extend-selection -1))
-    ;; else
-    (-let [(beg . end) (bounds-of-thing-at-point 'hel-line)]
-      (dotimes (_ count)
-        (funcall indent-function beg end)))))
+  (cond ((hel-linewise-selection-p)
+         (let ((deactivate-mark nil))
+           (dotimes (_ count)
+             (funcall indent-function (region-beginning) (region-end))))
+         (hel-extend-selection -1))
+        ((use-region-p)
+         (hel-save-region
+           (hel-expand-selection-to-full-lines)
+           (dotimes (_ count)
+             (funcall indent-function (region-beginning) (region-end)))
+           (hel-extend-selection -1)))
+        (t
+         (-let [(beg . end) (bounds-of-thing-at-point 'hel-line)]
+           (dotimes (_ count)
+             (funcall indent-function beg end))))))
 
 (defun hel--fix-newline-at-end-of-buffer ()
   "If selection ends at the end of buffer, and buffer doesn't ends with newline
