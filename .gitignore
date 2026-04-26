@@ -1,2 +1,3 @@
 .projectile-cache.eld
 *.elc
+/.agent-shell/

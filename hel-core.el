@@ -386,7 +386,9 @@ MODE and STATE should be symbols."
 (hel-define-state motion
   "Motion state."
   :cursor (list hel-motion-state-cursor-type
-                'hel-motion-state-main-cursor)) ; face
+                'hel-motion-state-main-cursor) ; face
+  (setq hel--extend-selection nil)
+  (deactivate-mark))
 
 ;;; Input-method
 

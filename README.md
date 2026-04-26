@@ -177,6 +177,7 @@ alternatives in Emacs.
 - [hel-org](extensions/hel-org)
 - [hel-paredit](extensions/hel-paredit)
 - [hel-vterm](extensions/hel-vterm)
+- [hel-agent-shell](extensions/hel-agent-shell)
 
 ## Tips
 

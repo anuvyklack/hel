@@ -1,0 +1,75 @@
+* hel-agent-shell
+
+The Hel extension that integrates it with [[https://github.com/xenodium/agent-shell][Agent-shell]] — a native Emacs shell on
+top of [[https://www.masteringemacs.org/article/comint-writing-command-interpreter][Comint mode]] to interact with LLM agents powered by ACP ([[https://agentclientprotocol.com][Agent Client Protocol]]).
+
+** Enable
+#+begin_src emacs-lisp
+(with-eval-after-load 'agent-shell
+  (require 'hel-agent-shell))
+#+end_src
+
+** Usage
+*** Keys available in all modes
+
+| Key       | Action                                           |
+|-----------+--------------------------------------------------|
+| =, v=       | switch shell / viewport mode                     |
+| =, <tab>=   | cycle session mode                               |
+| =, RET=     | set session mode                                 |
+| =, m=       | set model                                        |
+| =, s=       | make screenshot and send it                      |
+| =, !=       | execute shell command and insert its output      |
+| =, t=       | show token usage                                 |
+| =, p= / =, P= | add / remove pending request while model is busy |
+
+*** Shell
+
+| Key       | Action                             |
+|-----------+------------------------------------|
+| =RET=       | send prompt                        |
+| =[[= / =]]=   | next / previous item               |
+| =C-r=       | history                            |
+| =C-j= / =C-k= | next / previous item               |
+| =p=         | paste text or image from clipboard |
+| =, ,=       | compose prompt in dedicated buffer |
+
+*** Viewport
+
+Viewport buffer starts in Hel Motion state. You can switch to Normal state with
+=i= to copy some text. Switch back to Motion state with =Esc=.
+
+| Key       | Action                                     |
+|-----------+--------------------------------------------|
+| =i=         | switch to Normal state, =Esc= to switch back |
+| =C-j= / =C-k= | next / previous item on the page           |
+| =[[= / =]]=   | next / previous page                       |
+| =?= or =, ?=  | help menu                                  |
+| =r=         | replay                                     |
+| =y=         | replay with "yes"                          |
+| =m=         | replay with "more"                         |
+| =a=         | replay with "again"                        |
+| =c=         | reply with "continue"                      |
+| =1= - =9=     | reply with number                          |
+
+*** Compose buffer
+
+| Key        | Action                             |
+|------------+------------------------------------|
+| =, ,= or =Z Z= | send prompt                        |
+| =Z Q=        | discard prompt and cancel          |
+| =[[=         | previous page                      |
+| =C-j= / =C-k=  | next / previous history            |
+| =C-r=        | history                            |
+| =p=          | paste text or image from clipboard |
+
+** Customization
+
+If you want, you can configure =Enter= to insert a new line in Insert state, and
+send the prompt in Normal state in Shell mode:
+#+begin_src emacs-lisp
+(with-eval-after-load 'agent-shell
+  (hel-keymap-set agent-shell-mode-map :state 'insert "RET" 'newline)
+  (hel-keymap-set agent-shell-mode-map :state 'normal "RET" 'comint-send-input))
+#+end_src
+
