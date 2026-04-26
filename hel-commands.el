@@ -1328,8 +1328,8 @@ already there."
                                       hel-m-negative-argument
                                       hel-mi-negative-argument
                                       hel-ma-negative-argument))))))
-    (cl-pushnew `((nil . ,regexp) . ignore)
-                which-key-replacement-alist :test #'equal)))
+    (add-to-list 'which-key-replacement-alist
+                 `((nil . ,regexp) . ignore))))
 
 ;; miw
 (hel-define-command hel-mark-inner-word (count)
