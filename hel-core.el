@@ -606,7 +606,9 @@ Example:
 
 (defun hel-keymap-local-set (&rest args)
   "Create keybinding from KEY to DEFINITION in current buffer local keymap.
-See `current-local-map' for details on what a local keymap is.
+It is the one that is set with `use-local-map' and in most cases it is the
+major-mode keymap — i.e. it is shared with all other buffers in the same
+major mode.
 
 STATE is an optional keyword argument that specifies the Hel state
 in which the keybindings will be active. It must appear before any

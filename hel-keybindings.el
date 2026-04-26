@@ -376,7 +376,7 @@ use it."
   "S"   '("split root window horizontally" . hel-root-window-split)
   "V"   '("split root window vertically" . hel-root-window-vsplit)
   "c"   '("close window" . hel-window-delete)
-  "o"   '("close other windows" . delete-other-windows)
+  "o"   '("close all other windows" . delete-other-windows)
   "p"   '("pin buffer to window" . toggle-window-dedicated)
 
   "w"   '("goto other window" . other-window)

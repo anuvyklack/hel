@@ -1,6 +1,6 @@
 * hel-vterm
 
-The Hel extension that integrates it with [[https://github.com/akermu/emacs-libvterm][Vterm]].
+The Hel extension that integrates it with [[https://github.com/akermu/emacs-libvterm][Vterm]] terminal emulator.
 
 ** Enable
 #+begin_src emacs-lisp
