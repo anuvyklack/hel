@@ -843,6 +843,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
         beginning-of-line
         capitalize-word
         comment-dwim             ;; gc
+        default-indent-new-line
         delete-backward-char
         delete-blank-lines
         delete-char
@@ -887,6 +888,7 @@ from being executed when `hel-multiple-cursors-mode' is active."
         org-self-insert-command
         previous-line
         quoted-insert            ;; C-q
+        repeat
         right-char
         right-word
         self-insert-command
