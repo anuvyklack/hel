@@ -294,6 +294,80 @@ in the command loop, and the fake cursors can pick up on those instead."
   (hel-set-initial-state 'helpful-mode 'normal)
   (put 'helpful-at-point 'multiple-cursors nil))
 
+;;;; Comint
+
+(with-eval-after-load 'comint
+  (hel-keymap-set comint-mode-map :state 'normal
+    "i" 'hel-comint-insert
+    "a" 'hel-comint-append
+    "I" 'hel-comint-insert-line
+    "A" 'hel-comint-append-line
+    "c" 'hel-comint-change))
+
+(defun hel-comint--goto-process-mark ()
+  "Move point to the beginning of writable input start."
+  (-> (current-buffer)
+      (get-buffer-process)
+      (process-mark)
+      (goto-char)))
+
+;; i
+(hel-define-command hel-comint-insert ()
+  "Switch to Insert state, jumping to prompt if cursor is in read-only area."
+  :multiple-cursors nil
+  (interactive)
+  (unless (comint-after-pmark-p)
+    (hel-disable-multiple-cursors-mode)
+    (deactivate-mark)
+    (hel-comint--goto-process-mark))
+  (hel-insert))
+
+;; a
+(hel-define-command hel-comint-append ()
+  "Switch to Insert state after selection, jumping to prompt if in read-only."
+  :multiple-cursors nil
+  (interactive)
+  (unless (comint-after-pmark-p)
+    (hel-disable-multiple-cursors-mode)
+    (deactivate-mark)
+    (hel-comint--goto-process-mark))
+  (hel-append))
+
+;; I
+(hel-define-command hel-comint-insert-line ()
+  "Go to beginning of writable input and switch to Insert state."
+  :multiple-cursors nil
+  (interactive)
+  (unless (comint-after-pmark-p)
+    (hel-disable-multiple-cursors-mode)
+    (deactivate-mark)
+    (hel-comint--goto-process-mark))
+  (hel-insert-line))
+
+;; A
+(hel-define-command hel-comint-append-line ()
+  "Go to end of input line and switch to Insert state."
+  :multiple-cursors nil
+  (interactive)
+  (unless (comint-after-pmark-p)
+    (hel-disable-multiple-cursors-mode)
+    (deactivate-mark)
+    (hel-comint--goto-process-mark))
+  (hel-append-line))
+
+;; c
+(hel-define-command hel-comint-change ()
+  "Delete selection and switch to Insert state.
+If cursor is in read-only area, jump to prompt instead of deleting."
+  :multiple-cursors nil
+  (interactive)
+  (if (comint-after-pmark-p)
+      (hel-change)
+    (hel-disable-multiple-cursors-mode)
+    (deactivate-mark)
+    (hel-comint--goto-process-mark)
+    (hel-insert-state 1)))
+
 ;;;; Compilation
 
 (hel-advice-add 'next-error     :around #'hel-jump-command-a)
