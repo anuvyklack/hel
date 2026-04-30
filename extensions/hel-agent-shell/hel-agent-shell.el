@@ -75,6 +75,8 @@
   "j"   'next-line
   "k"   'previous-line
   "l"   'right-char
+  "g g" 'beginning-of-buffer
+  "G"   'end-of-buffer
   "] ]" 'agent-shell-viewport-next-page
   "[ [" 'agent-shell-viewport-previous-page
   "C-j" 'agent-shell-viewport-next-item
