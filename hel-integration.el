@@ -590,6 +590,9 @@ If cursor is in read-only area, jump to prompt instead of deleting."
   "g g" #'beginning-of-buffer    ; also "<"
   "G"   #'end-of-buffer)         ; also ">"
 
+(hel-keymap-set special-mode-map :state 'normal
+  "<escape>" #'hel-motion-state)
+
 ;;;; prog-mode
 
 (hel-keymap-set prog-mode-map :state 'normal
