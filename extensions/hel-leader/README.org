@@ -1,38 +1,54 @@
-* hel-leader
+* hel-leader 2.0
+
+A leader key extension for [[https://github.com/anuvyklack/hel][Hel]] that surves two purposes:
+- Allows to use =Space= as leader key instead of =C-c= (Emacs native leader) in Hel
+  Normal and Motion state.
+- Allows entering Emacs =C-x=, =C-c=, =M-= and =C-M-= commands without modifier keys.
+
 ** Enable
 #+begin_src emacs-lisp
-;; Dependencie
 (use-package s :ensure t)
-
 (use-package hel-leader)
 #+end_src
 
 ** Usage
 
-- =Space= ::
-  Space key will act according to following rules:
+- =SPC= (~hel-leader~) :: 
 
-  - =x= is translated to =C-x C-=
-  - =c= is translated to =C-c C-=
-    - After this, =SPC= toggles the =C-= modifier.
-    - If the translation results in an undefined binding, the last key falls
-      back to an unmodified version (e.g. if =C-c C-a= is undefined, it falls
-      back to =C-c a=).
-  - =m= is translated to =M-=
-  - =g= is translated to =C-M-=
-  - Any other key is translated to =C-c <key>=. =C-c= is the native Emacs leader
-    key chord.
+  Keys are translated according to the following rules:
 
-- =C-w space= ::
-  The same as =Space= but the result buffer of the invoked command (if any) will
-  be opened in new window. This works the same as =C-w n space=.
+  | Input     | Result    |
+  |-----------+-----------|
+  | =SPC=       | =C-c=       |
+  | =SPC c=     | =C-c C-=    |
+  | =SPC x=     | =C-x=       |
+  | =SPC x x=   | =C-x C-=    |
+  | =SPC m=     | =M-=        |
+  | =SPC g=     | =C-M-=      |
+  | =SPC <key>= | =C-c <key>= |
 
-Examples:
+  Modifiers can be combined. After entering =C-x=, pressing =m= or =g= adds =M-= or =C-M-=
+  to the next key.
 
-| Input       | Translation |
-|-------------+-------------|
-| =SPC a=       | =C-c a=       |
-| =SPC c t t=   | =C-c C-t C-t= |
-| =SPC x m t=   | =C-x M-t=     |
-| =SPC g x=     | =C-M-x=       |
-| =SPC x SPC p= | =C-x p=       |
+- =C-w SPC= (~hel-leader-other-window~) ::
+  Same as =SPC=, but the result buffer of the invoked command (if any) is
+  opened in a new window. Equivalent to =C-w n SPC=.
+
+- =Backspace= (~hel-leader-undo~) :: Undo the last entered key.
+
+** Examples
+
+| Input     | Result    |
+|-----------+-----------|
+| =SPC a=     | =C-c a=     |
+| =SPC c t=   | =C-c C-t=   |
+| =SPC c t t= | =C-c C-t t= |
+| =SPC x f=   | =C-x f=     |
+| =SPC x x f= | =C-x C-f=   |
+| =SPC x m t= | =C-x M-t=   |
+| =SPC m x=   | =M-x=       |
+| =SPC g x=   | =C-M-x=     |
+
+** Differences from the version 1
+
+Originally the whole logic was copied from [[https://github.com/emacsorphanage/god-mode][God-Mode]].
