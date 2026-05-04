@@ -1,7 +1,21 @@
 * [Unreleased]
 ** Added
 
-- Keys for built-in =debugger= package
+- =hel-agent-shell= extension.
+
+- Keys for built-in =debugger= package.
+
+- Keys for =comint-mode=.
+
+- Keys for =image-mode=.
+
+** Changed
+
+- *[BREAKING]*
+  =hel-leader= extension is fully rewritten: the [[https://github.com/emacsorphanage/god-mode][God-Mode]] logic is replaced
+  with an original one.
+
+- In =special-mode= in Normal state =<Esc>= now switches to Motion state.
 
 * [0.10.0]
 ** Added
@@ -19,11 +33,11 @@
   declaration".
 
 - *[BREAKING]*
-  ~hel-surround-alist~ variable format has beed changed.
+  ~hel-surround-alist~ variable format has been changed.
 
 - *[BREAKING]*
   The mechanism for switching the shape and color of the main cursors has been
-  reworked. The single variables for main cursor appearence in each state are
+  reworked. The single variables for main cursor appearance in each state are
   removed and replaced with two variables: main cursor shape and face.
 
   - Removed:

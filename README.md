@@ -10,7 +10,7 @@
 ## Can I use Hel without knowing Emacs keys?
 
 > [!IMPORTANT]
-> what Vim, Helix, and other modal editors call Normal and Insert **modes**, Hel refers to as **states**. This is because the word "mode" in Emacs is already used for its [major](https://www.gnu.org/software/emacs/manual/html_node/emacs/Major-Modes.html) and [minor](https://www.gnu.org/software/emacs/manual/html_node/emacs/Minor-Modes.html) modes.
+> What Vim, Helix, and other modal editors call Normal and Insert **modes**, Hel refers to as **states**. This is because the word "mode" in Emacs is already used for its [major](https://www.gnu.org/software/emacs/manual/html_node/emacs/Major-Modes.html) and [minor](https://www.gnu.org/software/emacs/manual/html_node/emacs/Minor-Modes.html) modes.
 
 When several years ago I came to Emacs from Neovim, I was in love with Vim editing model, found Emacs native keybindings ugly and had zero interest in learning them. I want Emacs not as text editor (which it obviously lacks of) but as an operation system with Lisp and all its power. So the first question I asked myself was "Can I use Evil without learning Emacs keys?"
 
