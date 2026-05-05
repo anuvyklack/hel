@@ -25,30 +25,32 @@ A leader key extension for [[https://github.com/anuvyklack/hel][Hel]] that surve
   | =SPC x x=   | =C-x C-=    |
   | =SPC m=     | =M-=        |
   | =SPC g=     | =C-M-=      |
+  | =SPC SPC=   | =C-c C-c=   |
   | =SPC <key>= | =C-c <key>= |
 
   Modifiers can be combined. After entering =C-x=, pressing =m= or =g= adds =M-= or =C-M-=
   to the next key.
 
 - =C-w SPC= (~hel-leader-other-window~) ::
-  Same as =SPC=, but the result buffer of the invoked command (if any) is
+  Same as =SPC=, but the result buffer of the invoked command (if any) will be
   opened in a new window. Equivalent to =C-w n SPC=.
 
 - =Backspace= (~hel-leader-undo~) :: Undo the last entered key.
 
 ** Examples
 
-| Input     | Result    |
-|-----------+-----------|
-| =SPC a=     | =C-c a=     |
-| =SPC c t=   | =C-c C-t=   |
-| =SPC c t t= | =C-c C-t t= |
-| =SPC x f=   | =C-x f=     |
-| =SPC x x f= | =C-x C-f=   |
-| =SPC x m t= | =C-x M-t=   |
-| =SPC m x=   | =M-x=       |
-| =SPC g x=   | =C-M-x=     |
+| Input        | Result     |
+|--------------+------------|
+| =SPC a=        | =C-c a=      |
+| =SPC c t=      | =C-c C-t=    |
+| =SPC c t t=    | =C-c C-t t=  |
+| =SPC x f=      | =C-x f=      |
+| =SPC x x f=    | =C-x C-f=    |
+| =SPC x m t=    | =C-x M-t=    |
+| =SPC m x=      | =M-x=        |
+| =SPC g x=      | =C-M-x=      |
+| =SPC g S-left= | =C-M-S-left= |
 
-** Differences from the version 1
+** Difference from the version 1
 
 Originally the whole logic was copied from [[https://github.com/emacsorphanage/god-mode][God-Mode]].

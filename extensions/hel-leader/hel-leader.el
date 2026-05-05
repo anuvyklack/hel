@@ -183,6 +183,9 @@ Return the found command."
             (hel-leader--keys
              (cl-callf -snoc hel-leader--keys key))
             ;; All following conditions assumes that `hel-leader--keys' are empty.
+            ((equal "SPC" key)
+             (setq hel-leader--keys '("C-c" "C-c")
+                   hel-leader--pending-modifier nil))
             ((equal "c" key)
              (setq hel-leader--keys '("C-c")
                    hel-leader--pending-modifier "C-"))
