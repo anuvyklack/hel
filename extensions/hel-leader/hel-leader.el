@@ -83,7 +83,7 @@
 
 (defvar-keymap hel-leader-map
   :doc "hel-leader service keys."
-  "DEL"         #'hel-leader-undo ;; DEL in Emacs corresponds to the backspace key
+  "DEL"         #'hel-leader-undo ;; DEL in Emacs corresponds to the Backspace key
   "<backspace>" #'hel-leader-undo
   "ESC"         #'hel-leader-quit
   "<escape>"    #'hel-leader-quit
@@ -229,12 +229,12 @@ Return the found command."
     ("TAB" "C-<tab>")
     ("RET" "C-RET") ;; "C-<return>"
     ("ESC" "ESC")
-    (_ (if (s-contains? "C-" key)
+    (_ (if (s-starts-with? "C-" key)
            key
          (concat "C-" (hel-leader--handle-shift key))))))
 
 (defun hel-leader--add-meta (key)
-  (if (s-contains? "C-" key)
+  (if (s-starts-with? "C-" key)
       (hel-leader--add-control-meta key)
     (pcase key
       ("TAB" "M-TAB") ;; "M-<tab>"
@@ -295,9 +295,9 @@ KEYS should be a string of a list of strings."
 (defvar which-key-show-prefix)
 (defvar which-key-side-window-location)
 (defvar which-key-idle-delay)
+(defvar which-key-sort-order)
 (defvar which-key--last-try-2-loc)
 (defvar which-key--pages-obj)
-(defvar which-key-sort-order)
 
 (defun hel-leader--show-preview ()
   "Show preview with possible continuations for the keys
