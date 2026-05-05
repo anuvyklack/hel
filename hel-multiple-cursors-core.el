@@ -234,7 +234,8 @@ Return CURSOR."
                        'hel-insert-state-fake-cursor)
                       (t
                        'hel-normal-state-fake-cursor))))
-      (cond ((and hel-match-fake-cursor-style
+      (cond ((and (display-graphic-p)
+                  hel-match-fake-cursor-style
                   (hel-cursor-is-bar-p))
              (overlay-put cursor 'face nil)
              (overlay-put cursor 'before-string
