@@ -290,6 +290,7 @@ KEYS should be a string of a list of strings."
 (declare-function which-key--create-pages "which-key" (keys &optional prefix-keys prefix-title))
 (declare-function which-key--show-page "which-key" (&optional n))
 (declare-function which-key--hide-popup "which-key" ())
+(declare-function which-key--format-and-replace "which-key" (unformatted &optional preserve-full-key))
 (declare-function which-key--get-keymap-bindings-1 "which-key" (keymap start &optional prefix filter all ignore-commands))
 (defvar which-key-show-prefix)
 (defvar which-key-side-window-location)
