@@ -18,8 +18,8 @@
 ;;; Code:
 
 (require 'hel-vars)
-(require 'hel-macros)
 (require 'hel-common)
+(require 'hel-macros)
 (require 'hel-multiple-cursors-core)
 (require 'hel-core)
 (require 'hel-commands)
