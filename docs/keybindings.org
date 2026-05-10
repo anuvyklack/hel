@@ -28,6 +28,10 @@ In Motion state Hel provide service keys to control Emacs itself.
 
 - =:= :: Emacs analoug of command pallete. (Native key is =M-x=)
 
+- =C-:= ::
+  Open command palette with only the commands that make sense in the current
+  buffer. (Native key is =M-X=)
+
 - =M-u= ::
   Emacs universal argument. Native key is =C-u=, but Hel use it for scrolling,
   and =M-u= by default is bound to ~upcase-word~, for which Hel has itself version

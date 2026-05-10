@@ -45,7 +45,8 @@ use it."
   "M-<mouse-1>" #'hel-toggle-cursor-on-click)
 
 (hel-keymap-global-set :state 'normal
-  ":" #'execute-extended-command
+  ":"   #'execute-extended-command
+  "C-:" #'execute-extended-command-for-buffer
 
   ;; Arrows
   "<left>"  #'hel-backward-char
