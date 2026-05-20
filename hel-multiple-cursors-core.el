@@ -181,8 +181,7 @@ This function is the guts of the `hel-create-fake-cursor'."
 
 (defun hel--delete-all-fake-cursors ()
   "Remove all fake cursors overlays form current buffer.
-It is likely that you need `hel-delete-all-fake-cursors' function,
-not this one."
+It is likely that you need `hel-disable-multiple-cursors-mode', not this one."
   (when hel--max-cursors-original
     (setq hel-max-cursors-number hel--max-cursors-original
           hel--max-cursors-original nil))
@@ -579,7 +578,10 @@ delete last one with `hel-delete-fake-cursor'."
   :keymap (make-sparse-keymap)
   (if hel-multiple-cursors-mode
       (hel--disable-minor-modes-incompatible-with-multiple-cursors)
-    (hel--delete-all-fake-cursors)
+    ;; else
+    (when (hel-any-fake-cursors-p)
+      (setq hel--cursors-positions-history (hel-cursors-positions))
+      (hel--delete-all-fake-cursors))
     (hel--enable-minor-modes-incompatible-with-multiple-cursors))
   (hel-update-active-keymaps))
 
@@ -591,6 +593,9 @@ disable if only one."
     (hel-multiple-cursors-mode 'toggle)))
 
 (defun hel-disable-multiple-cursors-mode ()
+  "Remove all fake cursors from the current buffer.
+You may restore them with `hel-restore-cursors'."
+  (interactive)
   (when hel-multiple-cursors-mode
     (hel-multiple-cursors-mode -1)))
 

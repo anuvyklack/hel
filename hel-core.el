@@ -39,7 +39,6 @@
 ;; Declarations
 (defvar edebug-mode nil)
 (defvar edebug-mode-map)
-(declare-function hel-delete-all-fake-cursors "hel-commands")
 
 ;;; Hel mode
 
@@ -99,7 +98,7 @@
               hel-multiple-cursors-mode-map)
         (add-hook 'pre-command-hook  #'hel--pre-commad-hook 90 t)
         (add-hook 'post-command-hook #'hel--post-command-hook 90 t)
-        (add-hook 'after-revert-hook #'hel-delete-all-fake-cursors 90 t)
+        (add-hook 'after-revert-hook #'hel-disable-multiple-cursors-mode 90 t)
         (setq hel-input-method current-input-method)
         (add-hook 'input-method-activate-hook #'hel-activate-input-method 90 t)
         (add-hook 'input-method-deactivate-hook #'hel-deactivate-input-method 90 t)
@@ -107,7 +106,7 @@
     ;; else
     (remove-hook 'post-command-hook #'hel--post-command-hook t)
     (remove-hook 'pre-command-hook  #'hel--pre-commad-hook t)
-    (remove-hook 'after-revert-hook #'hel-delete-all-fake-cursors t)
+    (remove-hook 'after-revert-hook #'hel-disable-multiple-cursors-mode t)
     (remove-hook 'input-method-activate-hook #'hel-activate-input-method t)
     (remove-hook 'input-method-deactivate-hook #'hel-deactivate-input-method t)
     (hel--single-undo-step-end)

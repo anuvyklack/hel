@@ -472,7 +472,7 @@ If cursor is in read-only area, jump to prompt instead of deleting."
     "<remap> <save-buffer>" 'wgrep-finish-edit)
 
   (hel-advice-add 'wgrep-to-original-mode :before #'hel-deactivate-mark-a)
-  (hel-advice-add 'wgrep-to-original-mode :before #'hel-delete-all-fake-cursors)
+  (hel-advice-add 'wgrep-to-original-mode :before #'hel-disable-multiple-cursors-mode)
   (hel-advice-add 'wgrep-to-original-mode :after  #'hel-switch-to-initial-state))
 
 ;;;; occur-mode
@@ -531,7 +531,7 @@ If cursor is in read-only area, jump to prompt instead of deleting."
   (put 'wdired-exit          'multiple-cursors nil)
 
   (hel-advice-add 'wdired-change-to-dired-mode :before #'hel-deactivate-mark-a)
-  (hel-advice-add 'wdired-change-to-dired-mode :before #'hel-delete-all-fake-cursors)
+  (hel-advice-add 'wdired-change-to-dired-mode :before #'hel-disable-multiple-cursors-mode)
 
   (hel-advice-add 'wdired-next-line     :before #'hel-deactivate-mark-a)
   (hel-advice-add 'wdired-previous-line :before #'hel-deactivate-mark-a))

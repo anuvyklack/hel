@@ -203,7 +203,7 @@ use it."
 (hel-keymap-set hel-multiple-cursors-mode-map :state 'normal
   "K"   #'hel-keep-selections
   "M-K" #'hel-remove-selections
-  ","   #'hel-delete-all-fake-cursors
+  ","   #'hel-remove-all-fake-cursors
   "M-," #'hel-remove-main-cursor
   "("   #'hel-rotate-selections-backward
   ")"   #'hel-rotate-selections-forward

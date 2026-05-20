@@ -139,7 +139,7 @@ accessible part of the buffer.
 Push mark at previous position, unless extending selection."
   :multiple-cursors nil
   (interactive "P")
-  (hel-delete-all-fake-cursors)
+  (hel-disable-multiple-cursors-mode)
   (hel-push-point)
   (hel-maybe-deactivate-mark)
   (if num
@@ -158,7 +158,7 @@ Push mark at previous position, unless extending selection."
   "Move point the end of the buffer."
   :multiple-cursors nil
   (interactive)
-  (hel-delete-all-fake-cursors)
+  (hel-disable-multiple-cursors-mode)
   (hel-push-point)
   (hel-maybe-deactivate-mark)
   (goto-char (point-max)))
@@ -376,7 +376,7 @@ backward and jump to new top location."
             (-> (avy--regex-candidates avy-goto-word-0-regexp
                                        (point) (window-end nil t))
                 (avy-process)))
-      (hel-delete-all-fake-cursors)
+      (hel-disable-multiple-cursors-mode)
       (hel-push-point orig-point)
       (hel-set-region (if hel--extend-selection (mark) (point))
                       (progn (forward-thing 'hel-word)
@@ -393,7 +393,7 @@ backward and jump to new top location."
                                        (window-start) (point))
                 (nreverse)
                 (avy-process)))
-      (hel-delete-all-fake-cursors)
+      (hel-disable-multiple-cursors-mode)
       (hel-push-point orig-point)
       (if hel--extend-selection
           (hel-set-region (mark) (point))
@@ -410,7 +410,7 @@ backward and jump to new top location."
     (when (let ((avy-all-windows nil))
             (-> (avy--regex-candidates "[^ \r\n\t]+" (point) (window-end nil t))
                 (avy-process)))
-      (hel-delete-all-fake-cursors)
+      (hel-disable-multiple-cursors-mode)
       (hel-push-point orig-point)
       (hel-set-region (if hel--extend-selection (mark) (point))
                       (progn (forward-thing 'hel-WORD)
@@ -426,7 +426,7 @@ backward and jump to new top location."
             (-> (avy--regex-candidates "[^ \r\n\t]+" (window-start) (point))
                 (nreverse)
                 (avy-process)))
-      (hel-delete-all-fake-cursors)
+      (hel-disable-multiple-cursors-mode)
       (hel-push-point orig-point)
       (if hel--extend-selection
           (hel-set-region (mark) (point))
@@ -449,7 +449,7 @@ to the chosen one."
                            (hel-collect-positions)
                            (avy-process)))))
               ((natnump pos)))
-    (hel-delete-all-fake-cursors)
+    (hel-disable-multiple-cursors-mode)
     (hel-push-point)
     (if hel--extend-selection
         (let ((lines? (hel-linewise-selection-p)))
@@ -916,7 +916,7 @@ When called interactively — toggle extending selection."
 (hel-define-command hel-mark-whole-buffer ()
   :multiple-cursors nil
   (interactive)
-  (hel-delete-all-fake-cursors)
+  (hel-disable-multiple-cursors-mode)
   (hel-push-point)
   ;; `minibuffer-prompt-end'is really `point-min' in most cases, but if we're
   ;; in the minibuffer, this is at the end of the prompt.
@@ -932,6 +932,8 @@ entered regexp withing current selections."
   :multiple-cursors nil
   (interactive)
   (when (region-active-p)
+    (when hel-multiple-cursors-mode
+      (setq hel--cursors-positions-history (hel-cursors-positions)))
     (hel-with-real-cursor-as-fake
       (let* ((cursors (hel-all-fake-cursors))
              (ranges (-map (lambda (cursor)
@@ -1125,14 +1127,10 @@ at START-COLUMN, ends at END-COLUMN and consists of NUMBER-OF-LINES."
           (cons end start)))))
 
 ;; ,
-(hel-define-command hel-delete-all-fake-cursors ()
+(defalias 'hel-remove-all-fake-cursors #'hel-disable-multiple-cursors-mode
   (format "Delete all fake cursors from current buffer.
 You may restore them with %s (`hel-restore-cursors')."
-          (propertize "g v" 'face 'help-key-binding))
-  (interactive)
-  (when hel-multiple-cursors-mode
-    (setq hel--cursors-positions-history (hel-cursors-positions))
-    (hel-multiple-cursors-mode -1)))
+          (propertize "g v" 'face 'help-key-binding)))
 
 ;; M-,
 (hel-define-command hel-remove-main-cursor ()
@@ -1168,7 +1166,7 @@ You may restore them with %s (`hel-restore-cursors')."
                       (overlay-get cursor 'mark)
                       (point)
                       (if (use-region-p) (mark) 0)))))
-      (hel-delete-all-fake-cursors)
+      (hel-disable-multiple-cursors-mode)
       (hel-set-region beg end))))
 
 ;; )

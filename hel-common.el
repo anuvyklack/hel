@@ -1403,7 +1403,7 @@ REST contains all other elements."
 
 (defun hel-jump-command-a (command &rest args)
   "Aroung advice for COMMAND that moves point."
-  (hel-delete-all-fake-cursors)
+  (hel-disable-multiple-cursors-mode)
   (deactivate-mark)
   (hel-recenter-point-on-jump
     (prog1 (apply command args)
