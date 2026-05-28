@@ -36,7 +36,7 @@ when `hel-mode' is toggled on or off.
        (cl-pushnew '(,symbol ,how ,advice) hel--advices
                    :test #'equal)
        (when hel-mode
-         (advice-add ',symbol ,how #',advice)))))
+         (advice-add ',symbol ,how ',advice)))))
 
 (defmacro hel-advice-add (symbol how function)
   "Wrapper around `advice-add' that automatically add/remove advice

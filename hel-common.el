@@ -1422,6 +1422,8 @@ REST contains all other elements."
   (or hel--extend-selection
       (deactivate-mark)))
 
+(declare-function hel-disable-multiple-cursors-mode "hel-multiple-cursors-core")
+
 (defun hel-jump-command-a (command &rest args)
   "Aroung advice for COMMAND that moves point."
   (hel-disable-multiple-cursors-mode)

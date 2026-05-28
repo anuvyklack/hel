@@ -249,11 +249,11 @@ in the command loop, and the fake cursors can pick up on those instead."
 (with-eval-after-load 'edebug
   (add-hook 'edebug-mode-hook #'hel-update-active-keymaps)
   (hel-keymap-set edebug-mode-map
-    "SPC"   nil ; unding `edebug-step-mode'
-    "h"     nil ; unding `edebug-goto-here'
-    "s"     #'edebug-step-mode
-    "H"     #'edebug-goto-here
-    "C-c h" #'edebug-goto-here) ; <leader> h
+    "SPC"    nil ; unding `edebug-step-mode'
+    "h"      nil ; unding `edebug-goto-here'
+    "s"     'edebug-step-mode
+    "H"     'edebug-goto-here
+    "C-c h" 'edebug-goto-here) ; <leader> h
   (hel-keymap-set edebug-mode-map :state 'normal
     "<escape>" #'hel-normal-state-escape))
 
@@ -335,6 +335,8 @@ in the command loop, and the fake cursors can pick up on those instead."
     "<remap> <hel-append-line>" 'hel-comint-append-line ; "A"
     "<remap> <hel-change>"      'hel-comint-change))    ; "c"
 
+(declare-function comint-after-pmark-p "comint")
+
 (defun hel-comint--goto-process-mark ()
   "Move point to the beginning of writable input start."
   (-> (current-buffer)
@@ -408,27 +410,27 @@ If cursor is in read-only area, jump to prompt instead of deleting."
   (dolist (keymap (list compilation-minor-mode-map
                         compilation-mode-map))
     (hel-keymap-set keymap
-      "o"   #'compilation-display-error
+      "o"    'compilation-display-error
 
-      "g"   nil ; unbind `recompile'
-      "g o" #'compile-goto-error
-      "g r" #'recompile ; revert
+      "g"     nil ; unbind `recompile'
+      "g o"  'compile-goto-error
+      "g r"  'recompile ; revert
 
-      "n"   #'next-error-no-select
-      "N"   #'previous-error-no-select
-      "C-j" #'next-error-no-select
-      "C-k" #'previous-error-no-select
+      "n"    'next-error-no-select
+      "N"    'previous-error-no-select
+      "C-j"  'next-error-no-select
+      "C-k"  'previous-error-no-select
 
-      "}"   #'compilation-next-file
-      "{"   #'compilation-previous-file
-      "] p" #'compilation-next-file
-      "[ p" #'compilation-previous-file
-      "z j" #'compilation-next-file
-      "z k" #'compilation-previous-file))
+      "}"    'compilation-next-file
+      "{"    'compilation-previous-file
+      "] p"  'compilation-next-file
+      "[ p"  'compilation-previous-file
+      "z j"  'compilation-next-file
+      "z k"  'compilation-previous-file))
 
   (hel-keymap-set compilation-mode-map
-    "g f" #'next-error-follow-minor-mode
-    "Z Q" #'kill-compilation)
+    "g f" 'next-error-follow-minor-mode
+    "Z Q" 'kill-compilation)
 
   (hel-advice-add 'compile-goto-error :around #'hel-jump-command-a))
 
@@ -455,8 +457,8 @@ If cursor is in read-only area, jump to prompt instead of deleting."
 (with-eval-after-load 'grep
   ;; `grep-mode-map' is inherited from `compilation-minor-mode-map'
   (hel-keymap-set grep-mode-map
-    "i"   #'wgrep-change-to-wgrep-mode
-    "g f" #'next-error-follow-minor-mode))
+    "i"   'wgrep-change-to-wgrep-mode
+    "g f" 'next-error-follow-minor-mode))
 
 ;;;;; wgrep
 
@@ -520,7 +522,7 @@ If cursor is in read-only area, jump to prompt instead of deleting."
     "J" 'undefined)
 
   (hel-keymap-set wdired-mode-map
-    "<remap> <save-buffer>" #'wdired-finish-edit
+    "<remap> <save-buffer>" 'wdired-finish-edit
     "C-g" 'wdired-abort-changes)
 
   (put 'wdired--self-insert  'multiple-cursors t)
@@ -535,6 +537,8 @@ If cursor is in read-only area, jump to prompt instead of deleting."
 
   (hel-advice-add 'wdired-next-line     :before #'hel-deactivate-mark-a)
   (hel-advice-add 'wdired-previous-line :before #'hel-deactivate-mark-a))
+
+(declare-function wdired-exit "wdired")
 
 (hel-define-command helheim-wdired-exit ()
   :multiple-cursors t
@@ -618,7 +622,7 @@ If cursor is in read-only area, jump to prompt instead of deleting."
 ;;;; shortdoc
 
 (with-eval-after-load 'shortdoc
-  (keymap-set shortdoc-mode-map "y" #'shortdoc-copy-function-as-kill))
+  (keymap-set shortdoc-mode-map "y" 'shortdoc-copy-function-as-kill))
 
 ;;;; special-mode
 
@@ -679,22 +683,22 @@ If cursor is in read-only area, jump to prompt instead of deleting."
           (defun hel-setup-winner-mode-keys ()
             (when winner-mode
               (hel-keymap-set hel-window-map
-                "u" #'winner-undo
-                "U" #'winner-redo))))
+                "u" 'winner-undo
+                "U" 'winner-redo))))
 
 (add-hook 'tab-bar-history-mode-hook
           (defun hel-setup-tab-bar-history-mode-keys ()
             (when tab-bar-history-mode
               (hel-keymap-set hel-window-map
-                "u" #'tab-bar-history-back
-                "U" #'tab-bar-history-forward))))
+                "u" 'tab-bar-history-back
+                "U" 'tab-bar-history-forward))))
 
 ;;;; VC
 
 (with-eval-after-load 'log-view
   (hel-keymap-set log-view-mode-map
-    "j" #'log-view-msg-next
-    "k" #'log-view-msg-prev))
+    "j" 'log-view-msg-next
+    "k" 'log-view-msg-prev))
 
 ;;;; which-key
 
