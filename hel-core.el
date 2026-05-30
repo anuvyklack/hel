@@ -647,7 +647,8 @@ KEY / DEFINITION pairs.
   "Update the main cursor appearence in current buffer according to
 current Hel state."
   (when (eq (window-buffer) (current-buffer))
-    (when-let* ((x (hel-state-property hel-state :cursor)))
+    (when-let* ((hel-local-mode)
+                (x (hel-state-property hel-state :cursor)))
       (if (proper-list-p x)
           (-each x #'hel-set-cursor)
         (funcall #'hel-set-cursor x)))))
