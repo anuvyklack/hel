@@ -745,19 +745,19 @@ and which for all to `hel-whitelist-file' file."
                         (setq real-cursor? t))
                        ((/= id i)
                         (push i for-deletion))))
-          (pcase id
-            (0 (hel-set-region beg end dir))
-            (_ (when-let* ((cursor (gethash id hel--cursors-table)))
-                 (cond (real-cursor?
-                        (hel-restore-point-from-fake-cursor cursor)
-                        (hel-set-region beg end dir))
-                       ((< dir 0)
-                        (hel-move-fake-cursor cursor beg end))
-                       (t
-                        (hel-move-fake-cursor cursor end beg))))))
-          (dolist (id for-deletion)
-            (when-let* ((cursor (gethash id hel--cursors-table)))
-              (hel--delete-fake-cursor cursor)))))
+        (pcase id
+          (0 (hel-set-region beg end dir))
+          (_ (when-let* ((cursor (gethash id hel--cursors-table)))
+               (cond (real-cursor?
+                      (hel-restore-point-from-fake-cursor cursor)
+                      (hel-set-region beg end dir))
+                     ((< dir 0)
+                      (hel-move-fake-cursor cursor beg end))
+                     (t
+                      (hel-move-fake-cursor cursor end beg))))))
+        (dolist (id for-deletion)
+          (when-let* ((cursor (gethash id hel--cursors-table)))
+            (hel--delete-fake-cursor cursor)))))
     (hel-auto-multiple-cursors-mode)))
 
 (defun hel--overlapping-regions ()
