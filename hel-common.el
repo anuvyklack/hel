@@ -982,8 +982,8 @@ BEG, END position and done the indentation."
          (hel-save-region
            (hel-expand-selection-to-full-lines)
            (dotimes (_ count)
-             (funcall indent-function (region-beginning) (region-end)))
-           (hel-extend-selection -1)))
+             (funcall indent-function (region-beginning) (region-end))))
+         (hel-extend-selection -1))
         (t
          (-let [(beg . end) (bounds-of-thing-at-point 'hel-line)]
            (dotimes (_ count)
