@@ -27,13 +27,23 @@
 
 ;; ESC in normal state
 (hel-define-command hel-normal-state-escape ()
-  "Command for ESC key in Hel Normal state."
+  (format "Command for ESC key in Hel Normal state.
+Execute in order:
+- Disable extending selection (enabled with %s command);
+- Deactivate the region;
+- Disable search results highlighting."
+          (propertize "v" 'face 'help-key-binding))
   :multiple-cursors t
   (interactive)
   (cond (hel--extend-selection
          (hel-extend-selection -1))
-        (t
-         (deactivate-mark))))
+        ((region-active-p)
+         (deactivate-mark))
+        (hel-search--session
+         (hel-search-session-cleanup hel-search--session)
+         (setq hel-search--session nil
+               hel-search--current nil
+               hel-search--total nil))))
 
 ;;; Motions
 
@@ -885,9 +895,15 @@ When called interactively — toggle extending selection."
   "Deactivate selection."
   :multiple-cursors t
   (interactive)
-  (if hel--extend-selection
-      (set-mark (point))
-    (deactivate-mark)))
+  (cond (hel--extend-selection
+         (set-mark (point)))
+        ((use-region-p)
+         (deactivate-mark))
+        (hel-search--session
+         (hel-search-session-cleanup hel-search--session)
+         (setq hel-search--session nil
+               hel-search--current nil
+               hel-search--total nil))))
 
 ;; x
 (hel-define-command hel-expand-line-selection (count)
@@ -965,6 +981,8 @@ entered regexp withing current selections."
                               (hel-create-fake-cursor point mark)))
             ;; Else restore original cursors.
             (hel-place-cursors cursors-positions)))))
+    (hel-search--commit-folds (->> (hel-cursors-positions)
+                                   (-map #'car)))
     (hel-auto-multiple-cursors-mode)))
 
 ;; S
@@ -1661,112 +1679,6 @@ keys to repeat motion forward/backward."
     (hel-maybe-set-mark)
     (hel-motion-loop (dir count)
       (hel-find-char char dir t))))
-
-;; /
-(hel-define-command hel-search-forward (count)
-  :multiple-cursors nil
-  :merge-selections t
-  (interactive "p")
-  (when (hel-search-interactively)
-    (setq hel-search--direction 1)
-    (hel-search-next count)))
-
-;; ?
-(hel-define-command hel-search-backward (count)
-  :multiple-cursors nil
-  :merge-selections t
-  (interactive "p")
-  (when (hel-search-interactively -1)
-    (setq hel-search--direction -1)
-    (hel-search-next count)))
-
-;; n
-(hel-define-command hel-search-next (count)
-  "Select next COUNT search match."
-  :multiple-cursors nil
-  :merge-selections t
-  (interactive "p")
-  (unless hel-search--direction (setq hel-search--direction 1))
-  (when (< hel-search--direction 0)
-    (cl-callf - count))
-  (let ((regexp (hel-search-pattern))
-        (region-dir (if (use-region-p) (hel-region-direction) 1)))
-    (hel-recenter-point-on-jump
-      (hel-motion-loop (search-dir count)
-        (-when-let ((beg . end) (save-excursion
-                                  (helf-search--search regexp search-dir)))
-          ;; Push mark on first invocation.
-          (unless (or (memq last-command '(hel-search-next hel-search-previous))
-                      (hel-search--keep-highlight-p last-command))
-            (hel-push-point))
-          (when (and hel--extend-selection (use-region-p))
-            (hel-create-fake-cursor-from-point))
-          (hel-set-region beg end region-dir))))
-    (hel-highlight-search-pattern regexp)))
-
-;; N
-(hel-define-command hel-search-previous (count)
-  "Select previous COUNT search match."
-  :multiple-cursors nil
-  :merge-selections t
-  (interactive "p")
-  (hel-search-next (- count)))
-
-;; *
-(hel-define-command hel-construct-search-pattern ()
-  "Construct search pattern from all current selections and store it to / register.
-Auto-detect word boundaries at the beginning and end of the search pattern."
-  :multiple-cursors nil
-  (interactive)
-  (let ((quote-fn (if hel-use-pcre-regex #'rxt-quote-pcre #'regexp-quote))
-        patterns)
-    (hel-with-each-cursor
-      (when (use-region-p)
-        (let* ((beg (region-beginning))
-               (end (region-end))
-               (open-word-boundary
-                (cond ((eql beg (pos-bol))
-                       (->> (buffer-substring-no-properties beg (1+ beg))
-                            (string-match-p "[[:word:]]")))
-                      (t
-                       (->> (buffer-substring-no-properties (1- beg) (1+ beg))
-                            (string-match-p "[^[:word:]][[:word:]]")))))
-               (close-word-boundary
-                (cond ((eql end (pos-eol))
-                       (->> (buffer-substring-no-properties (1- end) end)
-                            (string-match-p "[[:word:]]")))
-                      (t
-                       (->> (buffer-substring-no-properties (1- end) (1+ end))
-                            (string-match-p "[[:word:]][^[:word:]]")))))
-               (string (->> (buffer-substring-no-properties (point) (mark))
-                            (funcall quote-fn))))
-          (push (concat (if open-word-boundary "\\b")
-                        string
-                        (if close-word-boundary "\\b"))
-                patterns))))
-    (setq patterns (nreverse (-uniq patterns)))
-    (let* ((separator (if hel-use-pcre-regex "|" "\\|"))
-           (regexp (apply #'concat (-interpose separator patterns))))
-      (hel-add-to-regex-history regexp)
-      (hel-highlight-search-pattern regexp))))
-
-;; M-*
-(hel-define-command hel-construct-search-pattern-no-bounds ()
-  "Construct search pattern from all current selection and store it to / register.
-Do not auto-detect word boundaries in the search pattern."
-  :multiple-cursors nil
-  (interactive)
-  (let ((quote (if hel-use-pcre-regex #'rxt-quote-pcre #'regexp-quote))
-        patterns)
-    (hel-with-each-cursor
-      (when (use-region-p)
-        (push (funcall quote (buffer-substring-no-properties (point) (mark)))
-              patterns)))
-    (cl-callf nreverse patterns)
-    (let* ((separator (if hel-use-pcre-regex "|" "\\|"))
-           (regexp (apply #'concat (-interpose separator patterns))))
-      (hel-add-to-regex-history regexp)
-      (hel-highlight-search-pattern regexp))))
 
 ;;; Surround
 

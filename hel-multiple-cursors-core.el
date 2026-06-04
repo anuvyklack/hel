@@ -173,7 +173,7 @@ This function is the guts of the `hel-create-fake-cursor'."
     (let ((cursor (hel--set-cursor-overlay nil point)))
       (overlay-put cursor 'id id)
       (overlay-put cursor 'type 'fake-cursor)
-      (overlay-put cursor 'priority 100)
+      (overlay-put cursor 'priority 101)
       (hel--store-cursor-state cursor point mark)
       (hel--set-fake-region-overlay cursor)
       (puthash id cursor hel--cursors-table)
@@ -267,7 +267,8 @@ Return CURSOR."
                          (overlay-put 'face 'region)
                          (overlay-put 'type 'fake-region)
                          (overlay-put 'id (overlay-get cursor 'id))
-                         (overlay-put 'priority 1)))
+                         ;; The same as Emacs native region overlay.
+                         (overlay-put 'priority 100)))
           (overlay-put cursor 'fake-region region))
       ;; else
       (hel--delete-fake-region-overlay cursor))))
@@ -578,7 +579,6 @@ Restore it after BODY evaluation if it is still alive."
 No need to activate it manually: it is activated automatically when you create
 first fake cursor with `hel-create-fake-cursor', and disabled when you
 delete last one with `hel-delete-fake-cursor'."
-  :global nil
   :interactive nil
   :keymap (make-sparse-keymap)
   (if hel-multiple-cursors-mode
@@ -619,11 +619,6 @@ in the buffer."
     (dolist (mode hel--temporarily-disabled-minor-modes)
       (funcall mode 1))
     (setq hel--temporarily-disabled-minor-modes nil)))
-
-(defun hel-multiple-cursors--indicator ()
-  (when hel-multiple-cursors-mode
-    (format hel-multiple-cursors-mode-line-indicator
-            (hel-number-of-cursors))))
 
 ;;; Merge overlapping regions
 

@@ -130,7 +130,7 @@
           (add-hook 'minibuffer-setup-hook #'hel-local-mode))
         (add-hook 'window-buffer-change-functions #'hel--fundamental-mode-hack)
         (add-hook 'window-configuration-change-hook #'hel-update-cursor)
-        (add-to-list 'mode-line-misc-info '(:eval (hel-multiple-cursors--indicator))))
+        (add-to-list 'mode-line-misc-info 'hel-mode-line-info))
     ;; else
     (cl-loop for (fun _how advice) in hel--advices
              do (advice-remove fun advice))
@@ -309,6 +309,7 @@ STATE is the state's symbolic name."
                  thereis (hel-initial-state-for-mode mode))
         ;; Check major mode
         (hel-initial-state-for-mode major-mode t)
+        (setq hel-mode-map-alist nil)
         (if (hel-letters-are-self-insert-p) 'normal 'motion))))
 
 (defun hel-initial-state-for-mode (mode &optional follow-parent checked-modes)

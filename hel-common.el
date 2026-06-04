@@ -1180,14 +1180,13 @@ logical line on desired end of the region."
 
 (defsubst hel-distance (x y) (abs (- y x)))
 
-(cl-defun hel-search (string &optional (direction 1) limit regexp? visible?)
+(cl-defun hel-search (string &optional (direction 1) bound regexp? visible?)
   "Search for STRING toward the DIRECTION.
 
-DIRECTION can be either 1 — search forward, or -1 — search backward.
+DIRECTION: 1 — search forward, -1 — search backward.
 
-LIMIT optionally bounds the search. It should be a position that
-is *after* the point if DIRECTION is positive, and *before* the
-point — if negative.
+BOUND is a buffer position that bounds the search toward the DIRECTION.
+The match found must not end after that position.
 
 If REGEXP? is non-nil STRING will considered a regexp pattern,
 otherwise — literally.
@@ -1197,27 +1196,14 @@ If VISIBLE? is non-nil skip invisible matches.
 When REGEXP? is non-nil this function modifies the match data
 that `match-beginning', `match-end' and `match-data' access."
   (when-let* ((result (if regexp?
-                          (re-search-forward string limit t direction)
-                        (search-forward string limit t direction))))
+                          (re-search-forward string bound t direction)
+                        (search-forward string bound t direction))))
     (if (and visible?
+             ;; TODO
              (or (invisible-p (match-beginning 0))
                  (invisible-p (1- (match-end 0)))))
-        (hel-search string direction limit regexp? visible?)
+        (hel-search string direction bound regexp? visible?)
       result)))
-
-(defun hel-re-search-with-wrap (regexp &optional direction)
-  "Search REGEXP from the point toward the DIRECTION.
-If nothing found, wrap around the buffer and search up to the point."
-  (or direction (setq direction 1))
-  (when (and (use-region-p)
-             (/= direction (hel-region-direction)))
-    (goto-char (mark-marker)))
-  (or (re-search-forward regexp nil t direction)
-      ;; If nothing found — wrap around buffer end and try again.
-      (let ((point (point)))
-        (goto-char (if (< direction 0) (point-max) (point-min)))
-        (if (re-search-forward regexp point t direction)
-            (message "Wrapped around buffer")))))
 
 (cl-defun hel-looking-at (string &optional (direction 1) regexp?)
   "Return t if text directly after point toward the DIRECTION
@@ -1228,21 +1214,15 @@ otherwise it will be searched literally.
 
 When REGEXP? is non-nil this function modifies the match data
 that `match-beginning', `match-end' and `match-data' access."
-  (cond ((and regexp? (< 0 direction))
-         (looking-at string))
-        ((and regexp? (< direction 0))
-         (looking-back string (line-beginning-position)))
-        ((< 0 direction)
-         (let* ((pnt (point))
-                (pos (+ pnt (length string))))
-           (and (<= pos (point-max))
-                (string-equal (buffer-substring-no-properties pnt pos) string))))
-        ((< direction 0)
-         (let* ((pnt (point))
-                (pos (- pnt (length string))))
-           (and (<= (point-min) pos)
-                (string-equal (buffer-substring-no-properties pos pnt)
-                              string))))))
+  (if regexp?
+      (if (< 0 direction)
+          (looking-at string)
+        (looking-back string (line-beginning-position)))
+    ;; literall
+    (let* ((beg (point))
+           (end (+ beg (* (length string) direction))))
+      (and (<= (point-min) end (point-max))
+           (string-equal (buffer-substring-no-properties beg end) string)))))
 
 (defun hel-string-ends-with-newline (string)
   "Return t if STRING ends with newline character."
@@ -1339,29 +1319,15 @@ the returned list to the original symbol like this:
               tail (cdr tail))))
     list))
 
-(defun hel-echo (str &optional face)
-  "Show message in echo area."
-  (when face
-    (cl-callf propertize str 'face face))
-  (message "%s" str))
-
 (defun hel-pcre-to-elisp (regexp)
   "Convert PCRE REGEXP into Elisp one if Hel configured to use PCRE syntax."
   (if hel-use-pcre-regex
       (condition-case err
           (pcre-to-elisp regexp)
         (rxt-invalid-regexp
-         (hel-echo (error-message-string err) 'error)))
+         (message (-> (error-message-string err)
+                      (propertize 'face 'error)))))
     regexp))
-
-(defun hel-match-bounds ()
-  "Return cons cell with bounds of the first match group in `match-data'.
-If there were no match groups in the last used regexp — return the bounds
-of the full regexp match."
-  (cond ((match-beginning 1)
-         (cons (match-beginning 1) (match-end 1)))
-        (t
-         (cons (match-beginning 0) (match-end 0)))))
 
 (cl-defun hel-collect-positions (fun &optional (start (window-start))
                                                (end (window-end)))

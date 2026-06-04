@@ -137,7 +137,7 @@ Hel is in Motion state. All other attributes are ignored."
 
 (defface hel-normal-state-fake-cursor
   '((t :foreground "black"
-       :background "red"))
+       :background "#ea0064"))
   "Face for fake cursors when Hel is in Normal state."
   :group 'hel)
 
@@ -149,10 +149,6 @@ Hel is in Motion state. All other attributes are ignored."
 
 (defface hel-search-highlight '((t :inherit lazy-highlight))
   "Face for lazy highlighting all matches during search."
-  :group 'hel)
-
-(defface hel-mode-line-cursors-indicator '((t :inherit warning))
-  "Face for indicator with active cursors number in mode lilne."
   :group 'hel)
 
 ;;; Customizable variables
@@ -170,15 +166,25 @@ Hel is in Motion state. All other attributes are ignored."
            (remove-hook 'minibuffer-setup-hook 'hel-local-mode))))
 
 (defcustom hel-use-pcre-regex t
-  "If non-nil use PCRE regexp syntax instead of Emacs one."
+  "If non-nil use PCRE regexp syntax instead of Emacs regular expressions."
   :type 'integer
   :group 'hel)
 
-(defcustom hel-multiple-cursors-mode-line-indicator
-  #("  Cursors: %s " 1 14 (face hel-mode-line-cursors-indicator))
-  "What to display in the mode line while `hel-multiple-cursors-mode' is active."
-  :type '(choice string (const nil))
+(defcustom hel-mode-line-info
+  '((hel-multiple-cursors-mode
+     (:eval (-> (format " %s cursors " (hel-number-of-cursors))
+                (propertize 'face 'mode-line-emphasis))))
+    (hel-search--current
+     (:eval (-> (format " %s/" hel-search--current)
+                (propertize 'face 'mode-line-emphasis)))
+     (-> " " (propertize 'face 'mode-line-emphasis)))
+    (hel-search--total
+     (:eval (-> (format "%s " hel-search--total)
+                (propertize 'face 'mode-line-emphasis)))
+     (-> " " (propertize 'face 'mode-line-emphasis))))
+  ""
   :group 'hel)
+(put 'hel-mode-line-info 'risky-local-variable t)
 
 (defcustom hel-regex-history-max 16
   "Maximum length of regexp search ring before oldest elements are thrown away."
@@ -530,6 +536,11 @@ multiple cursors.")
 (hel-defvar-local hel--cursors-positions-history nil)
 
 (hel-defvar-local hel--input-cache nil)
+
+(hel-defvar-local hel-search--direction nil)
+(hel-defvar-local hel-search--session nil)
+(hel-defvar-local hel-search--current nil)
+(hel-defvar-local hel-search--total nil)
 
 (hel-defvar-local hel--narrowed-base-buffer nil)
 
