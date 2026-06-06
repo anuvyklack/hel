@@ -1116,7 +1116,7 @@ that `match-beginning', `match-end' and `match-data' access."
     (if (and visible?
              (or (invisible-p (match-beginning 0))
                  (invisible-p (1- (match-end 0)))))
-        (hel-search string limit regexp? visible?)
+        (hel-search string direction limit regexp? visible?)
       result)))
 
 (defun hel-re-search-with-wrap (regexp &optional direction)
