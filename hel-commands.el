@@ -830,26 +830,28 @@ With \\[universal-argument] paste the last coppied multiple selections from the
     (hel-invert-case-in-region (point) (1+ (point)))))
 
 ;; ` or gu
-(hel-define-command hel-downcase ()
+(hel-define-command hel-downcase (count)
   "Convert text in selection to lower case.
-With no selection downcase the character after point."
+With no selection downcase COUNT characters after point."
   :multiple-cursors t
-  (interactive "*")
+  (interactive "*p")
   (if (use-region-p)
       (let ((deactivate-mark nil))
         (downcase-region (region-beginning) (region-end)))
-    (downcase-region (point) (progn (forward-char) (point)))))
+    (save-excursion
+      (downcase-region (point) (progn (forward-char count) (point))))))
 
 ;; M-` or gU
-(hel-define-command hel-upcase ()
+(hel-define-command hel-upcase (count)
   "Convert text in selection to upper case.
-With no selection upcase the character after point."
+With no selection upcase COUNT characters after point."
   :multiple-cursors t
-  (interactive "*")
+  (interactive "*p")
   (if (use-region-p)
       (let ((deactivate-mark nil))
         (upcase-region (region-beginning) (region-end)))
-    (upcase-region (point) (progn (forward-char) (point)))))
+    (save-excursion
+      (upcase-region (point) (progn (forward-char count) (point))))))
 
 ;;; Selections
 

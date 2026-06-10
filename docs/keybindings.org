@@ -197,7 +197,11 @@ All keys available in Motion state are also work in Normal state.
 
 - =~= :: Invert case of characters.
 
-- =`= / =M-`= or =gu= / =gU= :: Convert selection to *lower* / *upper* case.
+- =`= / =M-`= or =gu= / =gU= ::
+  Convert selection to *lower* / *upper* case. With no selection convert count
+  characters after cursor. (Useful, for example, when you want to capitalize
+  only the first letter of a word — place cursor before word and press =gU=
+  with no selection.)
 
 - =] SPC= / =[ SPC= :: Add empty line *bellow* / *above* the current line.
 
