@@ -87,6 +87,9 @@ use it."
   "[ ." #'hel-mark-sentence-backward
   "] e" #'next-error
   "[ e" #'previous-error
+  ;; Because page boudaries are displayed as ^L.
+  "] l" #'forward-page
+  "[ l" #'backward-page
 
   ;; Easymotion / Avy
   "g w" #'hel-avy-word-forward

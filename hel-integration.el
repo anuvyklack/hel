@@ -624,6 +624,11 @@ If cursor is in read-only area, jump to prompt instead of deleting."
   "]" #'next-buffer
   "[" #'previous-buffer)
 
+;;;; page
+
+(hel-advice-add 'forward-page  :around #'hel-jump-command-a)
+(hel-advice-add 'backward-page :around #'hel-jump-command-a)
+
 ;;;; shortdoc
 
 (with-eval-after-load 'shortdoc
