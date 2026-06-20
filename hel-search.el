@@ -187,68 +187,6 @@ window edge toward DIRECTION (whole window when nil). Ignored if BOUNDS is set."
                                (hel-highlight-overlays hl)))
       ranges)))
 
-;;;; Find char: f F t T
-
-(defun hel-find-char (char direction exclusive?)
-  (let* ((case (let (case-fold-search)
-                 (not (string-match-p "[A-Z]" (char-to-string char)))))
-         (pattern (pcase char
-                    (?\t "\t") ;; TAB
-                    ((or ?\r ?\n) "\n") ;; RET
-                    ;; (?\e) ;; ESC
-                    ;; (?\d) ;; DEL <backspace>
-                    ;; (_ (char-fold-to-regexp (char-to-string char)))
-                    (_ (regexp-quote (char-to-string char)))))
-         (hl (hel-highlight-create :buffer (current-buffer)
-                                   :regexp pattern
-                                   :face 'hel-search-highlight))
-         (case-fold-search case)
-         (deactivate-mark nil))
-    (cl-flet ((search (dir)
-                (let ((case-fold-search case))
-                  (if exclusive?
-                      (cond ((<= 0 dir direction) ;; t n
-                             (forward-char))
-                            ((<= dir direction 0) ;; T n
-                             (backward-char)))
-                    ;; else
-                    (cond ((< dir 0 direction) ;; f N
-                           (backward-char))
-                          ((< direction 0 dir) ;; F N
-                           (forward-char))))
-                  ;; Search through folds (visible? nil): on a match inside a
-                  ;; closed overlay fold, `hel-search--reveal-position' below
-                  ;; opens it. Passing visible? non-nil would skip folded
-                  ;; matches and hit a latent arg-misalignment in `hel-search'.
-                  (if (hel-search pattern dir nil t)
-                      (prog1 t
-                        (setf (hel-highlight-direction hl) dir)
-                        (save-match-data
-                          (hel-highlight-update hl))
-                        (if exclusive?
-                            (cond ((<= 0 dir direction) ;; t n
-                                   (backward-char))
-                                  ((<= dir direction 0) ;; T n
-                                   (forward-char)))
-                          ;; not exclusive?
-                          (cond ((< dir 0 direction) ;; f N
-                                 (forward-char))
-                                ((< direction 0 dir) ;; F N
-                                 (backward-char))))
-                        ;; Reveal the fold at the landing position.
-                        (hel-search--reveal-position (point)))
-                    ;; else
-                    (prog1 nil
-                      (hel-highlight-cleanup hl))))))
-      (when (search direction)
-        (let ((next (lambda () (interactive) (search direction)))
-              (prev (lambda () (interactive) (search (- direction))))
-              (on-exit (lambda () (hel-highlight-cleanup hl))))
-          (set-transient-map (define-keymap
-                               "n" next
-                               "N" prev)
-                             t on-exit))))))
-
 ;;; New
 ;;;; Customization
 
@@ -1091,6 +1029,131 @@ If INVERT is non-nil — remove selections that match regexp."
             (hel--set-cursor-overlay cursor (overlay-get cursor 'point))
             (-> (overlay-get cursor 'fake-region)
                 (overlay-put 'face 'region))))))))
+
+;;;; Find char: f F t T
+
+;; f
+(hel-define-command hel-find-char-forward ()
+  "Prompt user for CHAR and move to the next occurrence of it.
+Right after this command while hints are active, you can use `n' and `N'
+keys to repeat motion forward/backward."
+  :multiple-cursors t
+  :merge-selections hel--extend-selection
+  (interactive)
+  (hel-maybe-set-mark)
+  (hel-find-char (read-char "f" t) 1 nil))
+
+;; F
+(hel-define-command hel-find-char-backward ()
+  "Prompt user for CHAR and move to the previous occurrence of it.
+Right after this command while hints are active, you can use `n' and `N'
+keys to repeat motion forward/backward."
+  :multiple-cursors t
+  :merge-selections hel--extend-selection
+  (interactive)
+  (hel-maybe-set-mark)
+  (hel-find-char (read-char "F" t) -1 nil))
+
+;; t
+(hel-define-command hel-till-char-forward ()
+  "Prompt user for CHAR and move before the next occurrence of it.
+Right after this command while hints are active, you can use `n' and `N'
+keys to repeat motion forward/backward."
+  :multiple-cursors t
+  :merge-selections hel--extend-selection
+  (interactive)
+  (hel-maybe-set-mark)
+  (hel-find-char (read-char "t" t) 1 t))
+
+;; T
+(hel-define-command hel-till-char-backward ()
+  "Prompt user for CHAR and move before the prevous occurrence of it.
+Right after this command while hints are active, you can use `n' and `N'
+keys to repeat motion forward/backward."
+  :multiple-cursors t
+  :merge-selections hel--extend-selection
+  (interactive)
+  (hel-maybe-set-mark)
+  (hel-find-char (read-char "T" t) -1 t))
+
+
+(defun hel-find-char (char direction exclusive?)
+  (let* ((case (let (case-fold-search)
+                 (not (string-match-p "[A-Z]" (char-to-string char)))))
+         (case-fold-search case)
+         (deactivate-mark nil)
+         (regexp (pcase char
+                   (?\t "\t") ;; TAB
+                   ((or ?\r ?\n) "\n") ;; RET
+                   ;; (?\e) ;; ESC
+                   ;; (?\d) ;; DEL <backspace>
+                   ;; (_ (char-fold-to-regexp (char-to-string char)))
+                   (_ (regexp-quote (char-to-string char)))))
+         overlays)
+    (cl-flet*
+        ((next (&optional (dir direction))
+           (interactive)
+           (if exclusive?
+               (cond ((<= 0 dir direction) ;; t n
+                      (forward-char))
+                     ((<= dir direction 0) ;; T n
+                      (backward-char)))
+             ;; else
+             (cond ((< dir 0 direction) ;; f N
+                    (backward-char))
+                   ((< direction 0 dir) ;; F N
+                    (forward-char))))
+           (-each overlays #'delete-overlay)
+           (when (hel-find-char--search regexp dir)
+             (setq overlays (hel-find-char--highlight regexp dir))
+             (if exclusive?
+                 (cond ((<= 0 dir direction) ;; t n
+                        (backward-char))
+                       ((<= dir direction 0) ;; T n
+                        (forward-char)))
+               ;; not exclusive?
+               (cond ((< dir 0 direction) ;; f N
+                      (forward-char))
+                     ((< direction 0 dir) ;; F N
+                      (backward-char))))
+             ;; Open fold at the landing position.
+             (-each (overlays-at (point)) #'hel-open-overlay)
+             t))
+         (previous ()
+           (interactive)
+           (next (- direction)))
+         (on-exit ()
+           (-each overlays #'delete-overlay)))
+      ;; main
+      (when (next direction)
+        (set-transient-map (define-keymap
+                             "n" #'next
+                             "N" #'previous)
+                           t #'on-exit)))))
+
+(defun hel-find-char--search (regexp dir)
+  (let ((limit (if (< dir 0) (window-start) (window-end)))
+        (found nil))
+    (while (and (not found)
+                (re-search-forward regexp limit t dir))
+      (if (hel-range-visible? (match-beginning 0) (match-end 0))
+          (setq found t)))
+    found))
+
+(defun hel-find-char--highlight (regexp dir)
+  (save-excursion
+    (save-match-data
+      (let ((limit (if (< dir 0) (window-start) (window-end)))
+            (i 0)
+            overlays)
+        (while (and (< i 16)
+                    (re-search-forward regexp limit t dir))
+          (unless (invisible-p (point))
+            (cl-incf i)
+            (push (-doto (make-overlay (match-beginning 0) (match-end 0) nil t nil)
+                    (overlay-put 'face 'lazy-highlight))
+                  overlays)))
+        overlays))))
 
 ;;; .
 (provide 'hel-search)

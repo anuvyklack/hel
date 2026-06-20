@@ -1566,62 +1566,6 @@ already there."
     (-let [(beg _ _ end) bounds]
       (hel-set-region beg end))))
 
-;;; Search
-
-;; f
-(hel-define-command hel-find-char-forward (count)
-  "Prompt user for CHAR and move to the next COUNT'th occurrence of it.
-Right after this command while hints are active, you can use `n' and `N'
-keys to repeat motion forward/backward."
-  :multiple-cursors t
-  :merge-selections hel--extend-selection
-  (interactive "p")
-  (let ((char (read-char "f" t)))
-    (hel-maybe-set-mark)
-    (hel-motion-loop (dir count)
-      (hel-find-char char dir nil))))
-
-;; F
-(hel-define-command hel-find-char-backward (count)
-  "Prompt user for CHAR and move to the previous COUNT'th occurrence of it.
-Right after this command while hints are active, you can use `n' and `N'
-keys to repeat motion forward/backward."
-  :multiple-cursors t
-  :merge-selections hel--extend-selection
-  (interactive "p")
-  (cl-callf - count)
-  (let ((char (read-char "F" t)))
-    (hel-maybe-set-mark)
-    (hel-motion-loop (dir count)
-      (hel-find-char char dir nil))))
-
-;; t
-(hel-define-command hel-till-char-forward (count)
-  "Prompt user for CHAR and move before the next COUNT'th occurrence of it.
-Right after this command while hints are active, you can use `n' and `N'
-keys to repeat motion forward/backward."
-  :multiple-cursors t
-  :merge-selections hel--extend-selection
-  (interactive "p")
-  (let ((char (read-char "t" t)))
-    (hel-maybe-set-mark)
-    (hel-motion-loop (dir count)
-      (hel-find-char char dir t))))
-
-;; T
-(hel-define-command hel-till-char-backward (count)
-  "Prompt user for CHAR and move before the prevous COUNT'th occurrence of it.
-Right after this command while hints are active, you can use `n' and `N'
-keys to repeat motion forward/backward."
-  :multiple-cursors t
-  :merge-selections hel--extend-selection
-  (interactive "p")
-  (cl-callf - count)
-  (let ((char (read-char "T" t)))
-    (hel-maybe-set-mark)
-    (hel-motion-loop (dir count)
-      (hel-find-char char dir t))))
-
 ;;; Surround
 
 ;; ms
