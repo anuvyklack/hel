@@ -612,7 +612,7 @@ Do not auto-detect word boundaries in the search pattern."
       (-each (hel-all-fake-cursors) #'hel--delete-fake-cursor)
       (setq hel--extend-selection nil)
       (if (setq regions (hel-select-interactively-in-regions regions invert))
-          (progn
+          (hel-recenter-point-on-jump
             ;; Real cursor
             (-let [(start . end) (car regions)]
               (hel-set-region start end)
