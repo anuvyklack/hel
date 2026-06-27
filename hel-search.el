@@ -275,7 +275,7 @@ Run search session if REGEXP is provided."
 (defun hel-search-session--highlight-overlay (start end)
   ;; Bug#77121: highlight overlays must be non-sticky at both ends.
   (-doto (make-overlay start end nil t nil)
-    (overlay-put 'face 'lazy-highlight)
+    (overlay-put 'face 'hel-search-highlight)
     (overlay-put 'priority '(nil . 50))
     (overlay-put 'modification-hooks '(hel--delete-overlay-on-modification-h))))
 
@@ -943,7 +943,7 @@ keys to repeat motion forward/backward."
           (unless (invisible-p (point))
             (cl-incf i)
             (push (-doto (make-overlay (match-beginning 0) (match-end 0) nil t nil)
-                    (overlay-put 'face 'lazy-highlight))
+                    (overlay-put 'face 'hel-search-highlight))
                   overlays)))
         overlays))))
 
