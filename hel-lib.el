@@ -1476,7 +1476,8 @@ REST contains all other elements."
   (hel-recenter-point-on-jump
     (prog1 (apply command args)
       ;; We can land in another buffer, so deactivate mark there as well.
-      (deactivate-mark))))
+      (deactivate-mark)
+      (-each (overlays-at (point)) #'hel-open-overlay))))
 
 (defun hel-switch-to-insert-state-a (&rest _)
   "Switch Hel into Insert state.
