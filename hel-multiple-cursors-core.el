@@ -321,13 +321,13 @@ Return CURSOR."
   (delete-overlay overlay))
 
 (defun hel-hide-fake-cursor (cursor)
-  "Disable the fake-CURSOR visibility in the buffer without deleting it."
+  "Disable the fake CURSOR visibility in the buffer without deleting it."
   (hel--delete-fake-region-overlay cursor)
   (delete-overlay cursor)
   cursor)
 
 (defun hel-show-fake-cursor (cursor)
-  "Restore fake-CURSOR visibility if it was previously hidden with
+  "Restore fake CURSOR visibility if it was previously hidden with
 `hel-hide-fake-cursor'."
   (hel--set-cursor-overlay cursor (overlay-get cursor 'point))
   (hel--set-fake-region-overlay cursor))

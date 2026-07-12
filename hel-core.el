@@ -224,7 +224,7 @@ Also two hooks are defined which are run each time Hel enter or exit STATE:
                    :modes        ,modes))
        ;; State function
        (defun ,symbol (&optional arg)
-         ,(format "Switch Hel into %s.
+         ,(format "Switch Hel to %s.
 When ARG is non-positive integer and Hel is in %s — disable it.\n\n%s"
                   state-name state-name doc)
          (interactive)
@@ -528,7 +528,7 @@ keymap will be ignored."
 
 ;;;###autoload (autoload 'hel-keymap-set "hel" nil t)
 (defun hel-keymap-set (keymap &rest args)
-  "Create keybinding from KEY to DEFINITION in KEYMAP.
+  "Bind KEY to DEFINITION in KEYMAP.
 
 STATE is an optional keyword argument that specifies the Hel state in
 which the keybindings will be active. Can be a symbol or list of symbols.

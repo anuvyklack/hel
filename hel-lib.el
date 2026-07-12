@@ -412,8 +412,8 @@ function prevents that. It is intended to be used as `:after' advice."
 
 (defun hel-split-keyword-args (args)
   "Split ARGS list into keyword-value pairs and remaining arguments.
-Returns a cons cell: (PLIST . REST)
-PLIST is a list with keyword-value pairs from the beginning of ARGS list.
+Returns a cons cell (PLIST . REST) where:
+PLIST is a list with keyword-value pairs from the beginning of ARGS list;
 REST contains all other elements."
   (let (plist)
     (while (keywordp (car-safe args))

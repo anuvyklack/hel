@@ -31,6 +31,8 @@ when `hel-mode' is toggled on or off."
 (defmacro hel-advice-add (symbol how function)
   "Wrapper around `advice-add' that automatically add/remove advice
 when `hel-mode' is toggled on or off"
+  (declare (indent defun)
+           (debug (symbolp keywordp symbolp)))
   `(progn
      (cl-pushnew (list ,symbol ,how ,function) hel--advices :test #'equal)
      (when hel-mode

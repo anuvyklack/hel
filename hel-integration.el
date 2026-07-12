@@ -660,7 +660,7 @@ If cursor is in read-only area, jump to prompt instead of deleting."
   "k"   #'previous-line
   "l"   #'right-char
   ;;
-  "g"   nil ; unbind `revert-buffer', we have it on "C-w r"
+  "g"   nil ; Unbind `revert-buffer' and convert to prefix.
   "g a" #'describe-char
   "g r" #'revert-buffer          ; also "C-w r"
   "g h" #'move-beginning-of-line ; native "C-a"
